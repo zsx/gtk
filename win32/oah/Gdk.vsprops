@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<VisualStudioPropertySheet
+	ProjectType="Visual C++"
+	Version="8.00"
+	Name="Gdk"
+	InheritedPropertySheets="$(OAH_INSTALLED_PATH)\vsprops\oah-PC.vsprops;.\GtkCommon.vsprops"
+	>
+	<Tool
+		Name="VCCLCompilerTool"
+		AdditionalIncludeDirectories="..\gdk;..\..\gdk;..\..\gdk\win32;..\..\gdk-pixbuf"
+		PreprocessorDefinitions="GDK_COMPILATION;INSIDE_GDK_WIN32;G_LOG_DOMAIN=\&quot;Gdk\&quot;;GDK_PIXBUF_DISABLE_DEPRECATED"
+	/>
+	<Tool
+		Name="VCLibrarianTool"
+		OutputFile="$(IntDir)\$(ProjectName).lib"
+	/>
+	<Tool
+		Name="VCLinkerTool"
+		AdditionalDependencies="libintl-proxy.lib imm32.lib"
+		ModuleDefinitionFile="$(IntDir)\gdk.def"
+	/>
+	<UserMacro
+		Name="GdkTarget"
+		Value="win32"
+	/>
+	<UserMacro
+		Name="OahTargetVersion"
+		Value="-$(GdkTarget)-$(GtkApiVersion)"
+	/>
+</VisualStudioPropertySheet>

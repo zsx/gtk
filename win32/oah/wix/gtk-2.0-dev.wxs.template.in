@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+	<Module Id="gtkdev" Version="@VERSION@.0" Language="1033">
+		<Package Id="{06E68DBA-FB4E-4188-B8BB-10F8E0F5B1AA}"
+				Description="Development package without source code, but includes: headers, import libraries, binaries and pkg-config files"
+				Manufacturer="Free Software Community" InstallerVersion="300" />
+
+		<Dependency RequiredId="gtk.8F8F3473_44AB_4711_99F0_5A68A0EEAC66" RequiredLanguage="0" RequiredVersion="@VERSION@" />
+		<Dependency RequiredId="wimp.1DE75694_42A1_4D6E_B3AB_41E0CC82D6E1" RequiredLanguage="0" RequiredVersion="@VERSION@" />
+
+		<Directory Id="TARGETDIR" Name="SourceDir">
+			<Directory Id="MODULE_DIR" Name=".">
+				<Directory Id="ModuleInclude" Name="include">
+					<Directory Id="GtkTopLevelInclude" Name="gtk-@API_VERSION@">
+						<Directory Id="GdkInclude" Name="gdk">
+							<Component Id="gdk_includes" Guid="{E8F1F7F4-06A3-45ec-8C42-790B8ADAB88B}">
+								%(include/gtk-@API_VERSION@/gdk_files)s
+							</Component>
+						</Directory>
+						<Directory Id="GdkPixbufInclude" Name="gdk-pixbuf">
+							<Component Id="gdk_pixbuf_includes" Guid="{5E8383D4-648F-4100-9DA9-A42E9947DD4D}">
+								%(include/gtk-@API_VERSION@/gdk-pixbuf_files)s
+							</Component>
+						</Directory>
+						<Directory Id="GtkInclude" Name="gtk">
+							<Component Id="gtk_includes" Guid="{5D4388CD-D019-4108-84EC-BE113C469373}">
+								%(include/gtk-@API_VERSION@/gtk_files)s
+							</Component>
+						</Directory>
+					</Directory>
+				</Directory>
+
+				<Directory Id="ModuleLib" Name="lib">
+					<Component Id="libs" Guid="{A81352D6-2800-4a2e-A4CF-D1B6143F2C03}">
+						%(lib_files)s
+					</Component>
+
+					<Directory Id="LibPkgConfig" Name="pkgconfig">
+						<Component Id="pcs" Guid="{1BC2B069-16F4-4fc4-BD82-636F8FD1887E}">
+							%(pc_files)s
+						</Component>
+					</Directory>
+
+					<Directory Id="LibGtk" Name="gtk-@API_VERSION@">
+						<Directory Id="LibGtkInclude" Name="include">
+							<Component Id="libgtkincludes" Guid="{A2AC7FF1-92A9-43b8-9891-0698A8C90214}">
+								%(lib/gtk-@API_VERSION@/include_files)s
+							</Component>
+						</Directory>
+					</Directory>
+				</Directory>
+
+				<Directory Id="ModuleRedist" Name="redist">
+					<Component Id="msms" Guid="{997FE744-3BAB-47b4-9FA8-0DE229834DBB}">
+						<File Id="gtk_@API_VERSION@.msm" Source="Win32\gtk-@API_VERSION@.msm" />
+						<File Id="wimp.msm" Source="Win32\wimp.msm" />
+					</Component>
+				</Directory>
+			</Directory>
+		</Directory>
+	</Module>
+</Wix>

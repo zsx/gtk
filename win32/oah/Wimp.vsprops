@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<VisualStudioPropertySheet
+	ProjectType="Visual C++"
+	Version="8.00"
+	Name="Wimp"
+	InheritedPropertySheets="$(OAH_INSTALLED_PATH)\vsprops\oah-PC.vsprops;.\GtkCommon.vsprops"
+	>
+	<Tool
+		Name="VCCLCompilerTool"
+		AdditionalIncludeDirectories="$(IntDir)\gtk;..\gtk;..\..\gtk;..\..\gdk"
+		PreprocessorDefinitions="GDK_DISABLE_DEPRECATED"
+	/>
+	<Tool
+		Name="VCLinkerTool"
+		OutputFile="$(OutDir)\lib\gtk-$(GtkApiVersion)\$(GtkBinaryVersion)\engines\$(ProjectName).dll"
+		ImportLibrary="$(OutDir)\lib\$(TargetName).lib"
+	/>
+</VisualStudioPropertySheet>

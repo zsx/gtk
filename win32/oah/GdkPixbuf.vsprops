@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<VisualStudioPropertySheet
+	ProjectType="Visual C++"
+	Version="8.00"
+	Name="GdkPixbuf"
+	InheritedPropertySheets="$(OAH_INSTALLED_PATH)\vsprops\oah-PC.vsprops;.\GtkCommon.vsprops"
+	>
+	<Tool
+		Name="VCCLCompilerTool"
+		AdditionalIncludeDirectories="..\gdk-pixbuf"
+		PreprocessorDefinitions="GDK_PIXBUF_ENABLE_BACKEND;G_LOG_DOMAIN=\&quot;GdkPixbuf\&quot;;INCLUDE_gdiplus;INCLUDE_gdip_png"
+	/>
+	<Tool
+		Name="VCLinkerTool"
+		AdditionalDependencies="libintl-proxy.lib"
+		ModuleDefinitionFile="$(IntDir)\gdk-pixbuf.def"
+	/>
+	<UserMacro
+		Name="OahTargetVersion"
+		Value="-$(GtkApiVersion)"
+	/>
+</VisualStudioPropertySheet>

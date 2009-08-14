@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+	<Module Id='gtk' Version='@VERSION@.0' Language="1033">
+		<Package Id="{8F8F3473-44AB-4711-99F0-5A68A0EEAC66}"
+				Description="A multi-platform toolkit for creating graphical user interfaces"
+				Manufacturer="Free Software Community" InstallerVersion="300" />
+
+		<Directory Id='TARGETDIR' Name='SourceDir'>
+			<Directory Id='MODULE_DIR' Name='.'>
+				<Directory Id="BinDir" Name="bin">
+					<Component Id="libgdk_pixbuf" Guid="{0D1C7EEE-9419-4c24-BC00-53C1053FDB73}">
+						<File Id="libgdk_pixbuf_@API_VERSION@.dll" Source="..\Win32\Release\bin\libgdk_pixbuf-@API_VERSION@.dll" />
+					</Component>
+					<Component Id="libgdk" Guid="{C68520A3-83C1-4c20-AC80-5FB5F088740E}">
+						<File Id="libgdk_win32_@API_VERSION@.dll" Source="..\Win32\Release\bin\libgdk-win32-@API_VERSION@.dll" />
+					</Component>
+					<Component Id="libgtk" Guid="{5604B682-ACB0-4c4e-9515-DBE37AE8E727}">
+						<File Id="libgtk_win32_@API_VERSION@.dll" Source="..\Win32\Release\bin\libgtk-win32-@API_VERSION@.dll" />
+					</Component>
+				</Directory>
+			</Directory>
+
+			<Directory Id="EtcDir" Name="etc">
+				<Directory Id="GtkTopLevelEtc" Name="gtk-@API_VERSION@">
+					<Component Id="etc_gtk" Guid="{A3814BD1-DAE6-4e81-AD30-67410F44A864}">
+						<File Id="gdk_pixbuf.loaders" Source="..\Win32\Release\etc\gtk-2.0\gdk-pixbuf.loaders" />
+						<File Id="gtkrc.default" Source="..\Win32\Release\etc\gtk-2.0\gtkrc" />
+					</Component>
+				</Directory>
+			</Directory>
+		</Directory>
+	</Module>
+</Wix>

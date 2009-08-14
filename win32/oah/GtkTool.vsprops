@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<VisualStudioPropertySheet
+	ProjectType="Visual C++"
+	Version="8.00"
+	Name="GtkTool"
+	InheritedPropertySheets="$(OAH_INSTALLED_PATH)\vsprops\oah-PC.vsprops;.\GtkCommon.vsprops"
+	>
+	<UserMacro
+		Name="OahTargetExt"
+		Value=".exe"
+	/>
+	<UserMacro
+		Name="OahTargetSuffix"
+		Value=""
+	/>
+</VisualStudioPropertySheet>

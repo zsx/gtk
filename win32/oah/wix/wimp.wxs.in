@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+	<Module Id='wimp' Version='@VERSION@.0' Language="1033">
+		<Package Id="{1DE75694-42A1-4d6e-B3AB-41E0CC82D6E1}"
+				Description="Wimp/MS-Windows theme engine for GTK+"
+				Manufacturer="Free Software Community" InstallerVersion="300" />
+
+		<Directory Id='TARGETDIR' Name='SourceDir'>
+			<Directory Id='MODULE_DIR' Name='.'>
+
+				<Directory Id='LIB_DIR' Name='lib'>
+					<Directory Id='LibGtkApiDir' Name='gtk-@API_VERSION@'>
+						<Directory Id='BinVerDir' Name='@BINARY_VERSION@'>
+							<Directory Id='LibGtkApiBinEnginesDir' Name='engines'>
+								<Component Id="libwimp" Guid="{A765F698-8427-425a-A99A-0353DDB7865F}">
+									<File Id="libwimp.dll" Source="..\Win32\Release\lib\gtk-@API_VERSION@\@BINARY_VERSION@\engines\libwimp.dll" />
+								</Component>
+							</Directory>
+						</Directory>
+					</Directory>
+				</Directory>
+
+				<Directory Id='SHARE_DIR' Name='share'>
+					<Directory Id='ThemesDir' Name='themes'>
+						<Directory Id='MsWindowsDir' Name='MS-Windows'>
+							<Directory Id='ShareThemesMsWinGtkApiDir' Name='gtk-@API_VERSION@'>
+								<Component Id="mswin_gtk_rc" Guid="{7C7633A4-A013-45de-A61A-C7B53B2AA496}">
+									<File Id="mswingtkrc" Source="..\Win32\Release\share\themes\MS-Windows\gtk-@API_VERSION@\gtkrc" />
+								</Component>
+							</Directory>
+						</Directory>
+					</Directory>
+				</Directory>
+
+			</Directory>
+		</Directory>
+	</Module>
+</Wix>

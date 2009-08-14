@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<VisualStudioPropertySheet
+	ProjectType="Visual C++"
+	Version="8.00"
+	Name="GtkVersion"
+	>
+	<UserMacro
+		Name="GtkMajorVersion"
+		Value="2"
+	/>
+	<UserMacro
+		Name="GtkMinorVersion"
+		Value="17"
+	/>
+	<UserMacro
+		Name="GtkMicroVersion"
+		Value="8"
+	/>
+	<UserMacro
+		Name="GtkApiVersion"
+		Value="$(GtkMajorVersion).0"
+	/>
+	<UserMacro
+		Name="GtkVersion"
+		Value="$(GtkMajorVersion).$(GtkMinorVersion).$(GtkMicroVersion)"
+	/>
+	<UserMacro
+		Name="GtkInterfaceAge"
+		Value="0"
+	/>
+	<!-- GtkBinaryAge = 100 * GtkMinorVersion + GtkMicroVersion -->
+	<UserMacro
+		Name="GtkBinaryAge"
+		Value="1708"
+	/>
+	<!-- GtkBinaryVersion = Define a string for the earliest version that this release has backwards binary compatibility with. -->
+	<UserMacro
+		Name="GtkBinaryVersion"
+		Value="2.10.0"
+	/>
+	<UserMacro
+		Name="HOST"
+		Value="i486-windows"
+	/>
+</VisualStudioPropertySheet>
