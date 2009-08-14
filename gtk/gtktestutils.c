@@ -25,6 +25,8 @@
 #include "config.h"
 
 #include <gtk/gtk.h>
+#include "gdk/gdkinternals.h" /* for input_only */
+
 #include "gtkalias.h"
 
 #include <locale.h>
