@@ -8,7 +8,7 @@
 	<Tool
 		Name="VCCLCompilerTool"
 		AdditionalIncludeDirectories="..\gdk;..\..\gdk;..\..\gdk\win32;..\..\gdk-pixbuf"
-		PreprocessorDefinitions="GDK_COMPILATION;INSIDE_GDK_WIN32;G_LOG_DOMAIN=\&quot;Gdk\&quot;;GDK_PIXBUF_DISABLE_DEPRECATED"
+		PreprocessorDefinitions="GDK_COMPILATION;G_LOG_DOMAIN=\&quot;Gdk\&quot;;GDK_PIXBUF_DISABLE_DEPRECATED"
 	/>
 	<Tool
 		Name="VCLibrarianTool"
