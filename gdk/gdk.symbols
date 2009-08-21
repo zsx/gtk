@@ -1305,7 +1305,3 @@ gdk_threads_unlock
 gdk_display
 #endif
 #endif
-
-#ifdef GDK_WINDOWING_WIN32
-_gdk_drawable_impl_win32_get_type G_GNUC_CONST
-#endif
