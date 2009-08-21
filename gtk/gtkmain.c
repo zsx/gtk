@@ -65,7 +65,6 @@
 #include "gtkalias.h"
 
 #include "gdk/gdkprivate.h" /* for GDK_WINDOW_DESTROYED */
-#include "gdk/gdkinternals.h" /* for GDK_WINDOW_DESTROYED */
 
 #ifdef G_OS_WIN32
 
