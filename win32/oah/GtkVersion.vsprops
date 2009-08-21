@@ -14,7 +14,7 @@
 	/>
 	<UserMacro
 		Name="GtkMicroVersion"
-		Value="8"
+		Value="9"
 	/>
 	<UserMacro
 		Name="GtkApiVersion"
@@ -31,7 +31,7 @@
 	<!-- GtkBinaryAge = 100 * GtkMinorVersion + GtkMicroVersion -->
 	<UserMacro
 		Name="GtkBinaryAge"
-		Value="1708"
+		Value="1709"
 	/>
 	<!-- GtkBinaryVersion = Define a string for the earliest version that this release has backwards binary compatibility with. -->
 	<UserMacro
