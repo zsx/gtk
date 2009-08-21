@@ -75,7 +75,6 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				PreprocessorDefinitions="GDK_COMPILATION"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
