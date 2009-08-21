@@ -8,7 +8,7 @@
 	<Tool
 		Name="VCCLCompilerTool"
 		AdditionalIncludeDirectories="$(IntDir)\gtk;..\gtk;..\..\gtk;..\..\gdk"
-		PreprocessorDefinitions="GTK_COMPILATION;INSIDE_GDK_WIN32;G_LOG_DOMAIN=\&quot;Gtk\&quot;;GTK_BINARY_VERSION=\&quot;$(GtkBinaryVersion)\&quot;;GTK_HOST=\&quot;$(HOST)\&quot;;GTK_PRINT_BACKENDS=\&quot;file,lpr\&quot;;GTK_PRINT_PREVIEW_COMMAND=\&quot;\&quot;;GDK_PIXBUF_DISABLE_DEPRECATED;GTK_FILE_SYSTEM_ENABLE_UNSUPPORTED;GTK_PRINT_BACKEND_ENABLE_UNSUPPORTED"
+		PreprocessorDefinitions="GTK_COMPILATION;G_LOG_DOMAIN=\&quot;Gtk\&quot;;GTK_BINARY_VERSION=\&quot;$(GtkBinaryVersion)\&quot;;GTK_HOST=\&quot;$(HOST)\&quot;;GTK_PRINT_BACKENDS=\&quot;file,lpr\&quot;;GTK_PRINT_PREVIEW_COMMAND=\&quot;\&quot;;GDK_PIXBUF_DISABLE_DEPRECATED;GTK_FILE_SYSTEM_ENABLE_UNSUPPORTED;GTK_PRINT_BACKEND_ENABLE_UNSUPPORTED"
 	/>
 	<Tool
 		Name="VCLibrarianTool"
