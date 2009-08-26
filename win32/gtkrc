@@ -1,0 +1,3 @@
+#This file was installed as a part GTK+ package to use Wimp as default theme (and engine).
+#OAH Build default theme
+gtk-theme-name = "MS-Windows"
