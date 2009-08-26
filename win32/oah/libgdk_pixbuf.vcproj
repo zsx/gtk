@@ -78,6 +78,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalIncludeDirectories="&quot;$(InputDir)&quot;"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -254,6 +255,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalIncludeDirectories="&quot;$(InputDir)&quot;"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -431,6 +433,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalIncludeDirectories="&quot;$(InputDir)&quot;"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -604,7 +607,7 @@
 				Name="Generated"
 				>
 				<File
-					RelativePath="..\gdk-pixbuf\gdk-pixbuf-aliasdef.c"
+					RelativePath="..\..\gdk-pixbuf\gdk-pixbuf-aliasdef.c"
 					>
 				</File>
 				<File
@@ -1315,40 +1318,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\gdk-pixbuf\gdk-pixbuf.loaders"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Generating $(InputFileName)"
-						CommandLine="mkdir &quot;$(OutDir)\etc\gtk-$(GtkApiVersion)&quot; 2&gt;NUL&#x0D;&#x0A;copy &quot;$(InputPath)&quot; &quot;$(OutDir)\etc\gtk-$(GtkApiVersion)\&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\etc\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Generating $(InputFileName)"
-						CommandLine="mkdir &quot;$(OutDir)\etc\gtk-$(GtkApiVersion)&quot; 2&gt;NUL&#x0D;&#x0A;copy &quot;$(InputPath)&quot; &quot;$(OutDir)\etc\gtk-$(GtkApiVersion)\&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\etc\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="ReleaseWdkCrt|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Generating $(InputFileName)"
-						CommandLine="mkdir &quot;$(OutDir)\etc\gtk-$(GtkApiVersion)&quot; 2&gt;NUL&#x0D;&#x0A;copy &quot;$(InputPath)&quot; &quot;$(OutDir)\etc\gtk-$(GtkApiVersion)\&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\etc\$(InputFileName)"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
 				RelativePath="..\..\gdk-pixbuf\gdk-pixbuf.symbols"
 				>
 			</File>
@@ -1357,7 +1326,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\gdk_pixbuf.rc.in"
+				RelativePath="..\..\gdk-pixbuf\gdk_pixbuf.rc.in"
 				>
 			</File>
 		</Filter>

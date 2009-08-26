@@ -75,6 +75,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				PreprocessorDefinitions="GTK_LIBDIR=&quot;\&quot;\&quot;&quot;"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -247,6 +248,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				PreprocessorDefinitions="GTK_LIBDIR=&quot;\&quot;\&quot;&quot;"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -420,6 +422,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				PreprocessorDefinitions="GTK_LIBDIR=&quot;\&quot;\&quot;&quot;"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -1532,7 +1535,7 @@
 				Name="Generated"
 				>
 				<File
-					RelativePath="..\gtk\gtkaliasdef.c"
+					RelativePath="..\..\gtk\gtkaliasdef.c"
 					>
 				</File>
 				<File
@@ -11329,7 +11332,7 @@
 				Name="Generated"
 				>
 				<File
-					RelativePath="..\gtk\gtkalias.h"
+					RelativePath="..\..\gtk\gtkalias.h"
 					>
 				</File>
 				<File
@@ -11348,10 +11351,6 @@
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
 			<File
-				RelativePath="..\config.h.in"
-				>
-			</File>
-			<File
 				RelativePath="$(IntDir)\gtk+-2.0.pc"
 				>
 			</File>
@@ -11368,7 +11367,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating gtkbuiltincache.h"
-						CommandLine="&quot;$(OutDir)\bin\gtk-update-icon-cache.exe&quot; --force --ignore-theme-index --source builtin_icons $(InputDir).. &gt; &quot;$(IntDir)\gtkbuiltincache.h&quot;&#x0D;&#x0A;"
+						CommandLine="&quot;$(OutDir)\bin\gtk-update-icon-cache.exe&quot; --force --ignore-theme-index --source builtin_icons &quot;$(InputDir)..&quot; &gt; &quot;$(IntDir)\gtkbuiltincache.h&quot;&#x0D;&#x0A;cl /E $(OAH_DEPS_INC_RSP_FILE) &quot;$(OutDir)\include\gtk-$(GtkApiVersion)\gtk\gtk.h&quot; &gt; &quot;$(IntDir)\types.c&quot;&#x0D;&#x0A;&quot;$(OAH_INSTALLED_PATH)\bin\grep.exe&quot; &quot;\bg[td]k_[a-zA-Z0-9_]*_get_type\b&quot; &quot;$(IntDir)\types.c&quot; | &quot;$(OAH_INSTALLED_PATH)\bin\sort.exe&quot; | &quot;$(OAH_INSTALLED_PATH)\bin\uniq.exe&quot; | &quot;$(OAH_INSTALLED_PATH)\bin\sed.exe&quot; &apos;{ s/^GType/*bp++ =/; s/(void)/()/; }&apos;&#x0D;&#x0A;&gt; &quot;$(IntDir)\gtktypefuncs.c&quot;&#x0D;&#x0A;"
 						Outputs="$(IntDir)\gtkbuiltincache.h"
 					/>
 				</FileConfiguration>
@@ -11388,7 +11387,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating gtkbuiltincache.h"
-						CommandLine="&quot;$(OutDir)\bin\gtk-update-icon-cache.exe&quot; --force --ignore-theme-index --source builtin_icons ..\..\gtk\stock-icons &gt; &quot;$(IntDir)\gtkbuiltincache.h&quot;&#x0D;&#x0A;del ..\..\gtk\stock-icons\icon-theme.cache&#x0D;&#x0A;"
+						CommandLine="&quot;$(OutDir)\bin\gtk-update-icon-cache.exe&quot; --force --ignore-theme-index --source builtin_icons &quot;$(InputDir)..&quot; &gt; &quot;$(IntDir)\gtkbuiltincache.h&quot;&#x0D;&#x0A;echo /*none*/ &gt; &quot;$(InputDir)&quot;\..\..\gtktypesfuncs.c&#x0D;&#x0A;"
 						Outputs="$(IntDir)\gtkbuiltincache.h"
 					/>
 				</FileConfiguration>
@@ -11408,7 +11407,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating gtkbuiltincache.h"
-						CommandLine="&quot;$(OutDir)\bin\gtk-update-icon-cache.exe&quot; --force --ignore-theme-index --source builtin_icons ..\..\gtk\stock-icons &gt; &quot;$(IntDir)\gtkbuiltincache.h&quot;&#x0D;&#x0A;del ..\..\gtk\stock-icons\icon-theme.cache&#x0D;&#x0A;"
+						CommandLine="&quot;$(OutDir)\bin\gtk-update-icon-cache.exe&quot; --force --ignore-theme-index --source builtin_icons &quot;$(InputDir)..&quot; &gt; &quot;$(IntDir)\gtkbuiltincache.h&quot;&#x0D;&#x0A;echo /*none*/ &gt; &quot;$(InputDir)&quot;\..\..\gtktypesfuncs.c&#x0D;&#x0A;"
 						Outputs="$(IntDir)\gtkbuiltincache.h"
 					/>
 				</FileConfiguration>
@@ -11428,7 +11427,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\gtk-win32.rc.in"
+				RelativePath="..\..\gtk\gtk-win32.rc.in"
 				>
 			</File>
 			<File
@@ -11557,14 +11556,6 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Debug|x64"
-					>
-					<Tool
-						Name="HeaderInstallerTool"
-						ModuleName="..\etc\gtk-$(GtkApiVersion)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Release|Win32"
 					>
 					<Tool
@@ -11573,23 +11564,7 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Release|x64"
-					>
-					<Tool
-						Name="HeaderInstallerTool"
-						ModuleName="..\etc\gtk-$(GtkApiVersion)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="ReleaseWdkCrt|Win32"
-					>
-					<Tool
-						Name="HeaderInstallerTool"
-						ModuleName="..\etc\gtk-$(GtkApiVersion)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="ReleaseWdkCrt|x64"
 					>
 					<Tool
 						Name="HeaderInstallerTool"

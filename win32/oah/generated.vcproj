@@ -67,7 +67,95 @@
 			/>
 		</Configuration>
 		<Configuration
+			Name="Debug|x64"
+			ConfigurationType="10"
+			InheritedPropertySheets="$(OAH_INSTALLED_PATH)\vsprops\oah-$(PlatformName)-$(ConfigurationName).vsprops;.\GtkCommon.vsprops"
+			CharacterSet="2"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="SymbolsGeneratorTool"
+			/>
+			<Tool
+				Name="GObjectGenMarshalTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="HeaderInstallerTool"
+			/>
+			<Tool
+				Name="DotInGeneratorTool"
+				Substitute="@GTK_MAJOR_VERSION@/$(GtkMajorVersion);@GTK_MINOR_VERSION@/$(GtkMinorVersion);@GTK_MICRO_VERSION@/$(GtkMicroVersion);@GTK_VERSION@/$(GtkVersion);@VERSION@/$(GtkVersion);@GTK_API_VERSION@/$(GtkApiVersion)"
+			/>
+			<Tool
+				Name="SEDTool"
+			/>
+			<Tool
+				Name="PkgConfigTool"
+			/>
+			<Tool
+				Name="PkgConfigOAHDepsTool"
+			/>
+			<Tool
+				Name="GObjectMkEnumsTemplateTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
+		<Configuration
 			Name="Release|Win32"
+			ConfigurationType="10"
+			InheritedPropertySheets="$(OAH_INSTALLED_PATH)\vsprops\oah-$(PlatformName)-$(ConfigurationName).vsprops;.\GtkCommon.vsprops"
+			CharacterSet="2"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="SymbolsGeneratorTool"
+			/>
+			<Tool
+				Name="GObjectGenMarshalTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="HeaderInstallerTool"
+			/>
+			<Tool
+				Name="DotInGeneratorTool"
+				Substitute="@GTK_MAJOR_VERSION@/$(GtkMajorVersion);@GTK_MINOR_VERSION@/$(GtkMinorVersion);@GTK_MICRO_VERSION@/$(GtkMicroVersion);@GTK_VERSION@/$(GtkVersion);@VERSION@/$(GtkVersion);@GTK_API_VERSION@/$(GtkApiVersion)"
+			/>
+			<Tool
+				Name="SEDTool"
+			/>
+			<Tool
+				Name="PkgConfigTool"
+			/>
+			<Tool
+				Name="PkgConfigOAHDepsTool"
+			/>
+			<Tool
+				Name="GObjectMkEnumsTemplateTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
+		<Configuration
+			Name="Release|x64"
 			ConfigurationType="10"
 			InheritedPropertySheets="$(OAH_INSTALLED_PATH)\vsprops\oah-$(PlatformName)-$(ConfigurationName).vsprops;.\GtkCommon.vsprops"
 			CharacterSet="2"
@@ -155,94 +243,6 @@
 			/>
 		</Configuration>
 		<Configuration
-			Name="Debug|x64"
-			ConfigurationType="10"
-			InheritedPropertySheets="$(OAH_INSTALLED_PATH)\vsprops\oah-$(PlatformName)-$(ConfigurationName).vsprops;.\GtkCommon.vsprops"
-			CharacterSet="2"
-			>
-			<Tool
-				Name="VCPreBuildEventTool"
-			/>
-			<Tool
-				Name="SymbolsGeneratorTool"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="PkgConfigOAHDepsTool"
-			/>
-			<Tool
-				Name="PkgConfigTool"
-			/>
-			<Tool
-				Name="SEDTool"
-			/>
-			<Tool
-				Name="GObjectGenMarshalTool"
-			/>
-			<Tool
-				Name="GObjectMkEnumsTemplateTool"
-			/>
-			<Tool
-				Name="DotInGeneratorTool"
-				Substitute="@GTK_MAJOR_VERSION@/$(GtkMajorVersion);@GTK_MINOR_VERSION@/$(GtkMinorVersion);@GTK_MICRO_VERSION@/$(GtkMicroVersion);@GTK_VERSION@/$(GtkVersion);@VERSION@/$(GtkVersion);@GTK_API_VERSION@/$(GtkApiVersion)"
-			/>
-			<Tool
-				Name="HeaderInstallerTool"
-			/>
-			<Tool
-				Name="VCMIDLTool"
-			/>
-			<Tool
-				Name="VCPostBuildEventTool"
-			/>
-		</Configuration>
-		<Configuration
-			Name="Release|x64"
-			ConfigurationType="10"
-			InheritedPropertySheets="$(OAH_INSTALLED_PATH)\vsprops\oah-$(PlatformName)-$(ConfigurationName).vsprops;.\GtkCommon.vsprops"
-			CharacterSet="2"
-			>
-			<Tool
-				Name="VCPreBuildEventTool"
-			/>
-			<Tool
-				Name="SymbolsGeneratorTool"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="PkgConfigOAHDepsTool"
-			/>
-			<Tool
-				Name="PkgConfigTool"
-			/>
-			<Tool
-				Name="SEDTool"
-			/>
-			<Tool
-				Name="GObjectGenMarshalTool"
-			/>
-			<Tool
-				Name="GObjectMkEnumsTemplateTool"
-			/>
-			<Tool
-				Name="DotInGeneratorTool"
-				Substitute="@GTK_MAJOR_VERSION@/$(GtkMajorVersion);@GTK_MINOR_VERSION@/$(GtkMinorVersion);@GTK_MICRO_VERSION@/$(GtkMicroVersion);@GTK_VERSION@/$(GtkVersion);@VERSION@/$(GtkVersion);@GTK_API_VERSION@/$(GtkApiVersion)"
-			/>
-			<Tool
-				Name="HeaderInstallerTool"
-			/>
-			<Tool
-				Name="VCMIDLTool"
-			/>
-			<Tool
-				Name="VCPostBuildEventTool"
-			/>
-		</Configuration>
-		<Configuration
 			Name="ReleaseWdkCrt|x64"
 			ConfigurationType="10"
 			InheritedPropertySheets="$(OAH_INSTALLED_PATH)\vsprops\oah-$(PlatformName)-$(ConfigurationName).vsprops;.\GtkCommon.vsprops"
@@ -255,29 +255,29 @@
 				Name="SymbolsGeneratorTool"
 			/>
 			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="PkgConfigOAHDepsTool"
-			/>
-			<Tool
-				Name="PkgConfigTool"
-			/>
-			<Tool
-				Name="SEDTool"
-			/>
-			<Tool
 				Name="GObjectGenMarshalTool"
 			/>
 			<Tool
-				Name="GObjectMkEnumsTemplateTool"
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="HeaderInstallerTool"
 			/>
 			<Tool
 				Name="DotInGeneratorTool"
 				Substitute="@GTK_MAJOR_VERSION@/$(GtkMajorVersion);@GTK_MINOR_VERSION@/$(GtkMinorVersion);@GTK_MICRO_VERSION@/$(GtkMicroVersion);@GTK_VERSION@/$(GtkVersion);@VERSION@/$(GtkVersion);@GTK_API_VERSION@/$(GtkApiVersion)"
 			/>
 			<Tool
-				Name="HeaderInstallerTool"
+				Name="SEDTool"
+			/>
+			<Tool
+				Name="PkgConfigTool"
+			/>
+			<Tool
+				Name="PkgConfigOAHDepsTool"
+			/>
+			<Tool
+				Name="GObjectMkEnumsTemplateTool"
 			/>
 			<Tool
 				Name="VCMIDLTool"
@@ -291,12 +291,129 @@
 	</References>
 	<Files>
 		<File
-			RelativePath="..\config.h.in"
+			RelativePath="..\..\config.h.win32.in"
 			>
+			<FileConfiguration
+				Name="Debug|Win32"
+				>
+				<Tool
+					Name="DotInGeneratorTool"
+					OutputFileName="config.h"
+				/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="Release|Win32"
+				>
+				<Tool
+					Name="DotInGeneratorTool"
+					OutputFileName="config.h"
+				/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="ReleaseWdkCrt|Win32"
+				>
+				<Tool
+					Name="DotInGeneratorTool"
+					OutputFileName="config.h"
+				/>
+			</FileConfiguration>
+		</File>
+		<File
+			RelativePath="..\..\gdk-pixbuf\gdk-pixbuf.symbols"
+			>
+			<FileConfiguration
+				Name="Debug|Win32"
+				>
+				<Tool
+					Name="VCCustomBuildTool"
+					CommandLine="perl &quot;$(InputDir)makegdkpixbufalias.pl&quot; &quot;$(InputDir)/gdk-pixbuf.symbols&quot; &gt; &quot;$(InputDir)gdk-pixbuf-alias.h&quot;&#x0D;&#x0A;perl &quot;$(InputDir)makegdkpixbufalias.pl&quot; -def &quot;$(InputDir)/gdk-pixbuf.symbols&quot; &gt; &quot;$(InputDir)gdk-pixbuf-aliasdef.c&quot;&#x0D;&#x0A;"
+					Outputs="&quot;$(InputDir)gdk-pixbuf-alias.h&quot;"
+				/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="Release|Win32"
+				>
+				<Tool
+					Name="VCCustomBuildTool"
+					CommandLine="perl &quot;$(InputDir)makegdkpixbufalias.pl&quot; &quot;$(InputDir)/gdk-pixbuf.symbols&quot; &gt; &quot;$(InputDir)gdk-pixbuf-alias.h&quot;&#x0D;&#x0A;perl &quot;$(InputDir)makegdkpixbufalias.pl&quot; -def &quot;$(InputDir)/gdk-pixbuf.symbols&quot; &gt; &quot;$(InputDir)gdk-pixbuf-aliasdef.c&quot;&#x0D;&#x0A;"
+					Outputs="&quot;$(InputDir)gdk-pixbuf-alias.h&quot;"
+				/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="ReleaseWdkCrt|Win32"
+				>
+				<Tool
+					Name="VCCustomBuildTool"
+					CommandLine="perl &quot;$(InputDir)makegdkpixbufalias.pl&quot; &quot;$(InputDir)/gdk-pixbuf.symbols&quot; &gt; &quot;$(InputDir)gdk-pixbuf-alias.h&quot;&#x0D;&#x0A;perl &quot;$(InputDir)makegdkpixbufalias.pl&quot; -def &quot;$(InputDir)/gdk-pixbuf.symbols&quot; &gt; &quot;$(InputDir)gdk-pixbuf-aliasdef.c&quot;&#x0D;&#x0A;"
+					Outputs="&quot;$(InputDir)gdk-pixbuf-alias.h&quot;"
+				/>
+			</FileConfiguration>
+		</File>
+		<File
+			RelativePath="..\..\gdk\gdk.symbols"
+			>
+			<FileConfiguration
+				Name="Debug|Win32"
+				>
+				<Tool
+					Name="VCCustomBuildTool"
+					CommandLine="perl &quot;$(InputDir)makegdkalias.pl&quot; &quot;$(InputPath)&quot; &gt; &quot;$(InputDir)gdkalias.h&quot;&#x0D;&#x0A;perl &quot;$(InputDir)makegdkalias.pl&quot; -def &quot;$(InputPath)&quot; &gt; &quot;$(InputDir)gdkaliasdef.c&quot;&#x0D;&#x0A;"
+					Outputs="&quot;$(InputDir)gdkalias.h&quot;"
+				/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="Release|Win32"
+				>
+				<Tool
+					Name="VCCustomBuildTool"
+					CommandLine="perl &quot;$(InputDir)makegdkalias.pl&quot; &quot;$(InputPath)&quot; &gt; &quot;$(InputDir)gdkalias.h&quot;&#x0D;&#x0A;perl &quot;$(InputDir)makegdkalias.pl&quot; -def &quot;$(InputPath)&quot; &gt; &quot;$(InputDir)gdkaliasdef.c&quot;&#x0D;&#x0A;"
+					Outputs="&quot;$(InputDir)gdkalias.h&quot;"
+				/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="ReleaseWdkCrt|Win32"
+				>
+				<Tool
+					Name="VCCustomBuildTool"
+					CommandLine="perl &quot;$(InputDir)makegdkalias.pl&quot; &quot;$(InputPath)&quot; &gt; &quot;$(InputDir)gdkalias.h&quot;&#x0D;&#x0A;perl &quot;$(InputDir)makegdkalias.pl&quot; -def &quot;$(InputPath)&quot; &gt; &quot;$(InputDir)gdkaliasdef.c&quot;&#x0D;&#x0A;"
+					Outputs="&quot;$(InputDir)gdkalias.h&quot;"
+				/>
+			</FileConfiguration>
 		</File>
 		<File
 			RelativePath="..\..\gdk\gdkconfig.h.win32"
 			>
+		</File>
+		<File
+			RelativePath="..\..\gtk\gtk.symbols"
+			>
+			<FileConfiguration
+				Name="Debug|Win32"
+				>
+				<Tool
+					Name="VCCustomBuildTool"
+					CommandLine="perl &quot;$(InputDir)makegtkalias.pl&quot; &quot;$(InputPath)&quot; &gt; &quot;$(InputDir)gtkalias.h&quot;&#x0D;&#x0A;perl &quot;$(InputDir)makegtkalias.pl&quot; -def &quot;$(InputPath)&quot; &gt; &quot;$(InputDir)gtkaliasdef.c&quot;&#x0D;&#x0A;"
+					Outputs="&quot;$(InputDir)gtkalias.h&quot;"
+				/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="Release|Win32"
+				>
+				<Tool
+					Name="VCCustomBuildTool"
+					CommandLine="perl &quot;$(InputDir)makegtkalias.pl&quot; &quot;$(InputPath)&quot; &gt; &quot;$(InputDir)gtkalias.h&quot;&#x0D;&#x0A;perl &quot;$(InputDir)makegtkalias.pl&quot; -def &quot;$(InputPath)&quot; &gt; &quot;$(InputDir)gtkaliasdef.c&quot;&#x0D;&#x0A;"
+					Outputs="&quot;$(InputDir)gtkalias.h&quot;"
+				/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="ReleaseWdkCrt|Win32"
+				>
+				<Tool
+					Name="VCCustomBuildTool"
+					CommandLine="perl &quot;$(InputDir)makegtkalias.pl&quot; &quot;$(InputPath)&quot; &gt; &quot;$(InputDir)gtkalias.h&quot;&#x0D;&#x0A;perl &quot;$(InputDir)makegtkalias.pl&quot; -def &quot;$(InputPath)&quot; &gt; &quot;$(InputDir)gtkaliasdef.c&quot;&#x0D;&#x0A;"
+					Outputs="&quot;$(InputDir)gtkalias.h&quot;"
+				/>
+			</FileConfiguration>
 		</File>
 	</Files>
 	<Globals>
