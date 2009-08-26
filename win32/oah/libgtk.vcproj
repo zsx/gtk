@@ -11367,7 +11367,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating gtkbuiltincache.h"
-						CommandLine="&quot;$(OutDir)\bin\gtk-update-icon-cache.exe&quot; --force --ignore-theme-index --source builtin_icons &quot;$(InputDir)..&quot; &gt; &quot;$(IntDir)\gtkbuiltincache.h&quot;&#x0D;&#x0A;cl /E $(OAH_DEPS_INC_RSP_FILE) &quot;$(OutDir)\include\gtk-$(GtkApiVersion)\gtk\gtk.h&quot; &gt; &quot;$(IntDir)\types.c&quot;&#x0D;&#x0A;&quot;$(OAH_INSTALLED_PATH)\bin\grep.exe&quot; &quot;\bg[td]k_[a-zA-Z0-9_]*_get_type\b&quot; &quot;$(IntDir)\types.c&quot; | &quot;$(OAH_INSTALLED_PATH)\bin\sort.exe&quot; | &quot;$(OAH_INSTALLED_PATH)\bin\uniq.exe&quot; | &quot;$(OAH_INSTALLED_PATH)\bin\sed.exe&quot; &apos;{ s/^GType/*bp++ =/; s/(void)/()/; }&apos;&#x0D;&#x0A;&gt; &quot;$(IntDir)\gtktypefuncs.c&quot;&#x0D;&#x0A;"
+						CommandLine="&quot;$(OutDir)\bin\gtk-update-icon-cache.exe&quot; --force --ignore-theme-index --source builtin_icons &quot;$(InputDir)..&quot; &gt; &quot;$(IntDir)\gtkbuiltincache.h&quot;&#x0D;&#x0A;echo /* none */ &gt; &quot;$(IntDir)\gtktypefuncs.c&quot;"
 						Outputs="$(IntDir)\gtkbuiltincache.h"
 					/>
 				</FileConfiguration>
@@ -11387,7 +11387,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating gtkbuiltincache.h"
-						CommandLine="&quot;$(OutDir)\bin\gtk-update-icon-cache.exe&quot; --force --ignore-theme-index --source builtin_icons &quot;$(InputDir)..&quot; &gt; &quot;$(IntDir)\gtkbuiltincache.h&quot;&#x0D;&#x0A;echo /*none*/ &gt; &quot;$(InputDir)&quot;\..\..\gtktypesfuncs.c&#x0D;&#x0A;"
+						CommandLine="&quot;$(OutDir)\bin\gtk-update-icon-cache.exe&quot; --force --ignore-theme-index --source builtin_icons &quot;$(InputDir)..&quot; &gt; &quot;$(IntDir)\gtkbuiltincache.h&quot;&#x0D;&#x0A;echo /* none */ &gt; &quot;$(IntDir)\gtktypefuncs.c&quot;"
 						Outputs="$(IntDir)\gtkbuiltincache.h"
 					/>
 				</FileConfiguration>
@@ -11407,7 +11407,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating gtkbuiltincache.h"
-						CommandLine="&quot;$(OutDir)\bin\gtk-update-icon-cache.exe&quot; --force --ignore-theme-index --source builtin_icons &quot;$(InputDir)..&quot; &gt; &quot;$(IntDir)\gtkbuiltincache.h&quot;&#x0D;&#x0A;echo /*none*/ &gt; &quot;$(InputDir)&quot;\..\..\gtktypesfuncs.c&#x0D;&#x0A;"
+						CommandLine="&quot;$(OutDir)\bin\gtk-update-icon-cache.exe&quot; --force --ignore-theme-index --source builtin_icons &quot;$(InputDir)..&quot; &gt; &quot;$(IntDir)\gtkbuiltincache.h&quot;&#x0D;&#x0A;echo /* none */ &gt; &quot;$(IntDir)\gtktypefuncs.c&quot;"
 						Outputs="$(IntDir)\gtkbuiltincache.h"
 					/>
 				</FileConfiguration>
