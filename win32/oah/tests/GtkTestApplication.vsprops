@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<VisualStudioPropertySheet
+	ProjectType="Visual C++"
+	Version="8.00"
+	Name="GtkTestApplication"
+	ConfigurationType="1"
+	InheritedPropertySheets="..\GtkVersion.vsprops"
+	>
+	<Tool
+		Name="VCCLCompilerTool"
+		AdditionalIncludeDirectories="$(IntDir)"
+	/>
+	<Tool
+		Name="VCLinkerTool"
+		SubSystem="1"
+	/>
+	<UserMacro
+		Name="OahTargetExt"
+		Value=".exe"
+	/>
+	<UserMacro
+		Name="OahTargetSuffix"
+		Value=""
+	/>
+</VisualStudioPropertySheet>
