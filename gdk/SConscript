@@ -1,0 +1,133 @@
+# vim: ft=python expandtab
+Import('env')
+
+env_gdk = env.Clone(PDB = 'libgdk-2.0.pdb')
+
+env_gdk['CPPDEFINES']=['HAVE_CONFIG_H',
+                       ('G_LOG_DOMAN', '\\\"Gdk\\\"'),
+                       'GDK_COMPILATION'] + env_gdk['DEBUG_CPPDEFINES']
+env_gdk.Append(CPPPATH=['#', '#gdk', '#gdk-pixbuf'])
+
+env_gdk.DotIn('gdkconfig.h', 'gdkconfig.h.win32')
+env_gdk.Alias('install', env_gdk.Install('$PREFIX/lib/gtk-2.0/include', 'gdkconfig.h'))
+
+env_gdk['DOT_SYMBOLS_FLAGS'] = '/DINCLUDE_VARIABLES /DGDK_WINDOWING_WIN32 /DG_OS_WIN32 /DALL_FILES'
+env_gdk.DotSymbols2Def('gdk.def', 'gdk.symbols')
+
+env_gdk.Command('gdkalias.h', 'gdk.symbols', env_gdk['PERL'] + ' gdk/makegdkalias.pl <$SOURCE >$TARGET')
+env_gdk.Command('gdkaliasdef.c', 'gdk.symbols', env_gdk['PERL'] + ' gdk/makegdkalias.pl -def <$SOURCE >$TARGET')
+
+gdk_public_h_sources = Split("\
+	gdk.h					\
+	gdkapplaunchcontext.h			\
+	gdkcairo.h				\
+	gdkcolor.h				\
+	gdkcursor.h				\
+	gdkdisplay.h				\
+	gdkdisplaymanager.h			\
+	gdkdnd.h				\
+	gdkdrawable.h				\
+	gdkevents.h				\
+	gdkfont.h				\
+	gdkgc.h					\
+	gdki18n.h				\
+	gdkimage.h				\
+	gdkinput.h				\
+	gdkkeys.h				\
+	gdkkeysyms.h				\
+	gdkpango.h				\
+	gdkpixbuf.h				\
+	gdkpixmap.h				\
+	gdkprivate.h				\
+	gdkproperty.h				\
+	gdkregion.h				\
+	gdkrgb.h				\
+	gdkscreen.h				\
+	gdkselection.h				\
+	gdkspawn.h				\
+	gdktestutils.h				\
+	gdktypes.h				\
+	gdkvisual.h				\
+	gdkwindow.h")
+
+gdk_built_public_sources =Split("			\
+	gdkenumtypes.h")
+
+gdk_built_private_headers = Split("			\
+	gdkalias.h")
+medialib_sources = []
+gdk_c_sources = medialib_sources + Split("                \
+	gdk.c			\
+	gdkapplaunchcontext.c	\
+	gdkcairo.c		\
+	gdkcolor.c		\
+	gdkcursor.c		\
+	gdkdisplay.c		\
+	gdkdisplaymanager.c	\
+	gdkdnd.c		\
+	gdkdraw.c		\
+	gdkevents.c     	\
+	gdkfont.c		\
+	gdkgc.c			\
+	gdkglobals.c		\
+	gdkimage.c		\
+	gdkkeys.c		\
+	gdkkeyuni.c		\
+	gdkoffscreenwindow.c	\
+	gdkpango.c		\
+	gdkpixbuf-drawable.c	\
+	gdkpixbuf-render.c	\
+	gdkpixmap.c		\
+	gdkpolyreg-generic.c	\
+	gdkrectangle.c		\
+	gdkregion-generic.c	\
+	gdkrgb.c		\
+	gdkscreen.c		\
+	gdkselection.c		\
+	gdkvisual.c		\
+	gdkwindow.c		\
+	gdkwindowimpl.c")
+
+gdk_built_sources =	Split("			\
+	gdkaliasdef.c				\
+	gdkenumtypes.c				\
+	gdkmarshalers.c") + gdk_c_sources + ['gdkkeynames.c']
+
+env_gdk_h = env_gdk.Clone(GLIB_MKENUMS_ARGV = [('template', r'gdk\gdkenumtypes.h.template')])
+env_gdk_h.AlwaysBuild(env_gdk_h.MkenumsGenerator('gdkenumtypes.h', gdk_public_h_sources))
+
+env_gdk_c = env_gdk.Clone(GLIB_MKENUMS_ARGV = [('template', r'gdk\gdkenumtypes.c.template')])
+env_gdk_c.AlwaysBuild(env_gdk_c.MkenumsGenerator('gdkenumtypes.c', gdk_public_h_sources))
+
+env_gdk['GLIB_GENMARSHAL_ARGV'] = [('prefix', '_gdk_marshal')]
+env_gdk.AlwaysBuild(env_gdk.MarshalGenerator(['gdkmarshalers.h', 'gdkmarshalers.c'], 'gdkmarshalers.list'))
+
+env_gdk_rc = env_gdk.Clone()
+env_gdk_rc['DOT_IN_SUBS']['@srcdir@'] = 'gdk/win32/rc'
+env_gdk_rc.DotIn('win32/rc/gdk.rc', 'win32/rc/gdk.rc.in')
+env_gdk_rc.RES('win32/rc/gdk.rc')
+#env_gdk.Depends('#gdk.res', '#gtk.ico')
+env_gdk.ParseConfig('pkg-config gobject-2.0 --cflags --libs')
+env_gdk.ParseConfig('pkg-config gthread-2.0 --cflags --libs')
+env_gdk.ParseConfig('pkg-config gio-2.0 --cflags --libs')
+env_gdk.ParseConfig('pkg-config cairo --cflags --libs')
+env_gdk.ParseConfig('pkg-config pangocairo --cflags --libs')
+env_gdk.ParseConfig('pkg-config atk --cflags --libs')
+env_gdk.Append(LIBS=['user32',
+                     'shell32',
+                     'gdi32',
+                     'imm32',
+                     'ole32',
+                     'uuid'])
+SConscript('win32/SConscript', exports = 'env_gdk')
+gdk_dll=env_gdk.SharedLibrary(['libgdk-win32-2.0' + env_gdk['LIB_SUFFIX'] + env_gdk['SHLIBSUFFIX'],
+                               'libgdk-win32-2.0.lib'],
+                               gdk_built_sources + ['gdk.def', 'win32/rc/gdk.res', 'win32/libgdk-win32.lib', '#gdk-pixbuf/libgdk-pixbuf-2.0.lib'])
+env_gdk.AddPostAction(gdk_dll, 'mt.exe -nologo -manifest ${TARGET}.manifest -outputresource:$TARGET;2')
+
+Alias('install', env_gdk.Install('$PREFIX/include/glib-2.0/gdk', gdk_public_h_sources + gdk_built_public_sources))
+Alias('install', env_gdk.Install('$PREFIX/bin', 'libgdk-win32-2.0' + env_gdk['LIB_SUFFIX'] + '.dll'))
+Alias('install', env_gdk.Install('$PREFIX/lib', 'libgdk-win32-2.0.lib'))
+Alias('install', env_gdk.InstallAs('$PREFIX/lib/gdk-win32-2.0.lib', 'libgdk-win32-2.0.lib'))
+if env_gdk['DEBUG'] == 1:
+    Alias('install', env_gdk.Install('$PREFIX/pdb', env_gdk['PDB']))
