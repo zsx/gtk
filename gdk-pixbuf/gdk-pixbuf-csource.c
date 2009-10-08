@@ -19,7 +19,7 @@
 #include "config.h"
 
 #define __GTK_H_INSIDE__
-#include "../gtk/gtkversion.h"	/* versioning */
+#include "gtkversion.h"	/* versioning */
 #undef __GTK_H_INSIDE__
 #include "gdk-pixbuf.h"
 #include "gdk-pixdata.h"
