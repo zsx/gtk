@@ -1,0 +1,14 @@
+# vim: ft=python expandtab
+
+Import('env_gdk_pixbuf')
+
+env_gdk_pixbuf_pixops = env_gdk_pixbuf.Clone()
+env_gdk_pixbuf_pixops.ParseConfig('pkg-config glib-2.0 --cflags')
+pixops = env_gdk_pixbuf_pixops.StaticLibrary('libpixops', 'pixops.c')
+
+#timescale
+
+env_gdk_pixbuf_pixops_timescale = env_gdk_pixbuf.Clone()
+env_gdk_pixbuf_pixops_timescale.ParseConfig('pkg-config glib-2.0 --cflags --libs')
+env_gdk_pixbuf_pixops_timescale.Program('timescale', ['timescale.c', 'libpixops.lib'])
+
