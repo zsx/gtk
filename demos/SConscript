@@ -1,0 +1,45 @@
+# vim: ft=python expandtab
+Import('env')
+
+env_demos = env.Clone()
+
+env_demos['CPPDEFINES']=['HAVE_CONFIG_H',
+                       'GTK_DISABLE_DEPRECATED',
+                       'GDK_DISABLE_DEPRECATED'] + env['DEBUG_CPPDEFINES']
+env_demos.Append(CPPPATH=['#', '#gtk', '#gdk-pixbuf', '#gdk'])
+env_demos.Append(LIBS=['libgdk-win32-2.0.lib', 'libgtk-win32-2.0.lib', 'libgdk_pixbuf-2.0.lib'])
+env_demos.Append(LIBPATH=['#gdk', '#gtk', '#gdk-pixbuf'])
+
+'''
+test-inline-pixbufs.h: $(pixbuf_csource_deps) apple-red.png gnome-foot.png
+	$(pixbuf_csource) --raw --build-list		\
+	        apple_red  $(srcdir)/apple-red.png	\
+                gnome_foot $(srcdir)/gnome-foot.png	\
+        > test-inline-pixbufs.h				\
+	|| (rm -f test-inline-pixbufs.h && false)
+        '''
+env_demos.Command('test-inline-pixbufs.h', ['apple-red.png', 'gnome-foot.png'], '''
+        %s\\bin\\gdk-pixbuf-csource --raw --build-list apple_red demos\\apple-red.png gnome_foot demos\\gnome-foot.png > $TARGET''' % env_demos['PREFIX'])
+
+tests = (('testpixbuf', ['testpixbuf.c', 'pixbuf-init.obj']),
+         ('testpixbuf_drawable', ['testpixbuf-drawable.c', 'pixbuf-init.obj']),
+         ('testpixbuf_save', ['testpixbuf-save.c']),
+         ('testpixbuf_scale', ['testpixbuf-scale.c', 'pixbuf-init.obj']),
+         ('testanimation', ['testanimation.c', 'pixbuf-init.obj']),
+         ('pixbuf_demo', ['pixbuf-demo.c', 'pixbuf-init.obj']))
+env_demos.Depends('testpixbuf', 'test-inline-pixbufs.h')
+
+env_demos.StaticObject('pixbuf-init', 'pixbuf-init.c') 
+
+for x in tests:
+    e = env_demos.Clone()
+    if isinstance(x, str):
+        e['PDB'] = x + '.pdb'
+        e.Program(x, x + '.c')
+        e.Alias('test', 'gtk\\tests\\%s.exe' % x)
+    else:
+        e['PDB'] = x[0] + '.pdb'
+        e.Program(x[0], x[1])
+        e.Alias('test', 'gtk\\tests\\%s.exe' % x[0])
+
+SConscript('gtk-demo/SConscript', exports = 'env_demos')

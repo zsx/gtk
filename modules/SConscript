@@ -1,0 +1,14 @@
+# vim: ft=python expandtab
+Import('env')
+
+env_modules = env.Clone()
+
+env_modules['CPPDEFINES']=['HAVE_CONFIG_H',
+                       'GTK_DISABLE_DEPRECATED',
+                       'GDK_DISABLE_DEPRECATED'] + env_modules['DEBUG_CPPDEFINES']
+env_modules.Append(CPPPATH=['#', '#gtk', '#gdk-pixbuf', '#gdk'])
+env_modules.Append(LIBS=['libgdk-win32-2.0.lib', 'libgtk-win32-2.0.lib', 'libgdk_pixbuf-2.0.lib'])
+env_modules.Append(LIBPATH=['#gdk', '#gtk', '#gdk-pixbuf'])
+
+SConscript(['engines/ms-windows/SConscript',
+            'input/SConscript'], exports = 'env_modules')

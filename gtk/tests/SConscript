@@ -1,0 +1,37 @@
+# vim: ft=python expandtab
+Import('env_gtk')
+
+env_gtk_tests = env_gtk.Clone()
+
+env_gtk_tests['CPPDEFINES']=['HAVE_CONFIG_H',
+                       'GTK_DISABLE_DEPRECATED',
+                       'GDK_DISABLE_DEPRECATED'] + env_gtk['DEBUG_CPPDEFINES']
+env_gtk_tests.Append(CPPPATH=['#', '#gtk', '#gdk-pixbuf', '#gdk'])
+env_gtk_tests.Append(LIBS=['libgdk-win32-2.0.lib', 'libgtk-win32-2.0.lib', 'libgdk_pixbuf-2.0.lib'])
+env_gtk_tests.Append(LIBPATH=['#gdk', '#gtk', '#gdk-pixbuf'])
+
+tests = ('testing',
+         'liststore',
+         'treestore',
+         'treeview',
+         'treeview-scrolling',
+         'recentmanager',
+         'floating',
+         ('object', ['object.c', 'pixbuf-init.obj']),
+         'crossingevents',
+         #('filechooser', ['filechooser.c', 'pixbuf-init.obj']),
+         ('textbuffer', ['textbuffer.c', 'pixbuf-init.obj']),
+         'filtermodel',
+         'expander')
+env_gtk.StaticObject('pixbuf-init', 'pixbuf-init.c') 
+
+for x in tests:
+    e = env_gtk_tests.Clone()
+    if isinstance(x, str):
+        e['PDB'] = x + '.pdb'
+        e.Program(x, x + '.c')
+        e.Alias('test', 'gtk\\tests\\%s.exe' % x)
+    else:
+        e['PDB'] = x[0] + '.pdb'
+        e.Program(x[0], x[1])
+        e.Alias('test', 'gtk\\tests\\%s.exe' % x[0])

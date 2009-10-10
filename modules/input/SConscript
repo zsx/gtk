@@ -1,0 +1,14 @@
+# vim: ft=python expandtab
+Import('env_modules')
+
+env_modules_input = env_modules.Clone()
+
+env_modules_input_ime = env_modules_input.Clone(PDB = 'im_ime.pdb')
+env_modules_input_ime.Append(LIBS = ['imm32', 'user32'])
+im_ime = env_modules_input_ime.SharedLibrary('im_ime', ['gtkimcontextime.c', 'imime.c'])
+im_ime_install = env_modules_input_ime.Install('$PREFIX/lib/gtk-2.0/$GTK_BINARY_VERSION/immodules', 'im_ime.dll')
+env_modules_input_ime.AddPostAction(im_ime, 'mt.exe -nologo -manifest ${TARGET}.manifest -outputresource:$TARGET;2')
+
+Alias('install', env_modules_input.Install('$PREFIX/etc/gtk-2.0/', 'gtk.immodules'))
+
+env_modules_input.Command('gtk.immodules', [im_ime_install, '$PREFIX/bin/gtk-query-immodules-2.0.exe'], '$PREFIX/bin/gtk-query-immodules-2.0.exe > $TARGET')
