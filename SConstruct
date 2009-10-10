@@ -59,8 +59,15 @@ env.AppendENVPath('PATH', env['PREFIX'] + '\\bin')
 
 subdirs = ['gdk-pixbuf/SConscript',
            'gdk/SConscript',
-           'gtk/SConscript']
+           'gtk/SConscript',
+           'modules/SConscript']
 if ARGUMENTS.get('build_test', 0):
-    subdirs += ['tests/SConscript']
+    subdirs += ['tests/SConscript',
+                'demos/SConscript']
+
+env.ParseConfig('pkg-config gio-2.0 --cflags --libs')
+env.ParseConfig('pkg-config pangowin32 --cflags --libs')
+env.ParseConfig('pkg-config pangocairo --cflags --libs')
+env.ParseConfig('pkg-config atk --cflags --libs')
 
 SConscript(subdirs, exports=['env'])

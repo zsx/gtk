@@ -55,7 +55,6 @@ gdip_loaders = [('ico', ['io-gdip-utils.c', 'io-gdip-animation.c', 'io-gdip-ico.
                 ('tiff', ['io-gdip-tiff.c'])]
 '''
 env_loaders = env_gdk_pixbuf.Clone()
-env_loaders.ParseConfig('pkg-config gobject-2.0 --cflags --libs')
 env_loaders.ParseConfig('pkg-config png12 --cflags --libs')
 for i in loaders + gdip_loaders:
     e = env_loaders.Clone(PDB = i[0] + '.pdb')

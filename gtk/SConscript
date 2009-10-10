@@ -542,13 +542,9 @@ Alias('install', env_gtk.Install('$PREFIX/include/gtk-2.0/gtk', gtk_public_h_sou
 
 env_gtk.DotIn('gtk-win32.rc', 'gtk-win32.rc.in')
 env_gtk.RES('gtk-win32.rc')
-env_gtk.ParseConfig('pkg-config gobject-2.0 --cflags --libs')
+
 env_gtk.ParseConfig('pkg-config gthread-2.0 --cflags --libs')
 env_gtk.ParseConfig('pkg-config gmodule-2.0 --cflags --libs')
-env_gtk.ParseConfig('pkg-config gio-2.0 --cflags --libs')
-env_gtk.ParseConfig('pkg-config cairo --cflags --libs')
-env_gtk.ParseConfig('pkg-config pangocairo --cflags --libs')
-env_gtk.ParseConfig('pkg-config atk --cflags --libs')
 
 def gtk_type_funcs(target, source, env):
     '''
@@ -911,3 +907,6 @@ for x in subs:
     for y in ['16', '24']:
         d = env_gtk.Command('stock-icons/%s/%s' % (y, x[1]), 'stock-icons/%s/%s' % (y, x[0]), 'copy $SOURCE $TARGET')
         env_gtk.Depends('gtkbuiltincache.h', d)
+
+if ARGUMENTS.get('build_test', 0):
+    SConscript('tests/SConscript', exports = 'env_gtk')
