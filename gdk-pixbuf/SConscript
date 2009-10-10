@@ -1,7 +1,7 @@
 # vim: ft=python expandtab
 Import('env')
 
-env_gdk_pixbuf = env.Clone(PDB = 'libgdk-pixbuf-2.0.pdb')
+env_gdk_pixbuf = env.Clone(PDB = 'libgdk_pixbuf-2.0.pdb')
 
 env_gdk_pixbuf['CPPDEFINES']=['HAVE_CONFIG_H',
                               ('G_LOG_DOMAIN', '\\\"GdkPixbuf\\\"'),
@@ -116,13 +116,13 @@ env_gdk_pixbuf['DOT_IN_SUBS']['@GDK_PIXBUF_MICRO@'] = env['DOT_IN_SUBS']['@GTK_M
 env_gdk_pixbuf['DOT_IN_SUBS']['@GDK_PIXBUF_VERSION@'] = env['DOT_IN_SUBS']['@GTK_VERSION@']
 env_gdk_pixbuf.DotIn('gdk-pixbuf-features.h', 'gdk-pixbuf-features.h.in')
 env_gdk_pixbuf_h = env_gdk_pixbuf.Clone(GLIB_MKENUMS_ARGV = [('template', r'gdk-pixbuf\gdk-pixbuf-enum-types.h.template')])
-env_gdk_pixbuf_h.AlwaysBuild(env_gdk_pixbuf_h.MkenumsGenerator('gdk-pixbuf-enum-types.h', libgdk_pixbuf_HEADERS))
+env_gdk_pixbuf_h.Depends(env_gdk_pixbuf_h.MkenumsGenerator('gdk-pixbuf-enum-types.h', libgdk_pixbuf_HEADERS), 'SConscript')
 
 env_gdk_pixbuf_c = env_gdk_pixbuf.Clone(GLIB_MKENUMS_ARGV = [('template', r'gdk-pixbuf\gdk-pixbuf-enum-types.c.template')])
-env_gdk_pixbuf_c.AlwaysBuild(env_gdk_pixbuf_c.MkenumsGenerator('gdk-pixbuf-enum-types.c', libgdk_pixbuf_HEADERS))
+env_gdk_pixbuf_c.Depends(env_gdk_pixbuf_c.MkenumsGenerator('gdk-pixbuf-enum-types.c', libgdk_pixbuf_HEADERS), 'SConscript')
 
 env_gdk_pixbuf['GLIB_GENMARSHAL_ARGV'] = [('prefix', '_gdk_pixbuf_marshal')]
-env_gdk_pixbuf.AlwaysBuild(env_gdk_pixbuf.MarshalGenerator(['gdk-pixbuf-marshal.h', 'gdk-pixbuf-marshal.c'], 'gdk-pixbuf-marshal.list'))
+env_gdk_pixbuf.Depends(env_gdk_pixbuf.MarshalGenerator(['gdk-pixbuf-marshal.h', 'gdk-pixbuf-marshal.c'], 'gdk-pixbuf-marshal.list'), 'SConscript')
 
 #env_gdk_pixbuf.AlwaysBuild(env_gdk_pixbuf.Command('gdk-pixbuf-marshal.h', 'gdk-pixbuf-marshal.list', '''
 #        echo #if !defined(GDK_PIXBUF_DISABLE_DEPRECATED) || defined(GDK_PIXBUF_COMPILATION) > $TARGET
@@ -147,6 +147,7 @@ env_gdk_pixbuf.ParseConfig('pkg-config gthread-2.0 --cflags --libs')
 env_gdk_pixbuf.ParseConfig('pkg-config gmodule-2.0 --cflags --libs')
 env_gdk_pixbuf.ParseConfig('pkg-config gio-2.0 --cflags --libs')
 env_gdk_pixbuf.ParseConfig('pkg-config png12 --cflags --libs')
+env_gdk_pixbuf.ParseConfig('pkg-config zlib --cflags --libs')
 env_gdk_pixbuf.Append(LIBS=['shlwapi',
                             'ws2_32',
                             'dnsapi',
@@ -164,7 +165,7 @@ env_gdk_pixbuf.AddPostAction(gdk_pixbuf_dll, 'mt.exe -nologo -manifest ${TARGET}
 Alias('install', env_gdk_pixbuf.Install('$PREFIX/include/gtk-2.0/gdk-pixbuf', libgdk_pixbuf_include_HEADERS))
 Alias('install', env_gdk_pixbuf.Install('$PREFIX/bin', 'libgdk_pixbuf-2.0' + env_gdk_pixbuf['LIB_SUFFIX'] + '.dll'))
 Alias('install', env_gdk_pixbuf.Install('$PREFIX/lib', 'libgdk_pixbuf-2.0.lib'))
-Alias('install', env_gdk_pixbuf.InstallAs('$PREFIX/lib/gdk_pixbuf-2.0.lib', 'libgdk-pixbuf-2.0.lib'))
+Alias('install', env_gdk_pixbuf.InstallAs('$PREFIX/lib/gdk_pixbuf-2.0.lib', 'libgdk_pixbuf-2.0.lib'))
 if env_gdk_pixbuf['DEBUG'] == 1:
     Alias('install', env_gdk_pixbuf.Install('$PREFIX/pdb', env_gdk_pixbuf['PDB']))
 
@@ -177,7 +178,7 @@ Alias('install', env_gdk_pixbuf_csource.Install('$PREFIX/bin', 'gdk-pixbuf-csour
 #gdk-pixbuf-query-loaders
 env_gdk_pixbuf_query_loaders = env_gdk_pixbuf.Clone(PDB = 'gdk-pixbuf-query-loaders.pdb')
 env_gdk_pixbuf_query_loaders.Append(CPPDEFINES=[('PIXBUF_LIBDIR', '"\\"%s%s\\""' % (env_gdk_pixbuf['PREFIX'].replace('\\', '\\\\'), r'\\etc\\gdk-pixbuf\\loaders'))])
-env_gdk_pixbuf_query_loaders.Program('gdk-pixbuf-query-loaders', ['queryloaders.c', 'libgdk-pixbuf-2.0.lib'])
+env_gdk_pixbuf_query_loaders.Program('gdk-pixbuf-query-loaders', ['queryloaders.c', 'libgdk_pixbuf-2.0.lib'])
 Alias('install', env_gdk_pixbuf_query_loaders.Install('$PREFIX/bin', 'gdk-pixbuf-query-loaders.exe'))
 if env_gdk_pixbuf_query_loaders['DEBUG'] == 1:
     Alias('install', env_gdk_pixbuf_query_loaders.Install('$PREFIX/pdb', env_gdk_pixbuf_query_loaders['PDB']))

@@ -94,13 +94,13 @@ gdk_built_sources =	Split("			\
 	gdkmarshalers.c") + gdk_c_sources + ['gdkkeynames.c']
 
 env_gdk_h = env_gdk.Clone(GLIB_MKENUMS_ARGV = [('template', r'gdk\gdkenumtypes.h.template')])
-env_gdk_h.AlwaysBuild(env_gdk_h.MkenumsGenerator('gdkenumtypes.h', gdk_public_h_sources))
+env_gdk_h.Depends(env_gdk_h.MkenumsGenerator('gdkenumtypes.h', gdk_public_h_sources), 'SConscript')
 
 env_gdk_c = env_gdk.Clone(GLIB_MKENUMS_ARGV = [('template', r'gdk\gdkenumtypes.c.template')])
-env_gdk_c.AlwaysBuild(env_gdk_c.MkenumsGenerator('gdkenumtypes.c', gdk_public_h_sources))
+env_gdk_c.Depends(env_gdk_c.MkenumsGenerator('gdkenumtypes.c', gdk_public_h_sources), 'SConscript')
 
 env_gdk['GLIB_GENMARSHAL_ARGV'] = [('prefix', '_gdk_marshal')]
-env_gdk.AlwaysBuild(env_gdk.MarshalGenerator(['gdkmarshalers.h', 'gdkmarshalers.c'], 'gdkmarshalers.list'))
+env_gdk.Depends(env_gdk.MarshalGenerator(['gdkmarshalers.c', 'gdkmarshalers.h'], 'gdkmarshalers.list'), 'SConscript')
 
 env_gdk_rc = env_gdk.Clone()
 env_gdk_rc['DOT_IN_SUBS']['@srcdir@'] = 'gdk/win32/rc'
@@ -122,7 +122,7 @@ env_gdk.Append(LIBS=['user32',
 SConscript('win32/SConscript', exports = 'env_gdk')
 gdk_dll=env_gdk.SharedLibrary(['libgdk-win32-2.0' + env_gdk['LIB_SUFFIX'] + env_gdk['SHLIBSUFFIX'],
                                'libgdk-win32-2.0.lib'],
-                               gdk_built_sources + ['gdk.def', 'win32/rc/gdk.res', 'win32/libgdk-win32.lib', '#gdk-pixbuf/libgdk-pixbuf-2.0.lib'])
+                               gdk_built_sources + ['gdk.def', 'win32/rc/gdk.res', 'win32/libgdk-win32.lib', '#gdk-pixbuf/libgdk_pixbuf-2.0.lib'])
 env_gdk.AddPostAction(gdk_dll, 'mt.exe -nologo -manifest ${TARGET}.manifest -outputresource:$TARGET;2')
 
 Alias('install', env_gdk.Install('$PREFIX/include/glib-2.0/gdk', gdk_public_h_sources + gdk_built_public_sources))
