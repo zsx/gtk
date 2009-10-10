@@ -98,7 +98,7 @@ test_slider_ranges (void)
 static void
 test_text_access (void)
 {
-  const int N_WIDGETS = 4;
+#define N_WIDGETS 4
   GtkWidget *widgets[N_WIDGETS];
   int i = 0;
   widgets[i++] = gtk_test_create_widget (GTK_TYPE_LABEL, NULL);

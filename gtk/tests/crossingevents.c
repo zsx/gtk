@@ -137,6 +137,7 @@ sensitivity_setup (CrossingTest *test,
 		   gconstpointer user_data)
 {
   GtkWidget *frame;
+  GtkWidget *vbox;
 
   test->window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
   gtk_widget_set_name (test->window, "W");
@@ -144,7 +145,7 @@ sensitivity_setup (CrossingTest *test,
   test->eventbox = gtk_event_box_new ();
   gtk_widget_set_name (test->eventbox, "E");
 
-  GtkWidget *vbox = gtk_vbox_new (FALSE, 10);
+  vbox = gtk_vbox_new (FALSE, 10);
   gtk_container_add (GTK_CONTAINER (test->window), frame);
   gtk_container_add (GTK_CONTAINER (frame), test->eventbox);
   gtk_container_add (GTK_CONTAINER (test->eventbox), vbox);
