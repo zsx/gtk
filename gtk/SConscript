@@ -506,10 +506,8 @@ gtk_built_public_sources = Split("		\
 	gtktypebuiltins.h")
 
 gtk_built_sources = Split(" \
-	gtkaliasdef.c				\
-	gtktypebuiltins.c			\
-	gtkmarshalers.c				\
-	gtkmarshal.c")
+	gtkaliasdef.c")
+
 env_gtk.Depends(env_gtk.Command('gtkmarshalers.h', 'gtkmarshalers.list','''
 	%s\\bin\\glib-genmarshal --prefix=_gtk_marshal $SOURCE --header >> $TARGET''' % env_gtk['PREFIX']), 'SConscript')
 env_gtk.Depends(env_gtk.Command('gtkmarshalers.c', 'gtkmarshalers.list','''
@@ -620,9 +618,15 @@ if env_gtk['DEBUG'] == 1:
 # Installed tools
 #
 env_gtk_query_immodule = env_gtk.Clone(PDB = 'gtk-query-immodules.pdb')
-env_gtk_query_immodule.Program('gtk-query-immodules-2.0', ['queryimmodules.c', '#gdk/libgdk-win32-2.0.lib', '#gdk-pixbuf/libgdk_pixbuf-2.0.lib', 'libgtk-win32-2.0.lib'])
+env_gtk_query_immodule.AddPostAction(
+    env_gtk_query_immodule.Program('gtk-query-immodules-2.0', ['queryimmodules.c', '#gdk/libgdk-win32-2.0.lib', '#gdk-pixbuf/libgdk_pixbuf-2.0.lib', 'libgtk-win32-2.0.lib']),
+    'mt.exe -nologo -manifest ${TARGET}.manifest -outputresource:$TARGET;2')
+Alias('install', env_gtk.Install('$PREFIX/bin', 'gtk-query-immodules-2.0.exe'))
+
 env_gtk_update_icon_cache = env_gtk.Clone(PDB = 'gtk-update-icon-cache.pdb')
 update_icon_cache = env_gtk_update_icon_cache.Program('gtk-update-icon-cache', ['updateiconcache.c', '#gdk/libgdk-win32-2.0.lib', '#gdk-pixbuf/libgdk_pixbuf-2.0.lib'])
+env_gtk_update_icon_cache.AddPostAction(update_icon_cache, 'mt.exe -nologo -manifest ${TARGET}.manifest -outputresource:$TARGET;2')
+Alias('install', env_gtk.Install('$PREFIX/bin', 'gtk-update-icon-cache.exe'))
 
 env_gtk.AppendENVPath('PATH', 'gdk')
 env_gtk.AppendENVPath('PATH', 'gdk-pixbuf')

@@ -172,13 +172,17 @@ if env_gdk_pixbuf['DEBUG'] == 1:
 #gdk-pixbuf-csource
 env_gdk_pixbuf_csource = env_gdk_pixbuf.Clone(PDB = 'gdk-pixbuf-csource.pdb')
 env_gdk_pixbuf_csource.Append(CPPPATH='#gtk')
-env_gdk_pixbuf_csource.Program('gdk-pixbuf-csource', ['gdk-pixbuf-csource.c', 'libgdk_pixbuf-2.0.lib'])
+env_gdk_pixbuf_csource.AddPostAction(
+        env_gdk_pixbuf_csource.Program('gdk-pixbuf-csource', ['gdk-pixbuf-csource.c', 'libgdk_pixbuf-2.0.lib']),
+        'mt.exe -nologo -manifest ${TARGET}.manifest -outputresource:$TARGET;2')
 Alias('install', env_gdk_pixbuf_csource.Install('$PREFIX/bin', 'gdk-pixbuf-csource.exe'))
 
 #gdk-pixbuf-query-loaders
 env_gdk_pixbuf_query_loaders = env_gdk_pixbuf.Clone(PDB = 'gdk-pixbuf-query-loaders.pdb')
 env_gdk_pixbuf_query_loaders.Append(CPPDEFINES=[('PIXBUF_LIBDIR', '"\\"%s%s\\""' % (env_gdk_pixbuf['PREFIX'].replace('\\', '\\\\'), r'\\etc\\gdk-pixbuf\\loaders'))])
-env_gdk_pixbuf_query_loaders.Program('gdk-pixbuf-query-loaders', ['queryloaders.c', 'libgdk_pixbuf-2.0.lib'])
+env_gdk_pixbuf_query_loaders.AddPostAction(
+        env_gdk_pixbuf_query_loaders.Program('gdk-pixbuf-query-loaders', ['queryloaders.c', 'libgdk_pixbuf-2.0.lib']),
+        'mt.exe -nologo -manifest ${TARGET}.manifest -outputresource:$TARGET;2')
 Alias('install', env_gdk_pixbuf_query_loaders.Install('$PREFIX/bin', 'gdk-pixbuf-query-loaders.exe'))
 if env_gdk_pixbuf_query_loaders['DEBUG'] == 1:
     Alias('install', env_gdk_pixbuf_query_loaders.Install('$PREFIX/pdb', env_gdk_pixbuf_query_loaders['PDB']))
