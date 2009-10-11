@@ -18,8 +18,8 @@ test-inline-pixbufs.h: $(pixbuf_csource_deps) apple-red.png gnome-foot.png
         > test-inline-pixbufs.h				\
 	|| (rm -f test-inline-pixbufs.h && false)
         '''
-env_demos.Command('test-inline-pixbufs.h', ['apple-red.png', 'gnome-foot.png'], '''
-        %s\\bin\\gdk-pixbuf-csource --raw --build-list apple_red demos\\apple-red.png gnome_foot demos\\gnome-foot.png > $TARGET''' % env_demos['PREFIX'])
+env_demos.Command('test-inline-pixbufs.h', ['$PREFIX/bin/gdk-pixbuf-csource.exe', 'apple-red.png', 'gnome-foot.png'], '''
+        $PREFIX\\bin\\gdk-pixbuf-csource --raw --build-list apple_red demos\\apple-red.png gnome_foot demos\\gnome-foot.png > $TARGET''')
 
 tests = (('testpixbuf', ['testpixbuf.c', 'pixbuf-init.obj']),
          ('testpixbuf_drawable', ['testpixbuf-drawable.c', 'pixbuf-init.obj']),
