@@ -28,10 +28,11 @@ env_gtk.StaticObject('pixbuf-init', 'pixbuf-init.c')
 for x in tests:
     e = env_gtk_tests.Clone()
     if isinstance(x, str):
-        e['PDB'] = x + '.pdb'
-        e.Program(x, x + '.c')
-        e.Alias('test', 'gtk\\tests\\%s.exe' % x)
+        name = x
+        src = x + '.c'
     else:
-        e['PDB'] = x[0] + '.pdb'
-        e.Program(x[0], x[1])
-        e.Alias('test', 'gtk\\tests\\%s.exe' % x[0])
+        name = x[0]
+        src = x[1]
+    e['PDB'] = name + '.pdb'
+    e.Program(name, src)
+    e.AlwaysBuild(e.Alias('test', [name + '.exe'], 'cd gtk\\tests && %s.exe' % name))

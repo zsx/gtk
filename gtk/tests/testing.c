@@ -98,6 +98,7 @@ test_slider_ranges (void)
 static void
 test_text_access (void)
 {
+#ifdef GTK_ENABLE_BROKEN /* GtkText is enabled only when GTK_ENABLE_BROKEN is defined */
 #define N_WIDGETS 4
   GtkWidget *widgets[N_WIDGETS];
   int i = 0;
@@ -122,6 +123,7 @@ test_text_access (void)
       g_assert (strcmp (text, "") == 0);
       g_free (text);
     }
+#endif
 }
 
 static void
@@ -221,10 +223,14 @@ main (int   argc,
   gtk_test_init (&argc, &argv);
   gtk_test_register_all_types();
   g_test_add_func ("/ui-tests/text-access", test_text_access);
+#ifndef G_OS_WIN32 /* simulate_click is not implemented on win32 */
   g_test_add_func ("/ui-tests/button-clicks", test_button_clicks);
   g_test_add_func ("/ui-tests/keys-events", test_button_keys);
+#endif
   g_test_add_func ("/ui-tests/slider-ranges", test_slider_ranges);
   g_test_add_func ("/ui-tests/xserver-sync", test_xserver_sync);
+#ifndef G_OS_WIN32
   g_test_add_func ("/ui-tests/spin-button-arrows", test_spin_button_arrows);
+#endif
   return g_test_run();
 }
