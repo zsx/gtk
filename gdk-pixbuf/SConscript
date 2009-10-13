@@ -178,7 +178,7 @@ Alias('install', env_gdk_pixbuf_csource.Install('$PREFIX/bin', 'gdk-pixbuf-csour
 
 #gdk-pixbuf-query-loaders
 env_gdk_pixbuf_query_loaders = env_gdk_pixbuf.Clone(PDB = 'gdk-pixbuf-query-loaders.pdb')
-env_gdk_pixbuf_query_loaders.Append(CPPDEFINES=[('PIXBUF_LIBDIR', '"\\"%s%s\\""' % (env_gdk_pixbuf['PREFIX'].replace('\\', '\\\\'), r'\\etc\\gdk-pixbuf\\loaders'))])
+env_gdk_pixbuf_query_loaders.Append(CPPDEFINES=[('PIXBUF_LIBDIR', r'\"%s\\lib\\gtk-2.0\\%s\\loaders\"' % (env_gdk_pixbuf['PREFIX'].replace('\\', r'\\'), env_gdk_pixbuf_query_loaders['GTK_BINARY_VERSION']))])
 env_gdk_pixbuf_query_loaders.AddPostAction(
         env_gdk_pixbuf_query_loaders.Program('gdk-pixbuf-query-loaders', ['queryloaders.c', 'libgdk_pixbuf-2.0.lib']),
         'mt.exe -nologo -manifest ${TARGET}.manifest -outputresource:$TARGET;2')
