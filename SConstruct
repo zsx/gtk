@@ -39,8 +39,7 @@ env['DOT_IN_SUBS'] = {'@PACKAGE_VERSION@': GTK_VERSION,
                       '@host@': 'i486-windows',
                       '@gdktarget@': 'win32',
                       '@GETTEXT_PACKAGE@': 'gtk20',
-                      '@GDKPACKAGES@': 'pangocairo gio-2.0',
-                      '@GTKPACKAGES@': 'atk'}
+                      '@GTK_PACKAGES@': 'atk cairo gio-2.0'}
 pcs = ('gdk-win32-2.0.pc',
        'gtk+-2.0.pc',
        'gdk-pixbuf-2.0.pc',
