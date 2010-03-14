@@ -43,18 +43,17 @@ env['DOT_IN_SUBS'] = {'@PACKAGE_VERSION@': GTK_VERSION,
                       '@host@': 'i486-windows',
                       '@gdktarget@': 'win32',
                       '@GETTEXT_PACKAGE@': 'gtk20',
+                      '@GDK_PACKAGES@': 'pangowin32 pangocairo',
                       '@GTK_PACKAGES@': 'atk cairo gio-2.0'}
-pcs = ('gdk-win32-2.0.pc',
+pcs = ('gdk-2.0.pc',
        'gtk+-2.0.pc',
        'gdk-pixbuf-2.0.pc',
        'gail.pc')
 
 for pc in pcs:
-    if pc != 'gdk-win32-2.0.pc':
-        env.DotIn(pc, pc + '.in')
-    else:
-        env.DotIn(pc, 'gdk-2.0.pc.in')
+    env.DotIn(pc, pc + '.in')
     env.Alias('install', env.Install('$PREFIX/lib/pkgconfig', pc))
+    env.Alias('install', env.InstallAs('$PREFIX/lib/pkgconfig/gdk-win32-2.0.pc', 'gdk-2.0.pc'))
 
 env.DotIn('config.h', 'config.h.win32.in')
 
