@@ -6,11 +6,15 @@ opts = Variables()
 opts.Add(PathVariable('PREFIX', 'Installation prefix', os.path.expanduser('~/FOSS'), PathVariable.PathIsDirCreate))
 opts.Add(BoolVariable('DEBUG', 'Build with Debugging information', 0))
 opts.Add(PathVariable('PERL', 'Path to the executable perl', r'C:\Perl\bin\perl.exe', PathVariable.PathIsFile))
+opts.Add(BoolVariable('WITH_OSMSVCRT', 'Link with the os supplied msvcrt.dll instead of the one supplied by the compiler (msvcr90.dll, for instance)', 0))
 
 env = Environment(variables = opts,
                   ENV=os.environ, tools = ['default', GBuilder])
 GInitialize(env)
 env['ESCAPED_PREFIX'] = env['PREFIX'].replace('\\', '\\\\')
+
+if env['WITH_OSMSVCRT']:
+    env['LIB_SUFFIX'] = '-0'
 
 GTK_MAJOR_VERSION=2
 GTK_MINOR_VERSION=18
@@ -39,19 +43,17 @@ env['DOT_IN_SUBS'] = {'@PACKAGE_VERSION@': GTK_VERSION,
                       '@host@': 'i486-windows',
                       '@gdktarget@': 'win32',
                       '@GETTEXT_PACKAGE@': 'gtk20',
-                      '@GDKPACKAGES@': 'pangocairo gio-2.0',
-                      '@GTKPACKAGES@': 'atk'}
-pcs = ('gdk-win32-2.0.pc',
+                      '@GDK_PACKAGES@': 'pangowin32 pangocairo',
+                      '@GTK_PACKAGES@': 'atk cairo gio-2.0'}
+pcs = ('gdk-2.0.pc',
        'gtk+-2.0.pc',
        'gdk-pixbuf-2.0.pc',
        'gail.pc')
 
 for pc in pcs:
-    if pc != 'gdk-win32-2.0.pc':
-        env.DotIn(pc, pc + '.in')
-    else:
-        env.DotIn(pc, 'gdk-2.0.pc.in')
+    env.DotIn(pc, pc + '.in')
     env.Alias('install', env.Install('$PREFIX/lib/pkgconfig', pc))
+    env.Alias('install', env.InstallAs('$PREFIX/lib/pkgconfig/gdk-win32-2.0.pc', 'gdk-2.0.pc'))
 
 env.DotIn('config.h', 'config.h.win32.in')
 
@@ -59,8 +61,15 @@ env.AppendENVPath('PATH', env['PREFIX'] + '\\bin')
 
 subdirs = ['gdk-pixbuf/SConscript',
            'gdk/SConscript',
-           'gtk/SConscript']
+           'gtk/SConscript',
+           'modules/SConscript']
 if ARGUMENTS.get('build_test', 0):
-    subdirs += ['tests/SConscript']
+    subdirs += ['tests/SConscript',
+                'demos/SConscript']
+
+env.ParseConfig('pkg-config gio-2.0 --cflags --libs')
+env.ParseConfig('pkg-config pangowin32 --cflags --libs')
+env.ParseConfig('pkg-config pangocairo --cflags --libs')
+env.ParseConfig('pkg-config atk --cflags --libs')
 
 SConscript(subdirs, exports=['env'])

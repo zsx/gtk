@@ -25,7 +25,9 @@
 
 
 #include <gtk/gtk.h>
+#ifdef HAVE_UNISTD_H
 #include <unistd.h>
+#endif
 
 #define VIEW_WIDTH 320
 #define VIEW_HEIGHT 240

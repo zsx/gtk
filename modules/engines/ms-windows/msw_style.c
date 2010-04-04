@@ -39,7 +39,6 @@
 #include <stdio.h>
 
 #include "gtk/gtk.h"
-#include "gtk/gtk.h"
 
 #ifdef BUILDING_STANDALONE
 #include "gdk/gdkwin32.h"

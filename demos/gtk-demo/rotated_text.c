@@ -1,4 +1,4 @@
-/* Rotated Text
+﻿/* Rotated Text
  *
  * This demo shows how to use PangoCairo to draw rotated and transformed
  * text.  The right pane shows a rotated GtkLabel widget.

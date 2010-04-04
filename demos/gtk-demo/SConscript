@@ -1,0 +1,63 @@
+# vim: ft=python expandtab
+Import('env_demos')
+import os
+
+env_demos_gtk = env_demos.Clone()
+
+env_demos_gtk['CPPDEFINES']=['HAVE_CONFIG_H',
+                       'GTK_DISABLE_DEPRECATED',
+                       'UNICODE',
+                       ('DEMOCODEDIR', '\\\"demos\\\\gtk-demo\\\"'),
+                       'GDK_DISABLE_DEPRECATED'] + env_demos_gtk['DEBUG_CPPDEFINES']
+
+demos =	Split("					\
+	appwindow.c				\
+	assistant.c				\
+	builder.c				\
+	button_box.c				\
+	changedisplay.c				\
+	clipboard.c				\
+	colorsel.c				\
+	combobox.c				\
+	dialog.c				\
+	drawingarea.c				\
+	editable_cells.c			\
+	entry_buffer.c				\
+	entry_completion.c			\
+	expander.c  				\
+	hypertext.c				\
+	iconview.c				\
+	iconview_edit.c				\
+	images.c				\
+	infobar.c				\
+	links.c					\
+	list_store.c				\
+	menus.c					\
+	offscreen_window.c			\
+	offscreen_window2.c			\
+	panes.c					\
+	pickers.c				\
+	pixbufs.c				\
+	printing.c				\
+	search_entry.c				\
+	sizegroup.c				\
+	stock_browser.c				\
+	textview.c				\
+	textscroll.c				\
+	tree_store.c				\
+	ui_manager.c")
+
+demos_str = " ".join(demos)
+
+#rotated_text.c				\
+
+env_demos_gtk['DOT_IN_SUBS']['@PERL@'] = env_demos_gtk['PERL']
+env_demos_gtk.DotIn('geninclude.pl', 'geninclude.pl.in')
+env_demos_gtk.Depends('geninclude.pl', 'SConscript')
+
+env_demos_gtk.Command('demos.h', demos, '''
+        cd demos/gtk-demo && %s geninclude.pl %s > demos.h''' % (env_demos_gtk['PERL'], demos_str))
+env_demos_gtk.Depends('demos.h', ['geninclude.pl', 'SConscript'])
+
+env_demos_gtk.Append(CPPPATH='#demos/gtk-demo')
+env_demos_gtk.Program('demos_gtk', demos + ['main.c'])

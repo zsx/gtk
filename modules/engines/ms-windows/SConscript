@@ -1,0 +1,25 @@
+# vim: ft=python expandtab
+Import('env_modules')
+
+libwimp_SOURCES = Split("\
+	msw_rc_style.c		\
+	msw_style.c		\
+	msw_theme_main.c	\
+	xp_theme.c")
+env_modules_engines_wimp = env_modules.Clone(PDB = 'libwimp.pdb')
+#env_modules_engines_wimp.Append(CPPDEFINES = ['BUILDING_STANDALONE'])
+env_modules_engines_wimp['CPPDEFINES']=['HAVE_CONFIG_H',
+        # 'GTK_DISABLE_DEPRECATED', GTK_IS_CLIST is deprecated
+                       'GDK_DISABLE_DEPRECATED'] + env_modules_engines_wimp['DEBUG_CPPDEFINES']
+env_modules_engines_wimp.Append(LIBS = ['gdi32', 'user32'])
+env_modules_engines_wimp.Append(LDFLAGS = '/SUBSYSTEM:WINDOWS')
+wimp_dll = env_modules_engines_wimp.SharedLibrary('libwimp', libwimp_SOURCES)
+wimp_install = Alias('install', env_modules_engines_wimp.Install('$PREFIX/lib/gtk-2.0/$GTK_BINARY_VERSION/engines', 'libwimp.dll'))
+env_modules_engines_wimp.AddPostAction(wimp_dll, 'mt.exe -nologo -manifest ${TARGET}.manifest -outputresource:$TARGET;2')
+Alias('install', env_modules_engines_wimp.Install('$PREFIX/share/themes/MS-Windows/gtk-2.0/', 'Theme/gtk-2.0/gtkrc'))
+
+'''
+Alias('post_install', env_modules_engines.Install('$PREFIX/etc/gtk-2.0/', 'gtk.immodules'))
+
+env_modules_engines.Command('gtk.immodules', [im_wimp_install, '$PREFIX/bin/gtk-query-immodules-2.0.exe'], '$PREFIX/bin/gtk-query-immodules-2.0.exe > $TARGET')
+'''
