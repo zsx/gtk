@@ -1,0 +1,34 @@
+<?xml version='1.0'?>
+<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>
+    <Module Id='LibgdkDev' Language='1033' Version='@VERSION@'>
+        <Package Id='f0ad8968-d743-4658-9b71-d33c1cc6c64b' Description='Libgdk devlopement package'
+            Comments='This is a windows installer for libgdk library devlopment files'
+            Manufacturer='Gnome4Win' InstallerVersion='200' />
+
+        <Directory Id='TARGETDIR' Name='SourceDir'>
+            <Directory Id='include' Name='include'>
+                <Component Id='headers' Guid='b2f3bc08-b017-4a68-9aa1-4fe79b85f431'>
+                    @HEADERS@
+                </Component>
+            </Directory>
+            <Directory Id='lib' Name='lib'>
+                <Component Id='libs' Guid='b83f111c-619d-48fa-abb2-b65e783ad2d6'>
+                    @LIBS@
+                </Component>
+                <Directory Id="gtk_2.0" Name="gtk-2.0">
+                    <Directory Id='libinclude' Name='include'>
+                        <Component Id='libheaders' Guid='cc20527a-8ea0-4ea8-b4df-9442f9740d04'>
+                            @LIBHEADERS@
+                        </Component>
+                    </Directory>
+                </Directory>
+                <Directory Id='pkgconfig' Name='pkgconfig'>
+                    <Component Id='pcs' Guid='8808e73b-97e0-4791-8c6d-de3ac9a9d727'>
+                        @PCS@
+                    </Component>
+                </Directory>
+            </Directory>
+            @PDBS@
+        </Directory>
+    </Module>
+</Wix>

@@ -1,0 +1,27 @@
+<?xml version='1.0'?>
+<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>
+    <Module Id='LibgdkpixbufDev' Language='1033' Version='@VERSION@'>
+        <Package Id='ad132c44-a73e-4fbd-8c76-82a17de749ad' Description='Libgdkpixbuf devlopement package'
+            Comments='This is a windows installer for libgdkpixbuf library devlopment files'
+            Manufacturer='Gnome4Win' InstallerVersion='200' />
+
+        <Directory Id='TARGETDIR' Name='SourceDir'>
+            <Directory Id='include' Name='include'>
+                <Component Id='headers' Guid='e5c13c15-26cc-4e6e-a3a2-90182fc5958a'>
+                    @HEADERS@
+                </Component>
+            </Directory>
+            <Directory Id='lib' Name='lib'>
+                <Component Id='libs' Guid='b7ed3d23-6355-4428-89c4-eefac703eb60'>
+                    @LIBS@
+                </Component>
+                <Directory Id='pkgconfig' Name='pkgconfig'>
+                    <Component Id='pcs' Guid='25e07b3c-6e38-479b-9c36-3f45bef2a348'>
+                        @PCS@
+                    </Component>
+                </Directory>
+            </Directory>
+            @PDBS@
+        </Directory>
+    </Module>
+</Wix>

@@ -1,0 +1,26 @@
+<?xml version='1.0'?>
+<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>
+    <Module Id='LibgtkRun' Language='1033' Version='@VERSION@'>
+        <Package Id='6995ba72-820c-429e-853c-273eee38b79b' Description='Libgtk runtime package'
+            Comments='This is a windows installer for libgtk library runtime files'
+            Manufacturer='Gnome4Win' InstallerVersion='200' />
+
+        <Directory Id='TARGETDIR' Name='SourceDir'>
+            <Directory Id='dlls' Name='bin'>
+                <Component Id='dlls' Guid='94de1cae-4884-4dc4-980c-dc0e0625864b'>
+                    @DLLS@
+                </Component>
+                <Component Id='exes' Guid='e33e52ec-635d-43a9-a45b-06d8eb427578'>
+                    @EXES@
+                </Component>
+            </Directory>
+            <Directory Id='etc' Name='etc'>
+                <Directory Id="gtk_2.0" Name="gtk-2.0">
+                    <Component Id='libheaders' Guid='f4d29b76-de86-46dd-9731-8ae0aba61ded'>
+                        @IMMODULES@
+                    </Component>
+                </Directory>
+            </Directory>
+        </Directory>
+    </Module>
+</Wix>

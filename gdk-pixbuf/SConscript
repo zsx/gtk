@@ -1,4 +1,5 @@
 # vim: ft=python expandtab
+from site_init import generate_file_element
 Import('env')
 
 env_gdk_pixbuf = env.Clone(PDB = 'libgdk_pixbuf-2.0.pdb')
@@ -155,18 +156,27 @@ env_gdk_pixbuf.Append(LIBS=['shlwapi',
                             'advapi32',
                             'shell32',
                             'Ole32'])
-gdk_pixbuf_dll=env_gdk_pixbuf.SharedLibrary(['libgdk_pixbuf-2.0' + env_gdk_pixbuf['LIB_SUFFIX'] + env_gdk_pixbuf['SHLIBSUFFIX'],
+dllname = 'libgdk_pixbuf-2.0' + env_gdk_pixbuf['LIB_SUFFIX'] + env_gdk_pixbuf['SHLIBSUFFIX']
+gdk_pixbuf_dll=env_gdk_pixbuf.SharedLibrary([dllname,
                                     'libgdk_pixbuf-2.0.lib'],
                                    libgdk_pixbuf_BUILT_SOURCES+ ['gdk_pixbuf.def', 'gdk_pixbuf.res', 'pixops/libpixops.lib'])
 #env_gdk_pixbuf.Depends('gdk_pixbuf_dll', libgdk_pixbuf_include_HEADERS)
 env_gdk_pixbuf.AddPostAction(gdk_pixbuf_dll, 'mt.exe -nologo -manifest ${TARGET}.manifest -outputresource:$TARGET;2')
 
 Alias('install', env_gdk_pixbuf.Install('$PREFIX/include/gtk-2.0/gdk-pixbuf', libgdk_pixbuf_include_HEADERS))
-Alias('install', env_gdk_pixbuf.Install('$PREFIX/bin', 'libgdk_pixbuf-2.0' + env_gdk_pixbuf['LIB_SUFFIX'] + '.dll'))
+env_gdk_pixbuf['DOT_IN_SUBS']['@HEADERS@'] = generate_file_element(libgdk_pixbuf_include_HEADERS, r'include/gtk-2.0/gdk-pixbuf', env_gdk_pixbuf)
+Alias('install', env_gdk_pixbuf.Install('$PREFIX/bin', dllname))
+env_gdk_pixbuf['DOT_IN_SUBS']['@DLLS@'] = generate_file_element(dllname, r'bin', env_gdk_pixbuf)
+
 Alias('install', env_gdk_pixbuf.Install('$PREFIX/lib', 'libgdk_pixbuf-2.0.lib'))
 Alias('install', env_gdk_pixbuf.InstallAs('$PREFIX/lib/gdk_pixbuf-2.0.lib', 'libgdk_pixbuf-2.0.lib'))
+env_gdk_pixbuf['DOT_IN_SUBS']['@LIBS@'] = generate_file_element(['libgdk_pixbuf-2.0.lib', 'gdk_pixbuf-2.0.lib'], r'lib', env_gdk_pixbuf)
+env_gdk_pixbuf['DOT_IN_SUBS']['@PCS@'] = generate_file_element(['gdk-pixbuf-2.0.pc'], r'lib/pkgconfig', env_gdk_pixbuf)
+
+pdbs = []
 if env_gdk_pixbuf['DEBUG'] == 1:
     Alias('install', env_gdk_pixbuf.Install('$PREFIX/pdb', env_gdk_pixbuf['PDB']))
+    pdbs.append(env_gdk_pixbuf['PDB'])
 
 #gdk-pixbuf-csource
 env_gdk_pixbuf_csource = env_gdk_pixbuf.Clone(PDB = 'gdk-pixbuf-csource.pdb')
@@ -175,6 +185,10 @@ env_gdk_pixbuf_csource.AddPostAction(
         env_gdk_pixbuf_csource.Program('gdk-pixbuf-csource', ['gdk-pixbuf-csource.c', 'libgdk_pixbuf-2.0.lib']),
         'mt.exe -nologo -manifest ${TARGET}.manifest -outputresource:$TARGET;2')
 Alias('install', env_gdk_pixbuf_csource.Install('$PREFIX/bin', 'gdk-pixbuf-csource.exe'))
+env_gdk_pixbuf['DOT_IN_SUBS']['@EXES@'] = generate_file_element(['gdk-pixbuf-csource.exe'], r'bin', env_gdk_pixbuf)
+if env_gdk_pixbuf_csource['DEBUG'] == 1:
+    Alias('install', env_gdk_pixbuf_csource.Install('$PREFIX/pdb', env_gdk_pixbuf_csource['PDB']))
+    pdbs.append(env_gdk_pixbuf_csource['PDB'])
 
 #gdk-pixbuf-query-loaders
 env_gdk_pixbuf_query_loaders = env_gdk_pixbuf.Clone(PDB = 'gdk-pixbuf-query-loaders.pdb')
@@ -182,6 +196,29 @@ env_gdk_pixbuf_query_loaders.Append(CPPDEFINES=[('PIXBUF_LIBDIR', r'\"%s\\lib\\g
 env_gdk_pixbuf_query_loaders.AddPostAction(
         env_gdk_pixbuf_query_loaders.Program('gdk-pixbuf-query-loaders', ['queryloaders.c', 'libgdk_pixbuf-2.0.lib']),
         'mt.exe -nologo -manifest ${TARGET}.manifest -outputresource:$TARGET;2')
-Alias('install', env_gdk_pixbuf_query_loaders.Install('$PREFIX/bin', 'gdk-pixbuf-query-loaders.exe'))
+query_install = env_gdk_pixbuf_query_loaders.Install('$PREFIX/bin', 'gdk-pixbuf-query-loaders.exe')
+Alias('install', query_install)
+env_gdk_pixbuf['DOT_IN_SUBS']['@EXES@'] += generate_file_element(['gdk-pixbuf-query-loaders.exe'], r'bin', env_gdk_pixbuf)
+
+env_gdk_pixbuf.PrependENVPath("PATH", env_gdk_pixbuf['PREFIX'] + r'\\bin')
+env_gdk_pixbuf.Command('gdk-pixbuf.loaders', [], 'gdk-pixbuf-query-loaders.exe > $TARGET')
+env_gdk_pixbuf.Depends('gdk-pixbuf.loaders', query_install)
+
+Alias('install', env_gdk_pixbuf.Install('$PREFIX/etc', 'gdk-pixbuf.loaders'))
+env_gdk_pixbuf['DOT_IN_SUBS']['@LOADERS@'] = generate_file_element(['gdk-pixbuf.loaders'], r'etc', env_gdk_pixbuf)
+
 if env_gdk_pixbuf_query_loaders['DEBUG'] == 1:
     Alias('install', env_gdk_pixbuf_query_loaders.Install('$PREFIX/pdb', env_gdk_pixbuf_query_loaders['PDB']))
+    pdbs.append(env_gdk_pixbuf_query_loaders['PDB'])
+if env_gdk_pixbuf['DEBUG'] == 1:
+    env_gdk_pixbuf['DOT_IN_SUBS']['@PDBS@'] = '''
+		  <Directory Id='pdb' Name='pdb'>
+			  <Component Id='pdbs' Guid='a956f85f-811e-4dcc-bff3-d33cd1c574b9'>
+				  %s 
+			  </Component>
+                  </Directory>''' % '\n'.join(map(lambda x: generate_file_element(x, r'pdb', env_gdk_pixbuf), pdbs))
+
+env_gdk_pixbuf.DotIn('gdkpixbufrun.wxs', 'gdkpixbufrun.wxs.in')
+env_gdk_pixbuf.DotIn('gdkpixbufdev.wxs', 'gdkpixbufdev.wxs.in')
+env_gdk_pixbuf.Depends(['gdkpixbufrun.wxs', 'gdkpixbufdev.wxs'], 'SConscript')
+env_gdk_pixbuf.Alias('install', env_gdk_pixbuf.Install('$PREFIX/wxs', ['gdkpixbufrun.wxs', 'gdkpixbufdev.wxs']))

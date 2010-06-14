@@ -1,0 +1,27 @@
+<?xml version='1.0'?>
+<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>
+    <Module Id='LibgtkDev' Language='1033' Version='@VERSION@'>
+        <Package Id='be961011-3b0e-4007-9704-5019fd35b3a8' Description='Libgtk devlopement package'
+            Comments='This is a windows installer for libgtk library devlopment files'
+            Manufacturer='Gnome4Win' InstallerVersion='200' />
+
+        <Directory Id='TARGETDIR' Name='SourceDir'>
+            <Directory Id='include' Name='include'>
+                <Component Id='headers' Guid='8330c760-a304-4637-a67c-7a6f30017545'>
+                    @HEADERS@
+                </Component>
+            </Directory>
+            <Directory Id='lib' Name='lib'>
+                <Component Id='libs' Guid='9241ceca-3250-4e51-94db-0c8f20bc4e02'>
+                    @LIBS@
+                </Component>
+                <Directory Id='pkgconfig' Name='pkgconfig'>
+                    <Component Id='pcs' Guid='6835e852-a787-4ac7-b77e-88a7e557cb43'>
+                        @PCS@
+                    </Component>
+                </Directory>
+            </Directory>
+            @PDBS@
+        </Directory>
+    </Module>
+</Wix>

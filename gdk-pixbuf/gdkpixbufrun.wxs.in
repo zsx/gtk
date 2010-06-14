@@ -1,0 +1,26 @@
+<?xml version='1.0'?>
+<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>
+    <Module Id='LibgdkpixbufRun' Language='1033' Version='@VERSION@'>
+        <Package Id='fb453f0d-747e-4f13-ac9b-08a7b28e886d' Description='Libgdkpixbuf runtime package'
+            Comments='This is a windows installer for libgdkpixbuf library runtime files'
+            Manufacturer='Gnome4Win' InstallerVersion='200' />
+
+        <Directory Id='TARGETDIR' Name='SourceDir'>
+            <Directory Id='dlls' Name='bin'>
+                <Component Id='dlls' Guid='e218fa05-373c-43e6-a13c-6f02365d1211'>
+                    @DLLS@
+                </Component>
+                <Component Id='exes' Guid='05cd9eca-6a4e-482b-9254-2f345b9db359'>
+                    @EXES@
+                </Component>
+            </Directory>
+            <Directory Id='etc' Name='etc'>
+                <Directory Id="gtk_2.0" Name="gtk-2.0">
+                    <Component Id='libheaders' Guid='8d5481e3-1e5b-4481-9c7e-87b2c0482eff'>
+                        @LOADERS@
+                    </Component>
+                </Directory>
+            </Directory>
+        </Directory>
+    </Module>
+</Wix>

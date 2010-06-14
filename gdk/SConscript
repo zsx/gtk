@@ -1,4 +1,6 @@
 # vim: ft=python expandtab
+from site_init import generate_file_element
+
 Import('env')
 
 env_gdk = env.Clone(PDB = 'libgdk-2.0.pdb')
@@ -10,6 +12,7 @@ env_gdk.Append(CPPPATH=['#', '#gdk', '#gdk-pixbuf'])
 
 env_gdk.DotIn('gdkconfig.h', 'gdkconfig.h.win32')
 env_gdk.Alias('install', env_gdk.Install('$PREFIX/lib/gtk-2.0/include', 'gdkconfig.h'))
+env_gdk['DOT_IN_SUBS']['@LIBHEADERS@'] = generate_file_element('gdkconfig.h', r'lib/gtk-2.0/include', env_gdk)
 
 env_gdk['DOT_SYMBOLS_FLAGS'] = '/DINCLUDE_VARIABLES /DGDK_WINDOWING_WIN32 /DG_OS_WIN32 /DALL_FILES'
 env_gdk.DotSymbols2Def('gdk.def', 'gdk.symbols')
@@ -115,14 +118,32 @@ env_gdk.Append(LIBS=['user32',
                      'ole32',
                      'uuid'])
 SConscript('win32/SConscript', exports = 'env_gdk')
-gdk_dll=env_gdk.SharedLibrary(['libgdk-win32-2.0' + env_gdk['LIB_SUFFIX'] + env_gdk['SHLIBSUFFIX'],
+dllname = 'libgdk-win32-2.0' + env_gdk['LIB_SUFFIX'] + env_gdk['SHLIBSUFFIX'],
+gdk_dll=env_gdk.SharedLibrary([dllname,
                                'libgdk-win32-2.0.lib'],
                                gdk_built_sources + ['gdk.def', 'win32/rc/gdk.res', 'win32/libgdk-win32.lib', '#gdk-pixbuf/libgdk_pixbuf-2.0.lib'])
 env_gdk.AddPostAction(gdk_dll, 'mt.exe -nologo -manifest ${TARGET}.manifest -outputresource:$TARGET;2')
 
 Alias('install', env_gdk.Install('$PREFIX/include/gtk-2.0/gdk', gdk_public_h_sources + gdk_built_public_sources))
-Alias('install', env_gdk.Install('$PREFIX/bin', 'libgdk-win32-2.0' + env_gdk['LIB_SUFFIX'] + '.dll'))
+env_gdk['DOT_IN_SUBS']['@HEADERS@'] = generate_file_element(gdk_public_h_sources + gdk_built_public_sources, r'include/gtk-2.0/gdk', env_gdk)
+
+Alias('install', env_gdk.Install('$PREFIX/bin', dllname))
+env_gdk['DOT_IN_SUBS']['@DLLS@'] = generate_file_element(dllname, r'bin', env_gdk)
+
 Alias('install', env_gdk.Install('$PREFIX/lib', 'libgdk-win32-2.0.lib'))
 Alias('install', env_gdk.InstallAs('$PREFIX/lib/gdk-win32-2.0.lib', 'libgdk-win32-2.0.lib'))
+env_gdk['DOT_IN_SUBS']['@LIBS@'] = generate_file_element(['libgdk-win32-2.0.lib', 'gdk-win32-2.0.lib'], r'lib', env_gdk)
+env_gdk['DOT_IN_SUBS']['@PCS@'] = generate_file_element(['gdk-2.0.pc', 'gdk-win32-2.0.pc'], r'lib/pkgconfig', env_gdk)
+
 if env_gdk['DEBUG'] == 1:
-    Alias('install', env_gdk.Install('$PREFIX/pdb', env_gdk['PDB']))
+    env_gdk.Alias('install', env_gdk.Install('$PREFIX/pdb', env_gdk['PDB']))
+    env_gdk['DOT_IN_SUBS']['@PDBS@'] = '''
+		  <Directory Id='pdb' Name='pdb'>
+			  <Component Id='pdbs' Guid='33dca6f7-92ad-4f80-9b1d-1a0d5b3fb6d3'>
+				  %s 
+			  </Component>
+		  </Directory>''' % generate_file_element(env_gdk['PDB'], r'pdb', env_gdk)
+env_gdk.DotIn('gdkrun.wxs', 'gdkrun.wxs.in')
+env_gdk.DotIn('gdkdev.wxs', 'gdkdev.wxs.in')
+env_gdk.Depends(['gdkrun.wxs', 'gdkdev.wxs'], 'SConscript')
+env_gdk.Alias('install', env_gdk.Install('$PREFIX/wxs', ['gdkrun.wxs', 'gdkdev.wxs']))
