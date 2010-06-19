@@ -58,25 +58,25 @@
 /**
  * SECTION:filesystem
  * @short_description: Functions for working with GIO
+ * @Title: Filesystem utilities
  *
  * The functions and objects described here make working with GTK+ and
- * GIO more convenient. #GtkMountOperation is needed when mounting volumes
- * and gtk_show_uri() is a convenient way to launch applications for URIs.
- * Another object that is worth mentioning in this context is 
- * #GdkAppLaunchContext, which provides visual feedback when lauching
- * applications.
- */
-
-/**
- * GtkMountOperation:
+ * GIO more convenient.
  *
- * #GtkMountOperation is an implementation of #GMountOperation that
- * can be used with GIO functions for mounting volumes such as
+ * #GtkMountOperation is needed when mounting volumes:
+ * It is an implementation of #GMountOperation that can be used with
+ * GIO functions for mounting volumes such as
  * g_file_mount_enclosing_volume(), g_file_mount_mountable(),
- * g_volume_mount(), g_mount_unmount() and others.
+ * g_volume_mount(), g_mount_unmount_with_operation() and others.
  *
  * When necessary, #GtkMountOperation shows dialogs to ask for
  * passwords, questions or show processes blocking unmount.
+ *
+ * gtk_show_uri() is a convenient way to launch applications for URIs.
+ *
+ * Another object that is worth mentioning in this context is
+ * #GdkAppLaunchContext, which provides visual feedback when lauching
+ * applications.
  */
 
 static void   gtk_mount_operation_finalize     (GObject          *object);
@@ -981,21 +981,22 @@ update_process_list_store (GtkMountOperation *mount_operation,
 
   diff_sorted_arrays (current_pids, processes, pid_equal, pid_indices_to_add, pid_indices_to_remove);
 
-  if (pid_indices_to_add->len > 0)
-    lookup_context = _gtk_mount_operation_lookup_context_get (gtk_widget_get_display (mount_operation->priv->process_tree_view));
-  for (n = 0; n < pid_indices_to_add->len; n++)
-    {
-      pid = g_array_index (processes, GPid, n);
-      add_pid_to_process_list_store (mount_operation, lookup_context, list_store, pid);
-    }
-
   for (n = 0; n < pid_indices_to_remove->len; n++)
     {
       pid = g_array_index (current_pids, GPid, n);
       remove_pid_from_process_list_store (mount_operation, list_store, pid);
     }
+
   if (pid_indices_to_add->len > 0)
-    _gtk_mount_operation_lookup_context_free (lookup_context);
+    {
+      lookup_context = _gtk_mount_operation_lookup_context_get (gtk_widget_get_display (mount_operation->priv->process_tree_view));
+      for (n = 0; n < pid_indices_to_add->len; n++)
+        {
+          pid = g_array_index (processes, GPid, n);
+          add_pid_to_process_list_store (mount_operation, lookup_context, list_store, pid);
+        }
+      _gtk_mount_operation_lookup_context_free (lookup_context);
+    }
 
   /* select the first item, if we went from a zero to a non-zero amount of processes */
   if (current_pids->len == 0 && pid_indices_to_add->len > 0)
@@ -1358,7 +1359,7 @@ gtk_mount_operation_aborted (GMountOperation *op)
 
 /**
  * gtk_mount_operation_new:
- * @parent: transient parent of the window, or %NULL
+ * @parent: (allow-none): transient parent of the window, or %NULL
  *
  * Creates a new #GtkMountOperation
  *
@@ -1399,7 +1400,7 @@ gtk_mount_operation_is_showing (GtkMountOperation *op)
 /**
  * gtk_mount_operation_set_parent:
  * @op: a #GtkMountOperation
- * @parent: transient parent of the window, or %NULL
+ * @parent: (allow-none): transient parent of the window, or %NULL
  *
  * Sets the transient parent for windows shown by the
  * #GtkMountOperation.

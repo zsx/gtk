@@ -63,6 +63,8 @@
 #include "gtktooltip.h"
 #include "gtkdebug.h"
 #include "gtkalias.h"
+#include "gtkmenu.h"
+#include "gdk/gdkkeysyms.h"
 
 #include "gdk/gdkprivate.h" /* for GDK_WINDOW_DESTROYED */
 
@@ -717,7 +719,6 @@ do_post_parse_initialization (int    *argc,
 
   /* do what the call to gtk_type_init() used to do */
   g_type_init ();
-  gtk_object_get_type ();
 
   _gtk_accel_map_init ();
   _gtk_rc_init ();
@@ -849,9 +850,9 @@ gtk_get_option_group (gboolean open_default_display)
 gboolean
 gtk_init_with_args (int            *argc,
 		    char         ***argv,
-		    char           *parameter_string,  
+		    const char     *parameter_string,
 		    GOptionEntry   *entries,
-		    char           *translation_domain,
+		    const char     *translation_domain,
 		    GError        **error)
 {
   GOptionContext *context;
@@ -883,9 +884,9 @@ gtk_init_with_args (int            *argc,
 
 /**
  * gtk_parse_args:
- * @argc: a pointer to the number of command line arguments.
- * @argv: a pointer to the array of command line arguments.
- * 
+ * @argc: (inout): a pointer to the number of command line arguments.
+ * @argv: (array) (inout): a pointer to the array of command line arguments.
+ *
  * Parses command line arguments, and initializes global
  * attributes of GTK+, but does not actually open a connection
  * to a display. (See gdk_display_open(), gdk_get_display_arg_name())
@@ -936,13 +937,13 @@ gtk_parse_args (int    *argc,
 
 /**
  * gtk_init_check:
- * @argc: Address of the <parameter>argc</parameter> parameter of your 
+ * @argc: (inout): Address of the <parameter>argc</parameter> parameter of your
  *   main() function. Changed if any arguments were handled.
- * @argv: Address of the <parameter>argv</parameter> parameter of main(). 
+ * @argv: (array length=argc) (inout) (allow-none): Address of the <parameter>argv</parameter> parameter of main().
  *   Any parameters understood by gtk_init() are stripped before return.
- * 
- * This function does the same work as gtk_init() with only 
- * a single change: It does not terminate the program if the GUI can't be 
+ *
+ * This function does the same work as gtk_init() with only
+ * a single change: It does not terminate the program if the GUI can't be
  * initialized. Instead it returns %FALSE on failure.
  *
  * This way the application can fall back to some other means of communication 
@@ -967,13 +968,13 @@ gtk_init_check (int	 *argc,
 
 /**
  * gtk_init:
- * @argc: Address of the <parameter>argc</parameter> parameter of your 
+ * @argc: (inout): Address of the <parameter>argc</parameter> parameter of your
  *   main() function. Changed if any arguments were handled.
- * @argv: Address of the <parameter>argv</parameter> parameter of main(). 
+ * @argv: (array length=argc) (inout) (allow-none): Address of the <parameter>argv</parameter> parameter of main().
  *   Any parameters understood by gtk_init() are stripped before return.
- * 
+ *
  * Call this function before using any other GTK+ functions in your GUI
- * applications.  It will initialize everything needed to operate the 
+ * applications.  It will initialize everything needed to operate the
  * toolkit and parses some standard command line options. @argc and 
  * @argv are adjusted accordingly so your own code will 
  * never see those standard arguments. 
@@ -1518,7 +1519,7 @@ gtk_main_do_event (GdkEvent *event)
        *  then we send the event to the original event widget.
        *  This is the key to implementing modality.
        */
-      if (GTK_WIDGET_IS_SENSITIVE (event_widget) &&
+      if (gtk_widget_is_sensitive (event_widget) &&
 	  gtk_widget_is_ancestor (event_widget, grab_widget))
 	grab_widget = event_widget;
     }
@@ -1558,14 +1559,14 @@ gtk_main_do_event (GdkEvent *event)
 	{
 	  g_object_ref (event_widget);
 	  if (!gtk_widget_event (event_widget, event) &&
-	      GTK_WIDGET_REALIZED (event_widget))
+	      gtk_widget_get_realized (event_widget))
 	    gtk_widget_destroy (event_widget);
 	  g_object_unref (event_widget);
 	}
       break;
       
     case GDK_EXPOSE:
-      if (event->any.window && GTK_WIDGET_DOUBLE_BUFFERED (event_widget))
+      if (event->any.window && gtk_widget_get_double_buffered (event_widget))
 	{
 	  gdk_window_begin_paint_region (event->any.window, event->expose.region);
 	  gtk_widget_send_expose (event_widget, event);
@@ -1614,6 +1615,30 @@ gtk_main_do_event (GdkEvent *event)
 	  if (gtk_invoke_key_snoopers (grab_widget, event))
 	    break;
 	}
+      /* Catch alt press to enable auto-mnemonics;
+       * menus are handled elsewhere
+       */
+      if ((event->key.keyval == GDK_Alt_L || event->key.keyval == GDK_Alt_R) &&
+          !GTK_IS_MENU_SHELL (grab_widget))
+        {
+          gboolean auto_mnemonics;
+
+          g_object_get (gtk_widget_get_settings (grab_widget),
+                        "gtk-auto-mnemonics", &auto_mnemonics, NULL);
+
+          if (auto_mnemonics)
+            {
+              gboolean mnemonics_visible;
+              GtkWidget *window;
+
+              mnemonics_visible = (event->type == GDK_KEY_PRESS);
+
+              window = gtk_widget_get_toplevel (grab_widget);
+
+              if (GTK_IS_WINDOW (window))
+                gtk_window_set_mnemonics_visible (GTK_WINDOW (window), mnemonics_visible);
+            }
+        }
       /* else fall through */
     case GDK_MOTION_NOTIFY:
     case GDK_BUTTON_RELEASE:
@@ -1625,13 +1650,13 @@ gtk_main_do_event (GdkEvent *event)
     case GDK_ENTER_NOTIFY:
       GTK_PRIVATE_SET_FLAG (event_widget, GTK_HAS_POINTER);
       _gtk_widget_set_pointer_window (event_widget, event->any.window);
-      if (GTK_WIDGET_IS_SENSITIVE (grab_widget))
+      if (gtk_widget_is_sensitive (grab_widget))
 	gtk_widget_event (grab_widget, event);
       break;
       
     case GDK_LEAVE_NOTIFY:
       GTK_PRIVATE_UNSET_FLAG (event_widget, GTK_HAS_POINTER);
-      if (GTK_WIDGET_IS_SENSITIVE (grab_widget))
+      if (gtk_widget_is_sensitive (grab_widget))
 	gtk_widget_event (grab_widget, event);
       break;
       
@@ -1734,7 +1759,7 @@ gtk_grab_notify_foreach (GtkWidget *child,
     {
       GTK_PRIVATE_SET_FLAG (child, GTK_SHADOWED);
       if (!was_shadowed && GTK_WIDGET_HAS_POINTER (child)
-	  && GTK_WIDGET_IS_SENSITIVE (child))
+	  && gtk_widget_is_sensitive (child))
 	_gtk_widget_synthesize_crossing (child, info->new_grab_widget,
 					 GDK_CROSSING_GTK_GRAB);
     }
@@ -1742,7 +1767,7 @@ gtk_grab_notify_foreach (GtkWidget *child,
     {
       GTK_PRIVATE_UNSET_FLAG (child, GTK_SHADOWED);
       if (was_shadowed && GTK_WIDGET_HAS_POINTER (child)
-	  && GTK_WIDGET_IS_SENSITIVE (child))
+	  && gtk_widget_is_sensitive (child))
 	_gtk_widget_synthesize_crossing (info->old_grab_widget, child,
 					 info->from_grab ? GDK_CROSSING_GTK_GRAB
 					 : GDK_CROSSING_GTK_UNGRAB);
@@ -1802,7 +1827,7 @@ gtk_grab_add (GtkWidget *widget)
   
   g_return_if_fail (widget != NULL);
   
-  if (!GTK_WIDGET_HAS_GRAB (widget) && GTK_WIDGET_IS_SENSITIVE (widget))
+  if (!gtk_widget_has_grab (widget) && gtk_widget_is_sensitive (widget))
     {
       GTK_WIDGET_SET_FLAGS (widget, GTK_HAS_GRAB);
       
@@ -1840,7 +1865,7 @@ gtk_grab_remove (GtkWidget *widget)
   
   g_return_if_fail (widget != NULL);
   
-  if (GTK_WIDGET_HAS_GRAB (widget))
+  if (gtk_widget_has_grab (widget))
     {
       GTK_WIDGET_UNSET_FLAGS (widget, GTK_HAS_GRAB);
 
@@ -2379,7 +2404,7 @@ gtk_propagate_event (GtkWidget *widget,
 	  /* If there is a grab within the window, give the grab widget
 	   * a first crack at the key event
 	   */
-	  if (widget != window && GTK_WIDGET_HAS_GRAB (widget))
+	  if (widget != window && gtk_widget_has_grab (widget))
 	    handled_event = gtk_widget_event (widget, event);
 	  
 	  if (!handled_event)
@@ -2387,7 +2412,7 @@ gtk_propagate_event (GtkWidget *widget,
 	      window = gtk_widget_get_toplevel (widget);
 	      if (GTK_IS_WINDOW (window))
 		{
-		  if (GTK_WIDGET_IS_SENSITIVE (window))
+		  if (gtk_widget_is_sensitive (window))
 		    gtk_widget_event (window, event);
 		}
 	    }
@@ -2411,7 +2436,7 @@ gtk_propagate_event (GtkWidget *widget,
 	   * to have children of the viewport eat the scroll
 	   * event
 	   */
-	  if (!GTK_WIDGET_IS_SENSITIVE (widget))
+	  if (!gtk_widget_is_sensitive (widget))
 	    handled_event = event->type != GDK_SCROLL;
 	  else
 	    handled_event = gtk_widget_event (widget, event);
@@ -2530,7 +2555,7 @@ gtk_print (gchar *str)
 				 G_CALLBACK (gtk_widget_hide),
 				 GTK_OBJECT (window));
       gtk_box_pack_start (GTK_BOX (box2), button, TRUE, TRUE, 0);
-      GTK_WIDGET_SET_FLAGS (button, GTK_CAN_DEFAULT);
+      gtk_widget_set_can_default (button, TRUE);
       gtk_widget_grab_default (button);
       gtk_widget_show (button);
     }
@@ -2539,7 +2564,7 @@ gtk_print (gchar *str)
   gtk_text_insert (GTK_TEXT (text), NULL, NULL, NULL, str, -1);
   level -= 1;
   
-  if (!GTK_WIDGET_VISIBLE (window))
+  if (!gtk_widget_get_visible (window))
     gtk_widget_show (window);
 }
 #endif

@@ -24,6 +24,8 @@
  * GTK+ at ftp://ftp.gtk.org/pub/gtk/. 
  */
 
+#undef GTK_DISABLE_DEPRECATED
+
 #include "config.h"
 #include <stdio.h>
 #include "gtk/gtk.h"
@@ -54,7 +56,7 @@ update_cursor (GtkWidget *widget,  gdouble x, gdouble y)
 			     x != cursor_x || y != cursor_y))
 	{
 	  gdk_draw_drawable (widget->window,
-			     widget->style->fg_gc[GTK_WIDGET_STATE (widget)],
+			     widget->style->fg_gc[gtk_widget_get_state (widget)],
 			     pixmap,
 			     cursor_x - 5, cursor_y - 5,
 			     cursor_x - 5, cursor_y - 5,
@@ -101,7 +103,7 @@ static gint
 expose_event (GtkWidget *widget, GdkEventExpose *event)
 {
   gdk_draw_drawable (widget->window,
-		     widget->style->fg_gc[GTK_WIDGET_STATE (widget)],
+		     widget->style->fg_gc[gtk_widget_get_state (widget)],
 		     pixmap,
 		     event->area.x, event->area.y,
 		     event->area.x, event->area.y,
@@ -122,7 +124,7 @@ draw_brush (GtkWidget *widget, GdkInputSource source,
   switch (source)
     {
     case GDK_SOURCE_MOUSE:
-      gc = widget->style->dark_gc[GTK_WIDGET_STATE (widget)];
+      gc = widget->style->dark_gc[gtk_widget_get_state (widget)];
       break;
     case GDK_SOURCE_PEN:
       gc = widget->style->black_gc;
@@ -131,7 +133,7 @@ draw_brush (GtkWidget *widget, GdkInputSource source,
       gc = widget->style->white_gc;
       break;
     default:
-      gc = widget->style->light_gc[GTK_WIDGET_STATE (widget)];
+      gc = widget->style->light_gc[gtk_widget_get_state (widget)];
     }
 
   update_rect.x = x - 10 * pressure;
@@ -293,7 +295,7 @@ create_input_dialog (void)
     }
   else
     {
-      if (!GTK_WIDGET_MAPPED(inputd))
+      if (!gtk_widget_get_mapped(inputd))
 	gtk_widget_show(inputd);
       else
 	gdk_window_raise(inputd->window);
@@ -370,7 +372,7 @@ main (int argc, char *argv[])
      events for the drawing area */
   gtk_widget_set_extension_events (drawing_area, GDK_EXTENSION_EVENTS_ALL);
 
-  GTK_WIDGET_SET_FLAGS (drawing_area, GTK_CAN_FOCUS);
+  gtk_widget_set_can_focus (drawing_area, TRUE);
   gtk_widget_grab_focus (drawing_area);
 
   /* .. And create some buttons */

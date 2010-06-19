@@ -230,6 +230,9 @@ gboolean   gtk_window_get_focus_on_map         (GtkWindow           *window);
 void       gtk_window_set_destroy_with_parent  (GtkWindow           *window,
                                                 gboolean             setting);
 gboolean   gtk_window_get_destroy_with_parent  (GtkWindow           *window);
+void       gtk_window_set_mnemonics_visible    (GtkWindow           *window,
+                                                gboolean             setting);
+gboolean   gtk_window_get_mnemonics_visible    (GtkWindow           *window);
 
 void       gtk_window_set_resizable            (GtkWindow           *window,
                                                 gboolean             resizable);
@@ -384,6 +387,8 @@ GtkWindowGroup *gtk_window_get_group (GtkWindow   *window);
 
 /* Ignore this unless you are writing a GUI builder */
 void     gtk_window_reshow_with_initial_size (GtkWindow *window);
+
+GtkWindowType gtk_window_get_window_type     (GtkWindow     *window);
 
 /* Window groups
  */

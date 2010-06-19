@@ -35,6 +35,7 @@
 #include "gtkmarshalers.h"
 #include "gtkorientable.h"
 #include "gtkrange.h"
+#include "gtkscale.h"
 #include "gtkscrollbar.h"
 #include "gtkprivate.h"
 #include "gtkintl.h"
@@ -654,7 +655,7 @@ gtk_range_get_property (GObject      *object,
 static void
 gtk_range_init (GtkRange *range)
 {
-  GTK_WIDGET_SET_FLAGS (range, GTK_NO_WINDOW);
+  gtk_widget_set_has_window (GTK_WIDGET (range), FALSE);
 
   range->orientation = GTK_ORIENTATION_HORIZONTAL;
   range->adjustment = NULL;
@@ -887,6 +888,155 @@ gtk_range_get_flippable (GtkRange *range)
   g_return_val_if_fail (GTK_IS_RANGE (range), FALSE);
 
   return range->flippable;
+}
+
+/**
+ * gtk_range_set_slider_size_fixed:
+ * @range: a #GtkRange
+ * @size_fixed: %TRUE to make the slider size constant
+ *
+ * Sets whether the range's slider has a fixed size, or a size that
+ * depends on it's adjustment's page size.
+ *
+ * This function is useful mainly for #GtkRange subclasses.
+ *
+ * Since: 2.20
+ **/
+void
+gtk_range_set_slider_size_fixed (GtkRange *range,
+                                 gboolean  size_fixed)
+{
+  g_return_if_fail (GTK_IS_RANGE (range));
+
+  if (size_fixed != range->slider_size_fixed)
+    {
+      range->slider_size_fixed = size_fixed ? TRUE : FALSE;
+
+      range->need_recalc = TRUE;
+      gtk_range_calc_layout (range, range->adjustment->value);
+      gtk_widget_queue_draw (GTK_WIDGET (range));
+    }
+}
+
+/**
+ * gtk_range_get_slider_size_fixed:
+ * @range: a #GtkRange
+ *
+ * This function is useful mainly for #GtkRange subclasses.
+ *
+ * See gtk_range_set_slider_size_fixed().
+ *
+ * Return value: whether the range's slider has a fixed size.
+ *
+ * Since: 2.20
+ **/
+gboolean
+gtk_range_get_slider_size_fixed (GtkRange *range)
+{
+  g_return_val_if_fail (GTK_IS_RANGE (range), FALSE);
+
+  return range->slider_size_fixed;
+}
+
+/**
+ * gtk_range_set_min_slider_size:
+ * @range: a #GtkRange
+ * @min_size: The slider's minimum size
+ *
+ * Sets the minimum size of the range's slider.
+ *
+ * This function is useful mainly for #GtkRange subclasses.
+ *
+ * Since: 2.20
+ **/
+void
+gtk_range_set_min_slider_size (GtkRange *range,
+                               gboolean  min_size)
+{
+  g_return_if_fail (GTK_IS_RANGE (range));
+  g_return_if_fail (min_size > 0);
+
+  if (min_size != range->min_slider_size)
+    {
+      range->min_slider_size = min_size;
+
+      range->need_recalc = TRUE;
+      gtk_range_calc_layout (range, range->adjustment->value);
+      gtk_widget_queue_draw (GTK_WIDGET (range));
+    }
+}
+
+/**
+ * gtk_range_get_min_slider_size:
+ * @range: a #GtkRange
+ *
+ * This function is useful mainly for #GtkRange subclasses.
+ *
+ * See gtk_range_set_min_slider_size().
+ *
+ * Return value: The minimum size of the range's slider.
+ *
+ * Since: 2.20
+ **/
+gint
+gtk_range_get_min_slider_size (GtkRange *range)
+{
+  g_return_val_if_fail (GTK_IS_RANGE (range), FALSE);
+
+  return range->min_slider_size;
+}
+
+/**
+ * gtk_range_get_range_rect:
+ * @range: a #GtkRange
+ * @range_rect: return location for the range rectangle
+ *
+ * This function returns the area that contains the range's trough
+ * and its steppers, in widget->window coordinates.
+ *
+ * This function is useful mainly for #GtkRange subclasses.
+ *
+ * Since: 2.20
+ **/
+void
+gtk_range_get_range_rect (GtkRange     *range,
+                          GdkRectangle *range_rect)
+{
+  g_return_if_fail (GTK_IS_RANGE (range));
+  g_return_if_fail (range_rect != NULL);
+
+  gtk_range_calc_layout (range, range->adjustment->value);
+
+  *range_rect = range->range_rect;
+}
+
+/**
+ * gtk_range_get_slider_range:
+ * @range: a #GtkRange
+ * @slider_start: (allow-none): return location for the slider's start, or %NULL
+ * @slider_end: (allow-none): return location for the slider's end, or %NULL
+ *
+ * This function returns sliders range along the long dimension,
+ * in widget->window coordinates.
+ *
+ * This function is useful mainly for #GtkRange subclasses.
+ *
+ * Since: 2.20
+ **/
+void
+gtk_range_get_slider_range (GtkRange *range,
+                            gint     *slider_start,
+                            gint     *slider_end)
+{
+  g_return_if_fail (GTK_IS_RANGE (range));
+
+  gtk_range_calc_layout (range, range->adjustment->value);
+
+  if (slider_start)
+    *slider_start = range->slider_start;
+
+  if (slider_end)
+    *slider_end = range->slider_end;
 }
 
 /**
@@ -1327,7 +1477,7 @@ gtk_range_size_allocate (GtkWidget     *widget,
   range->need_recalc = TRUE;
   gtk_range_calc_layout (range, range->adjustment->value);
 
-  if (GTK_WIDGET_REALIZED (range))
+  if (gtk_widget_get_realized (widget))
     gdk_window_move_resize (range->event_window,
 			    widget->allocation.x,
 			    widget->allocation.y,
@@ -1346,7 +1496,7 @@ gtk_range_realize (GtkWidget *widget)
 
   gtk_range_calc_layout (range, range->adjustment->value);
   
-  GTK_WIDGET_SET_FLAGS (widget, GTK_REALIZED);
+  gtk_widget_set_realized (widget, TRUE);
 
   widget->window = gtk_widget_get_parent_window (widget);
   g_object_ref (widget->window);
@@ -1503,7 +1653,7 @@ draw_stepper (GtkRange     *range,
       arrow_sensitive = range->layout->lower_sensitive;
     }
 
-  if (!GTK_WIDGET_IS_SENSITIVE (range) || !arrow_sensitive)
+  if (!gtk_widget_is_sensitive (GTK_WIDGET (range)) || !arrow_sensitive)
     state_type = GTK_STATE_INSENSITIVE;
   else if (clicked)
     state_type = GTK_STATE_ACTIVE;
@@ -1574,7 +1724,7 @@ gtk_range_expose (GtkWidget      *widget,
   g_object_get (gtk_widget_get_settings (widget),
                 "gtk-touchscreen-mode", &touchscreen,
                 NULL);
-  if (GTK_WIDGET_CAN_FOCUS (range))
+  if (gtk_widget_get_can_focus (GTK_WIDGET (range)))
     gtk_widget_style_get (GTK_WIDGET (range),
                           "focus-line-width", &focus_line_width,
                           "focus-padding", &focus_padding,
@@ -1592,7 +1742,7 @@ gtk_range_expose (GtkWidget      *widget,
   gtk_range_calc_marks (range);
   gtk_range_calc_layout (range, range->adjustment->value);
 
-  sensitive = GTK_WIDGET_IS_SENSITIVE (widget);
+  sensitive = gtk_widget_is_sensitive (widget);
 
   /* Just to be confusing, we draw the trough for the whole
    * range rectangle, not the trough rectangle (the trough
@@ -1779,9 +1929,8 @@ gtk_range_expose (GtkWidget      *widget,
                          fill_width, fill_height);
 	}
 
-      if (sensitive &&
-          GTK_WIDGET_HAS_FOCUS (range))
-        gtk_paint_focus (widget->style, widget->window, GTK_WIDGET_STATE (widget),
+      if (sensitive && gtk_widget_has_focus (widget))
+        gtk_paint_focus (widget->style, widget->window, gtk_widget_get_state (widget),
                          &area, widget, "trough",
                          widget->allocation.x + range->range_rect.x,
                          widget->allocation.y + range->range_rect.y,
@@ -2033,7 +2182,7 @@ gtk_range_button_press (GtkWidget      *widget,
 {
   GtkRange *range = GTK_RANGE (widget);
   
-  if (!GTK_WIDGET_HAS_FOCUS (widget))
+  if (!gtk_widget_has_focus (widget))
     gtk_widget_grab_focus (widget);
 
   /* ignore presses when we're already doing something else. */
@@ -2304,7 +2453,7 @@ gtk_range_scroll_event (GtkWidget      *widget,
 {
   GtkRange *range = GTK_RANGE (widget);
 
-  if (GTK_WIDGET_REALIZED (range))
+  if (gtk_widget_get_realized (widget))
     {
       GtkAdjustment *adj = GTK_RANGE (range)->adjustment;
       gdouble delta;
@@ -2392,7 +2541,7 @@ static void
 gtk_range_state_changed (GtkWidget    *widget,
 			 GtkStateType  previous_state)
 {
-  if (!GTK_WIDGET_IS_SENSITIVE (widget)) 
+  if (!gtk_widget_is_sensitive (widget))
     stop_scrolling (GTK_RANGE (widget));
 }
 
@@ -2450,9 +2599,11 @@ static gboolean
 force_repaint (gpointer data)
 {
   GtkRange *range = GTK_RANGE (data);
+
   range->layout->repaint_id = 0;
-  if (GTK_WIDGET_DRAWABLE (range))
+  if (gtk_widget_is_drawable (GTK_WIDGET (range)))
     gdk_window_process_updates (GTK_WIDGET (range)->window, FALSE);
+
   return FALSE;
 }
 
@@ -2468,7 +2619,8 @@ gtk_range_adjustment_value_changed (GtkAdjustment *adjustment,
   gtk_range_calc_layout (range, range->adjustment->value);
   
   /* now check whether the layout changed  */
-  if (layout_changed (range->layout, &layout))
+  if (layout_changed (range->layout, &layout) ||
+      (GTK_IS_SCALE (range) && GTK_SCALE (range)->draw_value))
     {
       gtk_widget_queue_draw (GTK_WIDGET (range));
       /* setup a timer to ensure the range isn't lagging too much behind the scroll position */
@@ -2766,7 +2918,7 @@ gtk_range_get_props (GtkRange  *range,
   if (tmp_stepper_spacing > 0)
     tmp_trough_under_steppers = FALSE;
 
-  if (GTK_WIDGET_CAN_FOCUS (range))
+  if (gtk_widget_get_can_focus (GTK_WIDGET (range)))
     {
       gint focus_line_width;
       gint focus_padding;

@@ -90,6 +90,9 @@ explicitly call g_object_ref() yourself.</para></listitem>
 <!-- ##### SECTION Stability_Level ##### -->
 
 
+<!-- ##### SECTION Image ##### -->
+
+
 <!-- ##### STRUCT GtkObject ##### -->
 <para>
 The object itself.  You should never use these members directly -
@@ -113,18 +116,16 @@ if all references are released.
 
 <!-- ##### MACRO GTK_OBJECT_TYPE ##### -->
 <para>
-Gets the type of an object.
+
 </para>
 
-@object: a #GtkObject.
 
 
 <!-- ##### MACRO GTK_OBJECT_TYPE_NAME ##### -->
 <para>
-Gets the name of an objects type.
+
 </para>
 
-@object: a #GtkObject.
 
 
 <!-- ##### ENUM GtkObjectFlags ##### -->

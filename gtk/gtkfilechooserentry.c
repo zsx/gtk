@@ -676,7 +676,7 @@ append_common_prefix (GtkFileChooserEntry *chooser_entry,
   gboolean is_complete_not_unique;
   gboolean prefix_expands_the_file_part;
   GError *error;
-  CommonPrefixResult result;
+  CommonPrefixResult result = NO_MATCH;
   gboolean have_result;
 
   clear_completions (chooser_entry);
@@ -1244,7 +1244,7 @@ gtk_file_chooser_entry_focus (GtkWidget        *widget,
   /* This is a bit evil -- it makes Tab never leave the entry. It basically
    * makes it 'safe' for people to hit. */
   if ((direction == GTK_DIR_TAB_FORWARD) &&
-      (GTK_WIDGET_HAS_FOCUS (widget)) &&
+      (gtk_widget_has_focus (widget)) &&
       (! control_pressed))
     {
       if (chooser_entry->has_completion)

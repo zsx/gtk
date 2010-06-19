@@ -551,10 +551,10 @@ gtk_combo_popup_list (GtkCombo *combo)
     }
   else
     {
-      GTK_WIDGET_SET_FLAGS (list, GTK_CAN_FOCUS);
+      gtk_widget_set_can_focus (GTK_WIDGET (list), TRUE);
       gtk_widget_grab_focus (combo->list);
       GTK_LIST (combo->list)->last_focus_child = NULL;
-      GTK_WIDGET_UNSET_FLAGS (list, GTK_CAN_FOCUS);
+      gtk_widget_set_can_focus (GTK_WIDGET (list), FALSE);
     }
   
   gtk_window_move (GTK_WINDOW (combo->popwin), x, y);
@@ -582,7 +582,7 @@ gtk_combo_popdown_list (GtkCombo *combo)
   if (GTK_BUTTON (combo->button)->in_button)
     {
       GTK_BUTTON (combo->button)->in_button = FALSE;
-      gtk_button_released (GTK_BUTTON (combo->button));
+      g_signal_emit_by_name (combo->button, "released");
     }
 
   if (GTK_WIDGET_HAS_GRAB (combo->popwin))
@@ -637,7 +637,7 @@ gtk_combo_activate (GtkWidget        *widget,
   popup_grab_on_window (combo->popwin->window,
 			gtk_get_current_event_time ());
 
-  if (!GTK_WIDGET_HAS_FOCUS (combo->entry))
+  if (!gtk_widget_has_focus (combo->entry))
     gtk_widget_grab_focus (combo->entry);
 
   gtk_grab_add (combo->popwin);
@@ -648,7 +648,7 @@ gtk_combo_popup_button_press (GtkWidget        *button,
 			      GdkEventButton   *event,
 			      GtkCombo         *combo)
 {
-  if (!GTK_WIDGET_HAS_FOCUS (combo->entry))
+  if (!gtk_widget_has_focus (combo->entry))
     gtk_widget_grab_focus (combo->entry);
 
   if (event->button != 1)
@@ -666,7 +666,7 @@ gtk_combo_popup_button_press (GtkWidget        *button,
   popup_grab_on_window (combo->popwin->window,
 			gtk_get_current_event_time ());
 
-  gtk_button_pressed (GTK_BUTTON (button));
+  g_signal_emit_by_name (button, "depressed");
 
   gtk_grab_add (combo->popwin);
 
@@ -705,7 +705,7 @@ static void
 gtk_combo_selection_changed (GtkList  *list,
 			     GtkCombo *combo)
 {
-  if (!GTK_WIDGET_VISIBLE (combo->popwin))
+  if (!gtk_widget_get_visible (combo->popwin))
     gtk_combo_update_entry (combo);
 }
 
@@ -924,7 +924,7 @@ gtk_combo_init (GtkCombo * combo)
   gtk_container_add (GTK_CONTAINER (combo->button), arrow);
   gtk_box_pack_start (GTK_BOX (combo), combo->entry, TRUE, TRUE, 0);
   gtk_box_pack_end (GTK_BOX (combo), combo->button, FALSE, FALSE, 0);
-  GTK_WIDGET_UNSET_FLAGS (combo->button, GTK_CAN_FOCUS);
+  gtk_widget_set_can_focus (combo->button, FALSE);
   gtk_widget_show (combo->entry);
   gtk_widget_show (combo->button);
   combo->entry_change_id = g_signal_connect (combo->entry, "changed",
@@ -968,8 +968,8 @@ gtk_combo_init (GtkCombo * combo)
   combo->popup = gtk_scrolled_window_new (NULL, NULL);
   gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (combo->popup),
 				  GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
-  GTK_WIDGET_UNSET_FLAGS (GTK_SCROLLED_WINDOW (combo->popup)->hscrollbar, GTK_CAN_FOCUS);
-  GTK_WIDGET_UNSET_FLAGS (GTK_SCROLLED_WINDOW (combo->popup)->vscrollbar, GTK_CAN_FOCUS);
+  gtk_widget_set_can_focus (GTK_SCROLLED_WINDOW (combo->popup)->hscrollbar, FALSE);
+  gtk_widget_set_can_focus (GTK_SCROLLED_WINDOW (combo->popup)->vscrollbar, FALSE);
   gtk_container_add (GTK_CONTAINER (frame), combo->popup);
   gtk_widget_show (combo->popup);
 

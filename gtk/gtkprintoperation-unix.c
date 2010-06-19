@@ -41,7 +41,6 @@
 #include "gtkpagesetupunixdialog.h"
 #include "gtkprintbackend.h"
 #include "gtkprinter.h"
-#include "gtkprinter-private.h"
 #include "gtkprintjob.h"
 #include "gtklabel.h"
 #include "gtkintl.h"
@@ -207,7 +206,7 @@ _gtk_print_operation_platform_backend_launch_preview (GtkPrintOperation *op,
   gchar *cmd;
   gchar *preview_cmd;
   GtkSettings *settings;
-  GtkPrintSettings *print_settings;
+  GtkPrintSettings *print_settings = NULL;
   GtkPageSetup *page_setup;
   GKeyFile *key_file = NULL;
   gchar *data = NULL;
@@ -235,8 +234,28 @@ _gtk_print_operation_platform_backend_launch_preview (GtkPrintOperation *op,
 
   key_file = g_key_file_new ();
   
-  print_settings = gtk_print_operation_get_print_settings (op);
-  gtk_print_settings_to_key_file (print_settings, key_file, NULL);
+  print_settings = gtk_print_settings_copy (gtk_print_operation_get_print_settings (op));
+
+  if (print_settings != NULL)
+    {
+      gtk_print_settings_set_reverse (print_settings, FALSE);
+      gtk_print_settings_set_page_set (print_settings, GTK_PAGE_SET_ALL);
+      gtk_print_settings_set_scale (print_settings, 1.0);
+      gtk_print_settings_set_number_up (print_settings, 1);
+      gtk_print_settings_set_number_up_layout (print_settings, GTK_NUMBER_UP_LAYOUT_LEFT_TO_RIGHT_TOP_TO_BOTTOM);
+
+      /*  These removals are neccessary because cups-* settings have higher priority
+       *  than normal settings.
+       */
+      gtk_print_settings_unset (print_settings, "cups-reverse");
+      gtk_print_settings_unset (print_settings, "cups-page-set");
+      gtk_print_settings_unset (print_settings, "cups-scale");
+      gtk_print_settings_unset (print_settings, "cups-number-up");
+      gtk_print_settings_unset (print_settings, "cups-number-up-layout");
+
+      gtk_print_settings_to_key_file (print_settings, key_file, NULL);
+      g_object_unref (print_settings);
+    }
 
   page_setup = gtk_print_context_get_page_setup (op->priv->print_context);
   gtk_page_setup_to_key_file (page_setup, key_file, NULL);
@@ -270,6 +289,19 @@ _gtk_print_operation_platform_backend_launch_preview (GtkPrintOperation *op,
   gdk_spawn_on_screen (screen, NULL, argv, NULL, G_SPAWN_SEARCH_PATH, NULL, NULL, NULL, &error);
 
   g_strfreev (argv);
+
+  if (error != NULL)
+    {
+      gchar* uri;
+
+      g_warning ("%s %s", _("Error launching preview"), error->message);
+
+      g_error_free (error);
+      error = NULL;
+      uri = g_filename_to_uri (filename, NULL, NULL);
+      gtk_show_uri (screen, uri, GDK_CURRENT_TIME, &error);
+      g_free (uri);
+    }
 
  out:
   if (error != NULL)
@@ -505,11 +537,26 @@ finish_print (PrintResponseData *rdata,
   GtkPrintOperation *op = rdata->op;
   GtkPrintOperationPrivate *priv = op->priv;
   GtkPrintJob *job;
+  gdouble top, bottom, left, right;
   
   if (rdata->do_print)
     {
       gtk_print_operation_set_print_settings (op, settings);
       priv->print_context = _gtk_print_context_new (op);
+
+      if (gtk_print_settings_get_number_up (settings) < 2)
+        {
+	  if (printer && gtk_printer_get_hard_margins (printer, &top, &bottom, &left, &right))
+	    _gtk_print_context_set_hard_margins (priv->print_context, top, bottom, left, right);
+	}
+      else
+        {
+	  /* Pages do not have any unprintable area when printing n-up as each page on the
+	   * sheet has been scaled down and translated to a position within the printable
+	   * area of the sheet.
+	   */
+	  _gtk_print_context_set_hard_margins (priv->print_context, 0, 0, 0, 0);
+	}
 
       if (page_setup != NULL &&
           (gtk_print_operation_get_default_page_setup (op) == NULL ||
@@ -919,12 +966,12 @@ get_page_setup_dialog (GtkWindow        *parent,
 
 /**
  * gtk_print_run_page_setup_dialog:
- * @parent: transient parent, or %NULL
- * @page_setup: an existing #GtkPageSetup, or %NULL
+ * @parent: (allow-none): transient parent
+ * @page_setup: (allow-none): an existing #GtkPageSetup
  * @settings: a #GtkPrintSettings
- * 
- * Runs a page setup dialog, letting the user modify the values from 
- * @page_setup. If the user cancels the dialog, the returned #GtkPageSetup 
+ *
+ * Runs a page setup dialog, letting the user modify the values from
+ * @page_setup. If the user cancels the dialog, the returned #GtkPageSetup
  * is identical to the passed in @page_setup, otherwise it contains the 
  * modifications done in the dialog.
  *
@@ -964,8 +1011,8 @@ gtk_print_run_page_setup_dialog (GtkWindow        *parent,
 
 /**
  * gtk_print_run_page_setup_dialog_async:
- * @parent: transient parent, or %NULL
- * @page_setup: an existing #GtkPageSetup, or %NULL
+ * @parent: (allow-none): transient parent, or %NULL
+ * @page_setup: (allow-none): an existing #GtkPageSetup, or %NULL
  * @settings: a #GtkPrintSettings
  * @done_cb: a function to call when the user saves the modified page setup
  * @data: user data to pass to @done_cb

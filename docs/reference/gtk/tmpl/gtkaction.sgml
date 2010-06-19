@@ -51,6 +51,9 @@ activate its action.
 <!-- ##### SECTION Stability_Level ##### -->
 
 
+<!-- ##### SECTION Image ##### -->
+
+
 <!-- ##### STRUCT GtkAction ##### -->
 <para>
 The <structname>GtkAction</structname> struct contains only private members
@@ -66,6 +69,11 @@ and should not be accessed directly.
 @action: the object which received the signal.
 
 <!-- ##### ARG GtkAction:action-group ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG GtkAction:always-show-image ##### -->
 <para>
 
 </para>
@@ -335,6 +343,24 @@ and should not be accessed directly.
 
 @action: 
 @proxy: 
+
+
+<!-- ##### FUNCTION gtk_action_get_always_show_image ##### -->
+<para>
+
+</para>
+
+@action: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gtk_action_set_always_show_image ##### -->
+<para>
+
+</para>
+
+@action: 
+@always_show: 
 
 
 <!-- ##### FUNCTION gtk_action_get_accel_path ##### -->

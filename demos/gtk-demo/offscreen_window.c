@@ -166,7 +166,7 @@ gtk_rotated_bin_class_init (GtkRotatedBinClass *klass)
 static void
 gtk_rotated_bin_init (GtkRotatedBin *bin)
 {
-  GTK_WIDGET_UNSET_FLAGS (bin, GTK_NO_WINDOW);
+  gtk_widget_set_has_window (GTK_WIDGET (bin), TRUE);
 }
 
 GtkWidget *
@@ -184,7 +184,7 @@ pick_offscreen_child (GdkWindow     *offscreen_window,
  GtkAllocation child_area;
  double x, y;
 
- if (bin->child && GTK_WIDGET_VISIBLE (bin->child))
+ if (bin->child && gtk_widget_get_visible (bin->child))
     {
       to_child (bin, widget_x, widget_y, &x, &y);
 
@@ -229,7 +229,7 @@ gtk_rotated_bin_realize (GtkWidget *widget)
   gint border_width;
   GtkRequisition child_requisition;
 
-  GTK_WIDGET_SET_FLAGS (widget, GTK_REALIZED);
+  gtk_widget_set_realized (widget, TRUE);
 
   border_width = GTK_CONTAINER (widget)->border_width;
 
@@ -262,7 +262,7 @@ gtk_rotated_bin_realize (GtkWidget *widget)
   attributes.window_type = GDK_WINDOW_OFFSCREEN;
 
   child_requisition.width = child_requisition.height = 0;
-  if (bin->child && GTK_WIDGET_VISIBLE (bin->child))
+  if (bin->child && gtk_widget_get_visible (bin->child))
     {
       attributes.width = bin->child->allocation.width;
       attributes.height = bin->child->allocation.height;
@@ -331,7 +331,7 @@ gtk_rotated_bin_remove (GtkContainer *container,
   GtkRotatedBin *bin = GTK_ROTATED_BIN (container);
   gboolean was_visible;
 
-  was_visible = GTK_WIDGET_VISIBLE (widget);
+  was_visible = gtk_widget_get_visible (widget);
 
   if (bin->child == widget)
     {
@@ -339,7 +339,7 @@ gtk_rotated_bin_remove (GtkContainer *container,
 
       bin->child = NULL;
 
-      if (was_visible && GTK_WIDGET_VISIBLE (container))
+      if (was_visible && gtk_widget_get_visible (GTK_WIDGET (container)))
         gtk_widget_queue_resize (GTK_WIDGET (container));
     }
 }
@@ -382,7 +382,7 @@ gtk_rotated_bin_size_request (GtkWidget      *widget,
   child_requisition.width = 0;
   child_requisition.height = 0;
 
-  if (bin->child && GTK_WIDGET_VISIBLE (bin->child))
+  if (bin->child && gtk_widget_get_visible (bin->child))
     gtk_widget_size_request (bin->child, &child_requisition);
 
   s = sin (bin->angle);
@@ -410,13 +410,13 @@ gtk_rotated_bin_size_allocate (GtkWidget     *widget,
   w = allocation->width - border_width * 2;
   h = allocation->height - border_width * 2;
 
-  if (GTK_WIDGET_REALIZED (widget))
+  if (gtk_widget_get_realized (widget))
     gdk_window_move_resize (widget->window,
                             allocation->x + border_width,
                             allocation->y + border_width,
                             w, h);
 
-  if (bin->child && GTK_WIDGET_VISIBLE (bin->child))
+  if (bin->child && gtk_widget_get_visible (bin->child))
     {
       GtkRequisition child_requisition;
       GtkAllocation child_allocation;
@@ -436,7 +436,7 @@ gtk_rotated_bin_size_allocate (GtkWidget     *widget,
         child_allocation.width = MIN ((w - s * child_allocation.height) / c,
                                       (h - c * child_allocation.height) / s);
 
-      if (GTK_WIDGET_REALIZED (widget))
+      if (gtk_widget_get_realized (widget))
         gdk_window_move_resize (bin->offscreen_window,
                                 child_allocation.x,
                                 child_allocation.y,
@@ -466,7 +466,7 @@ gtk_rotated_bin_expose (GtkWidget      *widget,
   gdouble s, c;
   gdouble w, h;
 
-  if (GTK_WIDGET_DRAWABLE (widget))
+  if (gtk_widget_is_drawable (widget))
     {
       if (event->window == widget->window)
         {
@@ -474,7 +474,7 @@ gtk_rotated_bin_expose (GtkWidget      *widget,
           GtkAllocation child_area;
           cairo_t *cr;
 
-          if (bin->child && GTK_WIDGET_VISIBLE (bin->child))
+          if (bin->child && gtk_widget_get_visible (bin->child))
             {
               pixmap = gdk_offscreen_window_get_pixmap (bin->offscreen_window);
               child_area = bin->child->allocation;
@@ -566,7 +566,7 @@ do_offscreen_window (GtkWidget *do_widget)
       gtk_container_add (GTK_CONTAINER (bin), button);
     }
 
-  if (!GTK_WIDGET_VISIBLE (window))
+  if (!gtk_widget_get_visible (window))
     gtk_widget_show_all (window);
   else
     {

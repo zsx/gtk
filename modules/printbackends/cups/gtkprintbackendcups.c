@@ -158,11 +158,11 @@ static GtkPageSetup *       cups_printer_get_default_page_size     (GtkPrinter  
 static void                 cups_printer_request_details           (GtkPrinter                        *printer);
 static gboolean             cups_request_default_printer           (GtkPrintBackendCups               *print_backend);
 static gboolean             cups_request_ppd                       (GtkPrinter                        *printer);
-static void                 cups_printer_get_hard_margins          (GtkPrinter                        *printer,
-								    double                            *top,
-								    double                            *bottom,
-								    double                            *left,
-								    double                            *right);
+static gboolean             cups_printer_get_hard_margins          (GtkPrinter                        *printer,
+								    gdouble                           *top,
+								    gdouble                           *bottom,
+								    gdouble                           *left,
+								    gdouble                           *right);
 static GtkPrintCapabilities cups_printer_get_capabilities          (GtkPrinter                        *printer);
 static void                 set_option_from_settings               (GtkPrinterOption                  *option,
 								    GtkPrintSettings                  *setting);
@@ -193,7 +193,7 @@ static gboolean             request_auth_info                       (gpointer   
 static void
 gtk_print_backend_cups_register_type (GTypeModule *module)
 {
-  static const GTypeInfo print_backend_cups_info =
+  const GTypeInfo print_backend_cups_info =
   {
     sizeof (GtkPrintBackendCupsClass),
     NULL,		/* base_init */
@@ -662,6 +662,40 @@ is_address_local (const gchar *address)
   else
     return FALSE;
 }
+
+#ifndef HAVE_CUPS_API_1_2
+/* Included from CUPS library because of backward compatibility */
+const char *
+httpGetHostname(http_t *http,
+                char   *s,
+                int    slen)
+{
+  struct hostent *host;
+
+  if (!s || slen <= 1)
+    return (NULL);
+
+  if (http)
+    {
+      if (http->hostname[0] == '/')
+        g_strlcpy (s, "localhost", slen);
+      else
+        g_strlcpy (s, http->hostname, slen);
+    }
+  else
+    {
+      if (gethostname (s, slen) < 0)
+        g_strlcpy (s, "localhost", slen);
+
+      if (!strchr (s, '.'))
+        {
+          if ((host = gethostbyname (s)) != NULL && host->h_name)
+            g_strlcpy (s, host->h_name, slen);
+        }
+    }
+  return (s);
+}
+#endif
 
 static void
 gtk_print_backend_cups_set_password (GtkPrintBackend  *backend,
@@ -4319,18 +4353,18 @@ cups_printer_prepare_for_print (GtkPrinter       *printer,
             break;
           case GTK_PAGE_ORIENTATION_LANDSCAPE:
             if (layout < 4)
-              layout = layout + 5 - 2 * (layout % 2);
+              layout = layout + 2 + 4 * (1 - layout / 2);
             else
-              layout = layout - 6 + 4 * (1 - (layout - 4) / 2);
+              layout = layout - 3 - 2 * (layout % 2);
             break;
           case GTK_PAGE_ORIENTATION_REVERSE_PORTRAIT:
             layout = (layout + 3 - 2 * (layout % 2)) % 4 + 4 * (layout / 4);
             break;
           case GTK_PAGE_ORIENTATION_REVERSE_LANDSCAPE:
             if (layout < 4)
-              layout = layout + 2 + 4 * (1 - layout / 2);
+              layout = layout + 5 - 2 * (layout % 2);
             else
-              layout = layout - 3 - 2 * (layout % 2);
+              layout = layout - 6 + 4 * (1 - (layout - 4) / 2);
             break;
         }
 
@@ -4428,7 +4462,7 @@ cups_printer_get_default_page_size (GtkPrinter *printer)
   return create_page_setup (ppd_file, size);
 }
 
-static void
+static gboolean
 cups_printer_get_hard_margins (GtkPrinter *printer,
 			       gdouble    *top,
 			       gdouble    *bottom,
@@ -4439,12 +4473,14 @@ cups_printer_get_hard_margins (GtkPrinter *printer,
 
   ppd_file = gtk_printer_cups_get_ppd (GTK_PRINTER_CUPS (printer));
   if (ppd_file == NULL)
-    return;
+    return FALSE;
 
   *left = ppd_file->custom_margins[0];
   *bottom = ppd_file->custom_margins[1];
   *right = ppd_file->custom_margins[2];
   *top = ppd_file->custom_margins[3];
+
+  return TRUE;
 }
 
 static GtkPrintCapabilities

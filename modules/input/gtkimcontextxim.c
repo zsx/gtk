@@ -158,7 +158,7 @@ static GSList *status_windows = NULL;
 void
 gtk_im_context_xim_register_type (GTypeModule *type_module)
 {
-  static const GTypeInfo im_context_xim_info =
+  const GTypeInfo im_context_xim_info =
   {
     sizeof (GtkIMContextXIMClass),
     (GBaseInitFunc) NULL,
@@ -1547,7 +1547,7 @@ claim_status_window (GtkIMContextXIM *context_xim)
   if (!context_xim->status_window && context_xim->client_widget)
     {
       GtkWidget *toplevel = gtk_widget_get_toplevel (context_xim->client_widget);
-      if (toplevel && GTK_WIDGET_TOPLEVEL (toplevel))
+      if (toplevel && gtk_widget_is_toplevel (toplevel))
 	{
 	  StatusWindow *status_window = status_window_get (toplevel);
 
@@ -1581,7 +1581,7 @@ update_in_toplevel (GtkIMContextXIM *context_xim)
     {
       GtkWidget *toplevel = gtk_widget_get_toplevel (context_xim->client_widget);
       
-      context_xim->in_toplevel = (toplevel && GTK_WIDGET_TOPLEVEL (toplevel));
+      context_xim->in_toplevel = (toplevel && gtk_widget_is_toplevel (toplevel));
     }
   else
     context_xim->in_toplevel = FALSE;

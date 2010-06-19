@@ -349,13 +349,13 @@ gtk_cell_renderer_toggle_render (GtkCellRenderer      *cell,
   else
     shadow = celltoggle->active ? GTK_SHADOW_IN : GTK_SHADOW_OUT;
 
-  if (GTK_WIDGET_STATE (widget) == GTK_STATE_INSENSITIVE || !cell->sensitive)
+  if (gtk_widget_get_state (widget) == GTK_STATE_INSENSITIVE || !cell->sensitive)
     {
       state = GTK_STATE_INSENSITIVE;
     }
   else if ((flags & GTK_CELL_RENDERER_SELECTED) == GTK_CELL_RENDERER_SELECTED)
     {
-      if (GTK_WIDGET_HAS_FOCUS (widget))
+      if (gtk_widget_has_focus (widget))
 	state = GTK_STATE_SELECTED;
       else
 	state = GTK_STATE_ACTIVE;

@@ -94,7 +94,7 @@ gtk_separator_init (GtkSeparator *separator)
   GtkWidget *widget = GTK_WIDGET (separator);
   GtkSeparatorPrivate *private = GTK_SEPARATOR_GET_PRIVATE (separator);
 
-  GTK_WIDGET_SET_FLAGS (separator, GTK_NO_WINDOW);
+  gtk_widget_set_has_window (GTK_WIDGET (separator), FALSE);
 
   private->orientation = GTK_ORIENTATION_HORIZONTAL;
 
@@ -184,7 +184,7 @@ gtk_separator_expose (GtkWidget      *widget,
   gint     separator_width;
   gint     separator_height;
 
-  if (!GTK_WIDGET_DRAWABLE (widget))
+  if (!gtk_widget_is_drawable (widget))
     return FALSE;
 
   gtk_widget_style_get (widget,
@@ -197,7 +197,7 @@ gtk_separator_expose (GtkWidget      *widget,
     {
       if (wide_separators)
         gtk_paint_box (widget->style, widget->window,
-                       GTK_WIDGET_STATE (widget), GTK_SHADOW_ETCHED_OUT,
+                       gtk_widget_get_state (widget), GTK_SHADOW_ETCHED_OUT,
                        &event->area, widget, "hseparator",
                        widget->allocation.x,
                        widget->allocation.y + (widget->allocation.height -
@@ -206,7 +206,7 @@ gtk_separator_expose (GtkWidget      *widget,
                        separator_height);
       else
         gtk_paint_hline (widget->style, widget->window,
-                         GTK_WIDGET_STATE (widget),
+                         gtk_widget_get_state (widget),
                          &event->area, widget, "hseparator",
                          widget->allocation.x,
                          widget->allocation.x + widget->allocation.width - 1,
@@ -217,7 +217,7 @@ gtk_separator_expose (GtkWidget      *widget,
     {
       if (wide_separators)
         gtk_paint_box (widget->style, widget->window,
-                       GTK_WIDGET_STATE (widget), GTK_SHADOW_ETCHED_OUT,
+                       gtk_widget_get_state (widget), GTK_SHADOW_ETCHED_OUT,
                        &event->area, widget, "vseparator",
                        widget->allocation.x + (widget->allocation.width -
                                                separator_width) / 2,
@@ -226,7 +226,7 @@ gtk_separator_expose (GtkWidget      *widget,
                        widget->allocation.height);
       else
         gtk_paint_vline (widget->style, widget->window,
-                         GTK_WIDGET_STATE (widget),
+                         gtk_widget_get_state (widget),
                          &event->area, widget, "vseparator",
                          widget->allocation.y,
                          widget->allocation.y + widget->allocation.height - 1,

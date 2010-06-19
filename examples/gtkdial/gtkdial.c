@@ -65,7 +65,7 @@ gtk_dial_get_type ()
 
   if (!dial_type)
     {
-      static const GTypeInfo dial_info =
+      const GTypeInfo dial_info =
       {
 	sizeof (GtkDialClass),
 	NULL,
@@ -214,7 +214,7 @@ gtk_dial_realize (GtkWidget *widget)
   g_return_if_fail (widget != NULL);
   g_return_if_fail (GTK_IS_DIAL (widget));
 
-  GTK_WIDGET_SET_FLAGS (widget, GTK_REALIZED);
+  gtk_widget_set_realized (widget, TRUE);
   dial = GTK_DIAL (widget);
 
   attributes.x = widget->allocation.x;
@@ -261,7 +261,7 @@ gtk_dial_size_allocate (GtkWidget     *widget,
   widget->allocation = *allocation;
   dial = GTK_DIAL (widget);
 
-  if (GTK_WIDGET_REALIZED (widget))
+  if (gtk_widget_get_realized (widget))
     {
 
       gdk_window_move_resize (widget->window,

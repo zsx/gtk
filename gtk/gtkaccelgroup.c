@@ -37,6 +37,31 @@
 #include "gtkmarshalers.h"
 #include "gtkalias.h"
 
+/**
+ * SECTION:gtkaccelgroup
+ * @Short_description: Groups of global keyboard accelerators for an entire GtkWindow
+ * @Title: Accelerator Groups
+ * @See_also:gtk_window_add_accel_group(), gtk_accel_map_change_entry(),
+ * gtk_item_factory_new(), gtk_label_new_with_mnemonic()
+ * 
+ * A #GtkAccelGroup represents a group of keyboard accelerators,
+ * typically attached to a toplevel #GtkWindow (with
+ * gtk_window_add_accel_group()). Usually you won't need to create a
+ * #GtkAccelGroup directly; instead, when using #GtkItemFactory, GTK+
+ * automatically sets up the accelerators for your menus in the item
+ * factory's #GtkAccelGroup.
+ * 
+ * 
+ * Note that <firstterm>accelerators</firstterm> are different from
+ * <firstterm>mnemonics</firstterm>. Accelerators are shortcuts for
+ * activating a menu item; they appear alongside the menu item they're a
+ * shortcut for. For example "Ctrl+Q" might appear alongside the "Quit"
+ * menu item. Mnemonics are shortcuts for GUI elements such as text
+ * entries or buttons; they appear as underlined characters. See
+ * gtk_label_new_with_mnemonic(). Menu items can have both accelerators
+ * and mnemonics, of course.
+ */
+
 
 /* --- prototypes --- */
 static void gtk_accel_group_finalize     (GObject    *object);
@@ -326,10 +351,11 @@ _gtk_accel_group_detach (GtkAccelGroup *accel_group,
 
 /**
  * gtk_accel_groups_from_object:
- * @object:        a #GObject, usually a #GtkWindow 
- * @returns: a list of all accel groups which are attached to @object
+ * @object:        a #GObject, usually a #GtkWindow
  *
  * Gets a list of all accel groups which are attached to @object.
+ *
+ * Returns: (element-type GtkAccelGroup) (transfer none): a list of all accel groups which are attached to @object
  */
 GSList*
 gtk_accel_groups_from_object (GObject *object)
@@ -665,11 +691,14 @@ gtk_accel_group_connect_by_path (GtkAccelGroup	*accel_group,
 /**
  * gtk_accel_group_disconnect:
  * @accel_group: the accelerator group to remove an accelerator from
- * @closure:     the closure to remove from this accelerator group
+ * @closure: (allow-none):     the closure to remove from this accelerator group, or %NULL
+ *               to remove all closures
  * @returns:     %TRUE if the closure was found and got disconnected
  *
  * Removes an accelerator previously installed through
  * gtk_accel_group_connect().
+ *
+ * Since 2.20 @closure can be %NULL.
  */
 gboolean
 gtk_accel_group_disconnect (GtkAccelGroup *accel_group,
@@ -680,7 +709,7 @@ gtk_accel_group_disconnect (GtkAccelGroup *accel_group,
   g_return_val_if_fail (GTK_IS_ACCEL_GROUP (accel_group), FALSE);
 
   for (i = 0; i < accel_group->n_accels; i++)
-    if (accel_group->priv_accels[i].closure == closure)
+    if (accel_group->priv_accels[i].closure == closure || !closure)
       {
 	g_object_ref (accel_group);
 	quick_accel_remove (accel_group, i);
@@ -775,8 +804,8 @@ _gtk_accel_group_reconnect (GtkAccelGroup *accel_group,
  * @accel_group:      the accelerator group to query
  * @accel_key:        key value of the accelerator
  * @accel_mods:       modifier combination of the accelerator
- * @n_entries:        location to return the number of entries found, or %NULL
- * @returns:          an array of @n_entries #GtkAccelGroupEntry elements, or %NULL. The array is owned by GTK+ and must not be freed. 
+ * @n_entries: (allow-none):        location to return the number of entries found, or %NULL
+ * @returns: (allow-none):          an array of @n_entries #GtkAccelGroupEntry elements, or %NULL. The array is owned by GTK+ and must not be freed. 
  *
  * Queries an accelerator group for all entries matching @accel_key and 
  * @accel_mods.
@@ -803,7 +832,7 @@ gtk_accel_group_query (GtkAccelGroup  *accel_group,
 /**
  * gtk_accel_group_from_accel_closure:
  * @closure: a #GClosure
- * @returns: the #GtkAccelGroup to which @closure is connected, or %NULL.
+ * @returns: (allow-none): the #GtkAccelGroup to which @closure is connected, or %NULL.
  *
  * Finds the #GtkAccelGroup to which @closure is connected; 
  * see gtk_accel_group_connect().

@@ -289,7 +289,7 @@ gail_button_real_initialize (AtkObject *obj,
   label = get_label_from_button (widget, 0, FALSE);
   if (GTK_IS_LABEL (label))
     {
-      if (GTK_WIDGET_MAPPED (label))
+      if (gtk_widget_get_mapped (label))
         gail_button_init_textutil (button, label);
       else 
         g_signal_connect (label,
@@ -459,7 +459,7 @@ gail_button_do_action (AtkAction *action,
      */
     return FALSE;
 
-  if (!GTK_WIDGET_IS_SENSITIVE (widget) || !GTK_WIDGET_VISIBLE (widget))
+  if (!gtk_widget_is_sensitive (widget) || !gtk_widget_get_visible (widget))
     return FALSE;
 
   button = GAIL_BUTTON (action); 
@@ -473,7 +473,7 @@ gail_button_do_action (AtkAction *action,
 	{
 	  button->action_queue = g_queue_new ();
 	}
-      g_queue_push_head (button->action_queue, (gpointer) i);
+      g_queue_push_head (button->action_queue, GINT_TO_POINTER(i));
       if (!button->action_idle_handler)
 	button->action_idle_handler = gdk_threads_add_idle (idle_do_action, button);
       break;
@@ -505,7 +505,7 @@ idle_do_action (gpointer data)
   g_object_ref (gail_button);
 
   if (widget == NULL /* State is defunct */ ||
-      !GTK_WIDGET_IS_SENSITIVE (widget) || !GTK_WIDGET_VISIBLE (widget))
+      !gtk_widget_is_sensitive (widget) || !gtk_widget_get_visible (widget))
     {
       g_object_unref (gail_button);
       return FALSE;
@@ -516,7 +516,7 @@ idle_do_action (gpointer data)
   button = GTK_BUTTON (widget); 
   while (!g_queue_is_empty (gail_button->action_queue)) 
     {
-      gint action_number = (gint) g_queue_pop_head (gail_button->action_queue);
+      gint action_number = GPOINTER_TO_INT(g_queue_pop_head (gail_button->action_queue));
       if (gail_button->default_is_press)
         {
           if (action_number == 0)
@@ -530,7 +530,7 @@ idle_do_action (gpointer data)
 	  /* first a press */ 
 
 	  button->in_button = TRUE;
-	  gtk_button_enter (button);
+	  g_signal_emit_by_name (button, "enter");
 	  /*
 	   * Simulate a button press event. calling gtk_button_pressed() does
 	   * not get the job done for a GtkOptionMenu.  
@@ -548,11 +548,11 @@ idle_do_action (gpointer data)
 	  tmp_event.button.type = GDK_BUTTON_RELEASE;
 	  gtk_widget_event (widget, &tmp_event);
 	  button->in_button = FALSE;
-	  gtk_button_leave (button); 
+	  g_signal_emit_by_name (button, "leave");
 	  break;
 	case 1:
 	  button->in_button = TRUE;
-	  gtk_button_enter (button);
+	  g_signal_emit_by_name (button, "enter");
 	  /*
 	   * Simulate a button press event. calling gtk_button_pressed() does
 	   * not get the job done for a GtkOptionMenu.  
@@ -568,7 +568,7 @@ idle_do_action (gpointer data)
 	  break;
 	case 2:
 	  button->in_button = FALSE;
-	  gtk_button_leave (button);
+	  g_signal_emit_by_name (button, "leave");
 	  break;
 	default:
 	  g_assert_not_reached ();
@@ -881,10 +881,10 @@ gail_button_ref_state_set (AtkObject *obj)
   if (widget == NULL)
     return state_set;
 
-  if (GTK_WIDGET_STATE (widget) == GTK_STATE_ACTIVE)
+  if (gtk_widget_get_state (widget) == GTK_STATE_ACTIVE)
     atk_state_set_add_state (state_set, ATK_STATE_ARMED);
 
-  if (!GTK_WIDGET_CAN_FOCUS(widget))
+  if (!gtk_widget_get_can_focus (widget))
     atk_state_set_remove_state (state_set, ATK_STATE_SELECTABLE);
 
 
@@ -902,7 +902,7 @@ gail_button_pressed_enter_handler (GtkWidget       *widget)
 {
   AtkObject *accessible;
 
-  if (GTK_WIDGET_STATE (widget) == GTK_STATE_ACTIVE)
+  if (gtk_widget_get_state (widget) == GTK_STATE_ACTIVE)
     {
       accessible = gtk_widget_get_accessible (widget);
       atk_object_notify_state_change (accessible, ATK_STATE_ARMED, TRUE);

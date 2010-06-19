@@ -83,7 +83,7 @@ gdk_device_get_type (void)
 
   if (!object_type)
     {
-      static const GTypeInfo object_info =
+      const GTypeInfo object_info =
       {
         sizeof (GdkDeviceClass),
         (GBaseInitFunc) NULL,
@@ -384,4 +384,10 @@ gdk_device_get_axis (GdkDevice *device, gdouble *axes, GdkAxisUse use, gdouble *
       }
   
   return FALSE;
+}
+
+void
+_gdk_input_window_crossing (GdkWindow *window,
+                            gboolean   enter)
+{
 }

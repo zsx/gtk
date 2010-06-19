@@ -27,6 +27,25 @@ Installation
 See the file 'INSTALL'
 
 
+Release notes for 2.20
+======================
+
+* GtkStatusbar now has a message area (see gtk_status_bar_get_message_area)
+  which makes it easy to place additional widgets inside the statusbar
+  frame or to replace the label widgets. Previously, this was only possible
+  by accessing the innards of the statusbar widget directly. Applications
+  which are doing so may need some adjustments, since the addition of the
+  message area changed the internal widget hierarchy.
+
+* GtkBuilder no longer sets the "name" property of widgets to the ID
+  attribute of the <object>. Use gtk_buildable_get_name() instead of
+  gtk_widget_get_name() to obtain the ID.
+
+* GTK+ now includes introspection data, as a consequence, it gained a
+  dependency on gobject-introspection. It is possible to build without
+  introspection by passing --disable-introspection to configure.
+
+
 Release notes for 2.18
 ======================
 

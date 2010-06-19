@@ -2920,6 +2920,7 @@ gdk_window_get_frame_extents (GdkWindow    *window,
 {
   GdkDisplay *display;
   GdkWindowObject *private;
+  GdkWindowImplX11 *impl;
   Window xwindow;
   Window xparent;
   Window root;
@@ -2955,7 +2956,8 @@ gdk_window_get_frame_extents (GdkWindow    *window,
   rect->y = private->y;
   gdk_drawable_get_size ((GdkDrawable *)private, &rect->width, &rect->height);
 
-  if (GDK_WINDOW_DESTROYED (private))
+  impl = GDK_WINDOW_IMPL_X11 (private->impl);
+  if (GDK_WINDOW_DESTROYED (private) || impl->override_redirect)
     return;
 
   nvroots = 0;
@@ -3254,7 +3256,7 @@ _gdk_windowing_window_at_pointer (GdkDisplay *display,
 	  xwindow_last = xwindow;
 	  XQueryPointer (xdisplay, xwindow,
 			 &root, &xwindow, &rootx, &rooty, &winx, &winy, &xmask);
-	  if (get_toplevel &&
+	  if (get_toplevel && xwindow_last != root &&
 	      (window = gdk_window_lookup_for_display (display, xwindow_last)) != NULL &&
 	      GDK_WINDOW_TYPE (window) != GDK_WINDOW_FOREIGN)
 	    {
@@ -3324,7 +3326,7 @@ _gdk_windowing_window_at_pointer (GdkDisplay *display,
 	  gdk_flush ();
 	  if (gdk_error_trap_pop ())
 	    break;
-	  if (get_toplevel &&
+	  if (get_toplevel && xwindow_last != root &&
 	      (window = gdk_window_lookup_for_display (display, xwindow_last)) != NULL &&
 	      GDK_WINDOW_TYPE (window) != GDK_WINDOW_FOREIGN)
 	    break;
@@ -3439,8 +3441,6 @@ do_shape_combine_region (GdkWindow       *window,
 			 gint             offset_y,
 			 gint             shape)
 {
-  GdkWindowObject *private = (GdkWindowObject *)window;
-  
   if (GDK_WINDOW_DESTROYED (window))
     return;
 
@@ -3909,7 +3909,7 @@ gdk_window_set_icon_name (GdkWindow   *window,
   GdkDisplay *display;
 
   if (GDK_WINDOW_DESTROYED (window) ||
-      WINDOW_IS_TOPLEVEL_OR_FOREIGN (window))
+      !WINDOW_IS_TOPLEVEL_OR_FOREIGN (window))
     return;
 
   display = gdk_drawable_get_display (window);
@@ -4593,10 +4593,10 @@ gdk_window_set_functions (GdkWindow    *window,
   gdk_window_set_mwm_hints (window, &hints);
 }
 
-static GdkRegion *
-xwindow_get_shape (Display *xdisplay,
-		   Window window,
-		   gint shape_type)
+GdkRegion *
+_xwindow_get_shape (Display *xdisplay,
+		    Window window,
+		    gint shape_type)
 {
   GdkRegion *shape;
   GdkRectangle *rl;
@@ -4604,14 +4604,15 @@ xwindow_get_shape (Display *xdisplay,
   gint rn, ord, i;
 
   shape = NULL;
-  
+  rn = 0;
+
   xrl = XShapeGetRectangles (xdisplay,
 			     window,
 			     shape_type, &rn, &ord);
-  
-  if (rn == 0)
+
+  if (xrl == NULL || rn == 0)
     return gdk_region_new (); /* Empty */
-  
+
   if (ord != YXBanded)
     {
       /* This really shouldn't happen with any xserver, as they
@@ -4648,21 +4649,20 @@ _gdk_windowing_get_shape_for_mask (GdkBitmap *mask)
   display = gdk_drawable_get_display (GDK_DRAWABLE (mask));
 
   window = XCreateSimpleWindow (GDK_DISPLAY_XDISPLAY (display),
-				GDK_SCREEN_XROOTWIN (gdk_display_get_default_screen (display)),
-				-1, -1, 1, 1, 0,
-				0, 0);
+                                GDK_SCREEN_XROOTWIN (gdk_drawable_get_screen (mask)),
+                                -1, -1, 1, 1, 0,
+                                0, 0);
   XShapeCombineMask (GDK_DISPLAY_XDISPLAY (display),
-		     window,
-		     ShapeBounding,
-		     0, 0,
-		     GDK_PIXMAP_XID (mask),
-		     ShapeSet);
-  
-  region = xwindow_get_shape (GDK_DISPLAY_XDISPLAY (display),
-			      window, ShapeBounding);
+                     window,
+                     ShapeBounding,
+                     0, 0,
+                     GDK_PIXMAP_XID (mask),
+                     ShapeSet);
 
-  XDestroyWindow (GDK_DISPLAY_XDISPLAY (display),
-		  window);
+  region = _xwindow_get_shape (GDK_DISPLAY_XDISPLAY (display),
+                               window, ShapeBounding);
+
+  XDestroyWindow (GDK_DISPLAY_XDISPLAY (display), window);
 
   return region;
 }
@@ -4672,7 +4672,7 @@ _gdk_windowing_window_get_shape (GdkWindow *window)
 {
   if (!GDK_WINDOW_DESTROYED (window) &&
       gdk_display_supports_shapes (GDK_WINDOW_DISPLAY (window)))
-    return xwindow_get_shape (GDK_WINDOW_XDISPLAY (window),
+    return _xwindow_get_shape (GDK_WINDOW_XDISPLAY (window),
 			      GDK_WINDOW_XID (window), ShapeBounding);
 
   return NULL;
@@ -4684,7 +4684,7 @@ _gdk_windowing_window_get_input_shape (GdkWindow *window)
 #if defined(ShapeInput)
   if (!GDK_WINDOW_DESTROYED (window) &&
       gdk_display_supports_shapes (GDK_WINDOW_DISPLAY (window)))
-    return xwindow_get_shape (GDK_WINDOW_XDISPLAY (window),
+    return _xwindow_get_shape (GDK_WINDOW_XDISPLAY (window),
 			      GDK_WINDOW_XID (window),
 			      ShapeInput);
 #endif
@@ -5606,6 +5606,7 @@ gdk_window_impl_iface_init (GdkWindowImplIface *iface)
   iface->destroy = _gdk_x11_window_destroy;
   iface->input_window_destroy = _gdk_input_window_destroy;
   iface->input_window_crossing = _gdk_input_crossing_event;
+  iface->supports_native_bg = TRUE;
 }
 
 #define __GDK_WINDOW_X11_C__

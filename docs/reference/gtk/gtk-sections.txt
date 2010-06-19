@@ -192,6 +192,8 @@ gtk_action_block_activate
 gtk_action_unblock_activate
 gtk_action_block_activate_from
 gtk_action_unblock_activate_from
+gtk_action_get_always_show_image
+gtk_action_set_always_show_image
 gtk_action_get_accel_path
 gtk_action_set_accel_path
 gtk_action_get_accel_closure
@@ -1182,6 +1184,7 @@ gtk_dialog_set_default_response
 gtk_dialog_set_has_separator
 gtk_dialog_set_response_sensitive
 gtk_dialog_get_response_for_widget
+gtk_dialog_get_widget_for_response
 gtk_dialog_get_action_area
 gtk_dialog_get_content_area
 <SUBSECTION>
@@ -1333,6 +1336,8 @@ gtk_entry_set_icon_tooltip_markup
 gtk_entry_get_icon_tooltip_markup
 gtk_entry_set_icon_drag_source
 gtk_entry_get_current_icon_drag_source
+gtk_entry_get_icon_window
+gtk_entry_get_text_window
 
 <SUBSECTION Standard>
 GTK_ENTRY
@@ -2633,7 +2638,6 @@ gtk_message_dialog_get_type
 GtkInfoBar
 gtk_info_bar_new
 gtk_info_bar_new_with_buttons
-gtk_info_bar_set_contents
 gtk_info_bar_add_action_widget
 gtk_info_bar_add_button
 gtk_info_bar_add_buttons
@@ -2732,6 +2736,8 @@ gtk_notebook_set_group_id
 gtk_notebook_get_group_id
 gtk_notebook_set_group
 gtk_notebook_get_group
+gtk_notebook_set_action_widget
+gtk_notebook_get_action_widget
 GtkNotebookWindowCreationFunc
 gtk_notebook_set_window_creation_hook
 <SUBSECTION Standard>
@@ -2796,6 +2802,25 @@ GTK_OBJECT_UNSET_FLAGS
 </SECTION>
 
 <SECTION>
+<FILE>gtkoffscreenwindow</FILE>
+<TITLE>GtkOffscreenWindow</TITLE>
+GtkOffscreenWindow
+gtk_offscreen_window_new
+gtk_offscreen_window_get_pixmap
+gtk_offscreen_window_get_pixbuf
+<SUBSECTION Standard>
+GTK_OFFSCREEN_WINDOW
+GTK_IS_OFFSCREEN_WINDOW
+GTK_TYPE_OFFSCREEN_WINDOW
+GTK_OFFSCREEN_WINDOW_CLASS
+GTK_IS_OFFSCREEN_WINDOW_CLASS
+GTK_OFFSCREEN_WINDOW_GET_CLASS
+
+<SUBSECTION Private>
+gtk_offscreen_window_get_type
+</SECTION>
+
+<SECTION>
 <FILE>gtkoptionmenu</FILE>
 <TITLE>GtkOptionMenu</TITLE>
 GtkOptionMenu
@@ -2820,7 +2845,6 @@ gtk_option_menu_get_type
 <FILE>gtkpaned</FILE>
 <TITLE>GtkPaned</TITLE>
 GtkPaned
-gtk_paned_new
 gtk_paned_add1
 gtk_paned_add2
 gtk_paned_gutter_size
@@ -2831,6 +2855,7 @@ gtk_paned_get_child2
 gtk_paned_set_gutter_size
 gtk_paned_set_position
 gtk_paned_get_position
+gtk_paned_get_handle_window
 <SUBSECTION Standard>
 GTK_PANED
 GTK_IS_PANED
@@ -3076,6 +3101,13 @@ gtk_range_set_upper_stepper_sensitivity
 gtk_range_get_upper_stepper_sensitivity
 gtk_range_get_flippable
 gtk_range_set_flippable
+gtk_range_get_min_slider_size
+gtk_range_get_range_rect
+gtk_range_get_slider_range
+gtk_range_get_slider_size_fixed
+gtk_range_set_min_slider_size
+gtk_range_set_slider_size_fixed
+
 <SUBSECTION Standard>
 GTK_RANGE
 GTK_IS_RANGE
@@ -3315,7 +3347,6 @@ gtk_recent_action_get_type
 <TITLE>GtkRuler</TITLE>
 GtkRuler
 GtkRulerMetric
-gtk_ruler_new
 gtk_ruler_set_metric
 gtk_ruler_set_range
 gtk_ruler_get_metric
@@ -3337,8 +3368,6 @@ gtk_ruler_draw_pos
 <FILE>gtkscale</FILE>
 <TITLE>GtkScale</TITLE>
 GtkScale
-gtk_scale_new
-gtk_scale_new_with_range
 gtk_scale_set_digits
 gtk_scale_set_draw_value
 gtk_scale_set_value_pos
@@ -3391,7 +3420,6 @@ gtk_scale_button_get_type
 <FILE>gtkscrollbar</FILE>
 <TITLE>GtkScrollbar</TITLE>
 GtkScrollbar
-gtk_scrollbar_new
 <SUBSECTION Standard>
 GTK_SCROLLBAR
 GTK_IS_SCROLLBAR
@@ -3437,7 +3465,6 @@ gtk_scrolled_window_get_type
 <FILE>gtkseparator</FILE>
 <TITLE>GtkSeparator</TITLE>
 GtkSeparator
-gtk_separator_new
 <SUBSECTION Standard>
 GTK_SEPARATOR
 GTK_IS_SEPARATOR
@@ -3585,6 +3612,24 @@ gtk_spin_button_get_type
 </SECTION>
 
 <SECTION>
+<FILE>gtkspinner</FILE>
+<TITLE>GtkSpinner</TITLE>
+GtkSpinner
+gtk_spinner_new
+gtk_spinner_start
+gtk_spinner_stop
+<SUBSECTION Standard>
+GTK_SPINNER
+GTK_IS_SPINNER
+GTK_TYPE_SPINNER
+GTK_SPINNER_CLASS
+GTK_IS_SPINER_CLASS
+GTK_SPINNER_GET_CLASS
+<SUBSECTION Private>
+gtk_spinner_get_type
+</SECTION>
+
+<SECTION>
 <FILE>gtkstatusbar</FILE>
 <TITLE>GtkStatusbar</TITLE>
 GtkStatusbar
@@ -3595,6 +3640,7 @@ gtk_statusbar_pop
 gtk_statusbar_remove
 gtk_statusbar_set_has_resize_grip
 gtk_statusbar_get_has_resize_grip
+gtk_statusbar_get_message_area
 <SUBSECTION Standard>
 GTK_STATUSBAR
 GTK_IS_STATUSBAR
@@ -3638,6 +3684,7 @@ gtk_status_icon_set_has_tooltip
 gtk_status_icon_get_has_tooltip
 gtk_status_icon_set_title
 gtk_status_icon_get_title
+gtk_status_icon_set_name
 gtk_status_icon_set_visible
 gtk_status_icon_get_visible
 gtk_status_icon_set_blinking
@@ -4172,11 +4219,15 @@ gtk_toggle_button_get_type
 <TITLE>GtkToolShell</TITLE>
 GtkToolShell
 GtkToolShellIface
+gtk_tool_shell_get_ellipsize_mode
 gtk_tool_shell_get_icon_size
 gtk_tool_shell_get_orientation
 gtk_tool_shell_get_relief_style
 gtk_tool_shell_get_style
+gtk_tool_shell_get_text_alignment
+gtk_tool_shell_get_text_orientation
 gtk_tool_shell_rebuild_menu
+gtk_tool_shell_get_text_size_group
 
 <SUBSECTION Standard>
 GTK_IS_TOOL_SHELL
@@ -4263,15 +4314,19 @@ gtk_tool_item_set_visible_vertical
 gtk_tool_item_get_visible_vertical
 gtk_tool_item_set_is_important
 gtk_tool_item_get_is_important
+gtk_tool_item_get_ellipsize_mode
 gtk_tool_item_get_icon_size
 gtk_tool_item_get_orientation
 gtk_tool_item_get_toolbar_style
 gtk_tool_item_get_relief_style
+gtk_tool_item_get_text_alignment
+gtk_tool_item_get_text_orientation
 gtk_tool_item_retrieve_proxy_menu_item
 gtk_tool_item_get_proxy_menu_item
 gtk_tool_item_set_proxy_menu_item
 gtk_tool_item_rebuild_menu
 gtk_tool_item_toolbar_reconfigured
+gtk_tool_item_get_text_size_group
 
 <SUBSECTION Standard>
 GTK_TYPE_TOOL_ITEM
@@ -4437,6 +4492,79 @@ gtk_tooltips_get_type
 </SECTION>
 
 <SECTION>
+<FILE>gtktoolitemgroup</FILE>
+<TITLE>GtkToolItemGroup</TITLE>
+GtkToolItemGroup
+gtk_tool_item_group_get_collapsed
+gtk_tool_item_group_get_drop_item
+gtk_tool_item_group_get_ellipsize
+gtk_tool_item_group_get_item_position
+gtk_tool_item_group_get_n_items
+gtk_tool_item_group_get_label
+gtk_tool_item_group_get_label_widget
+gtk_tool_item_group_get_nth_item
+gtk_tool_item_group_get_header_relief
+gtk_tool_item_group_insert
+gtk_tool_item_group_new
+gtk_tool_item_group_set_collapsed
+gtk_tool_item_group_set_ellipsize
+gtk_tool_item_group_set_item_position
+gtk_tool_item_group_set_label
+gtk_tool_item_group_set_label_widget
+gtk_tool_item_group_set_header_relief
+<SUBSECTION Standard>
+GtkToolItemGroupClass
+GTK_TOOL_ITEM_GROUP
+GTK_IS_TOOL_ITEM_GROUP
+GTK_TYPE_TOOL_ITEM_GROUP
+GTK_TOOL_ITEM_GROUP_CLASS
+GTK_IS_TOOL_ITEM_GROUP_CLASS
+GTK_TOOL_ITEM_GROUP_GET_CLASS
+<SUBSECTION Private>
+gtk_tool_item_group_get_type
+</SECTION>
+
+<SECTION>
+<FILE>gtktoolpalette</FILE>
+<TITLE>GtkToolPalette</TITLE>
+GtkToolPalette
+gtk_tool_palette_new
+gtk_tool_palette_get_exclusive
+gtk_tool_palette_set_exclusive
+gtk_tool_palette_get_expand
+gtk_tool_palette_set_expand
+gtk_tool_palette_get_group_position
+gtk_tool_palette_set_group_position
+gtk_tool_palette_get_icon_size
+gtk_tool_palette_set_icon_size
+gtk_tool_palette_unset_icon_size
+gtk_tool_palette_get_style
+gtk_tool_palette_set_style
+gtk_tool_palette_unset_style
+gtk_tool_palette_add_drag_dest
+gtk_tool_palette_get_drag_item
+gtk_tool_palette_get_drag_target_group
+gtk_tool_palette_get_drag_target_item
+gtk_tool_palette_get_drop_group
+gtk_tool_palette_get_drop_item
+GtkToolPaletteDragTargets
+gtk_tool_palette_set_drag_source
+gtk_tool_palette_get_hadjustment
+gtk_tool_palette_get_vadjustment
+<SUBSECTION Standard>
+GtkToolPaletteClass
+GTK_TOOL_PALETTE
+GTK_IS_TOOL_PALETTE
+GTK_TYPE_TOOL_PALETTE
+GTK_TOOL_PALETTE_CLASS
+GTK_IS_TOOL_PALETTE_CLASS
+GTK_TOOL_PALETTE_GET_CLASS
+<SUBSECTION Private>
+gtk_tool_palette_get_type
+GtkToolPalettePrivate
+</SECTION>
+
+<SECTION>
 <FILE>gtktooltip</FILE>
 <TITLE>GtkTooltip</TITLE>
 GtkTooltip
@@ -4445,6 +4573,7 @@ gtk_tooltip_set_text
 gtk_tooltip_set_icon
 gtk_tooltip_set_icon_from_stock
 gtk_tooltip_set_icon_from_icon_name
+gtk_tooltip_set_icon_from_gicon
 gtk_tooltip_set_custom
 gtk_tooltip_trigger_tooltip_query
 gtk_tooltip_set_tip_area
@@ -5106,6 +5235,23 @@ gtk_cell_renderer_spin_get_type
 </SECTION>
 
 <SECTION>
+<FILE>gtkcellrendererspinner</FILE>
+<TITLE>GtkCellRendererSpinner</TITLE>
+GtkCellRendererSpinner
+gtk_cell_renderer_spinner_new
+<SUBSECTION Standard>
+GTK_TYPE_CELL_RENDERER_SPINNER
+GTK_CELL_RENDERER_SPINNER
+GTK_CELL_RENDERER_SPINNER_CLASS
+GTK_IS_CELL_RENDERER_SPINNER
+GTK_IS_CELL_RENDERER_SPINNER_CLASS
+GTK_CELL_RENDERER_SPINNER_GET_CLASS
+<SUBSECTION Private>
+GtkCellRendererSpinnerPrivate
+gtk_cell_renderer_spinner_get_type
+</SECTION>
+
+<SECTION>
 <FILE>gtkcellrendererpixbuf</FILE>
 <TITLE>GtkCellRendererPixbuf</TITLE>
 GtkCellRendererPixbuf
@@ -5279,6 +5425,7 @@ gtk_viewport_set_hadjustment
 gtk_viewport_set_vadjustment
 gtk_viewport_set_shadow_type
 gtk_viewport_get_shadow_type
+gtk_viewport_get_bin_window
 <SUBSECTION Standard>
 GTK_VIEWPORT
 GTK_IS_VIEWPORT
@@ -5539,6 +5686,7 @@ gtk_widget_send_expose
 gtk_widget_style_get
 gtk_widget_style_get_property
 gtk_widget_style_get_valist
+gtk_widget_style_attach
 gtk_widget_get_accessible
 gtk_widget_child_focus
 gtk_widget_child_notify
@@ -5597,11 +5745,17 @@ gtk_widget_set_visible
 gtk_widget_has_default
 gtk_widget_has_focus
 gtk_widget_has_grab
+gtk_widget_has_rc_style
 gtk_widget_is_drawable
 gtk_widget_is_toplevel
 gtk_widget_set_window
 gtk_widget_set_receives_default
 gtk_widget_get_receives_default
+gtk_widget_set_realized
+gtk_widget_get_realized
+gtk_widget_set_mapped
+gtk_widget_get_mapped
+gtk_widget_get_requisition
 
 <SUBSECTION>
 gtk_requisition_copy
@@ -5709,6 +5863,7 @@ gtk_window_get_urgency_hint
 gtk_window_get_accept_focus
 gtk_window_get_focus_on_map
 gtk_window_get_group
+gtk_window_get_window_type
 gtk_window_move
 gtk_window_parse_geometry
 gtk_window_reshow_with_initial_size
@@ -5724,6 +5879,8 @@ gtk_window_set_icon_name
 gtk_window_set_auto_startup_notification
 gtk_window_get_opacity
 gtk_window_set_opacity
+gtk_window_get_mnemonics_visible
+gtk_window_set_mnemonics_visible
 <SUBSECTION Standard>
 GTK_WINDOW
 GTK_IS_WINDOW
@@ -5928,6 +6085,7 @@ gtk_paint_polygon
 gtk_paint_shadow
 gtk_paint_shadow_gap
 gtk_paint_slider
+gtk_paint_spinner
 gtk_paint_string
 gtk_paint_tab
 gtk_paint_vline
@@ -6745,6 +6903,7 @@ gtk_printer_has_details
 gtk_printer_request_details
 gtk_printer_get_capabilities
 gtk_printer_get_default_page_size
+gtk_printer_get_hard_margins
 GtkPrinterFunc
 gtk_enumerate_printers
 
@@ -6929,8 +7088,10 @@ gtk_paper_size_to_key_file
 
 <SUBSECTION Standard>
 GTK_TYPE_PAPER_SIZE
+
 <SUBSECTION Private>
 gtk_paper_size_get_type
+gtk_custom_paper_unix_dialog_get_type
 </SECTION>
 
 
@@ -6989,6 +7150,7 @@ gtk_print_context_get_dpi_y
 gtk_print_context_get_pango_fontmap
 gtk_print_context_create_pango_context
 gtk_print_context_create_pango_layout
+gtk_print_context_get_hard_margins
 
 <SUBSECTION Standard>
 GTK_TYPE_PRINT_CONTEXT

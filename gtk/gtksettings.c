@@ -35,6 +35,12 @@
 #include <pango/pangofc-fontmap.h>
 #endif
 
+#ifdef GDK_WINDOWING_QUARTZ
+#define DEFAULT_KEY_THEME "Mac"
+#else
+#define DEFAULT_KEY_THEME NULL
+#endif
+
 #define DEFAULT_TIMEOUT_INITIAL 200
 #define DEFAULT_TIMEOUT_REPEAT   20
 #define DEFAULT_TIMEOUT_EXPAND  500
@@ -116,7 +122,10 @@ enum {
   PROP_SOUND_THEME_NAME,
   PROP_ENABLE_INPUT_FEEDBACK_SOUNDS,
   PROP_ENABLE_EVENT_SOUNDS,
-  PROP_ENABLE_TOOLTIPS
+  PROP_ENABLE_TOOLTIPS,
+  PROP_TOOLBAR_STYLE,
+  PROP_TOOLBAR_ICON_SIZE,
+  PROP_AUTO_MNEMONICS
 };
 
 
@@ -310,7 +319,7 @@ gtk_settings_class_init (GtkSettingsClass *class)
                                              g_param_spec_string ("gtk-key-theme-name",
 								  P_("Key Theme Name"),
 								  P_("Name of key theme RC file to load"),
-								  NULL,
+								  DEFAULT_KEY_THEME,
 								  GTK_PARAM_READWRITE),
                                              NULL);
   g_assert (result == PROP_KEY_THEME_NAME);    
@@ -961,6 +970,53 @@ gtk_settings_class_init (GtkSettingsClass *class)
                                                                    GTK_PARAM_READWRITE),
                                              NULL);
   g_assert (result == PROP_ENABLE_TOOLTIPS);
+
+  /**
+   * GtkSettings:toolbar-style:
+   *
+   * The size of icons in default toolbars.
+   */
+  result = settings_install_property_parser (class,
+                                             g_param_spec_enum ("gtk-toolbar-style",
+                                                                   P_("Toolbar style"),
+                                                                   P_("Whether default toolbars have text only, text and icons, icons only, etc."),
+                                                                   GTK_TYPE_TOOLBAR_STYLE,
+                                                                   GTK_TOOLBAR_BOTH,
+                                                                   GTK_PARAM_READWRITE),
+                                             gtk_rc_property_parse_enum);
+  g_assert (result == PROP_TOOLBAR_STYLE);
+
+  /**
+   * GtkSettings:toolbar-icon-size:
+   *
+   * The size of icons in default toolbars.
+   */
+  result = settings_install_property_parser (class,
+                                             g_param_spec_enum ("gtk-toolbar-icon-size",
+                                                                   P_("Toolbar Icon Size"),
+                                                                   P_("The size of icons in default toolbars."),
+                                                                   GTK_TYPE_ICON_SIZE,
+                                                                   GTK_ICON_SIZE_LARGE_TOOLBAR,
+                                                                   GTK_PARAM_READWRITE),
+                                             gtk_rc_property_parse_enum);
+  g_assert (result == PROP_TOOLBAR_ICON_SIZE);
+
+  /**
+   * GtkSettings:gtk-auto-mnemonics:
+   *
+   * Whether mnemonics should be automatically shown and hidden when the user
+   * presses the mnemonic activator.
+   *
+   * Since: 2.20
+   */
+  result = settings_install_property_parser (class,
+                                             g_param_spec_boolean ("gtk-auto-mnemonics",
+                                                                   P_("Auto Mnemonics"),
+                                                                   P_("Whether mnemonics should be automatically shown and hidden when the user presses the mnemonic activator."),
+                                                                   FALSE,
+                                                                   GTK_PARAM_READWRITE),
+                                             NULL);
+  g_assert (result == PROP_AUTO_MNEMONICS);
 }
 
 static void
@@ -1025,8 +1081,8 @@ gtk_settings_get_for_screen (GdkScreen *screen)
  * 
  * Gets the #GtkSettings object for the default GDK screen, creating
  * it if necessary. See gtk_settings_get_for_screen().
- * 
- * Return value: a #GtkSettings object. If there is no default
+ *
+ * Return value: (transfer none): a #GtkSettings object. If there is no default
  *  screen, then returns %NULL.
  **/
 GtkSettings*
@@ -1310,6 +1366,7 @@ settings_install_property_parser (GtkSettingsClass   *class,
     case G_TYPE_FLOAT:
     case G_TYPE_DOUBLE:
     case G_TYPE_STRING:
+    case G_TYPE_ENUM:
       break;
     case G_TYPE_BOXED:
       if (strcmp (g_param_spec_get_name (pspec), "color-hash") == 0)
@@ -2190,8 +2247,8 @@ settings_update_color_scheme (GtkSettings *settings)
 }
 
 static gboolean
-add_color_to_hash (gchar      *name, 
-		   GdkColor   *color, 
+add_color_to_hash (gchar      *name,
+		   GdkColor   *color,
 		   GHashTable *target)
 {
   GdkColor *old;
@@ -2200,7 +2257,7 @@ add_color_to_hash (gchar      *name,
   if (!old || !gdk_color_equal (old, color))
     {
       g_hash_table_insert (target, g_strdup (name), gdk_color_copy (color));
-      
+
       return TRUE;
     }
 
@@ -2208,7 +2265,7 @@ add_color_to_hash (gchar      *name,
 }
 
 static gboolean
-add_colors_to_hash_from_string (GHashTable  *hash, 
+add_colors_to_hash_from_string (GHashTable  *hash,
 				const gchar *colors)
 {
   gchar *s, *p, *name;
@@ -2256,24 +2313,27 @@ add_colors_to_hash_from_string (GHashTable  *hash,
 
 static gboolean
 update_color_hash (ColorSchemeData   *data,
-		   const gchar       *str, 
+		   const gchar       *str,
 		   GtkSettingsSource  source)
 {
   gboolean changed = FALSE;
   gint i;
   GHashTable *old_hash;
+  GHashTableIter iter;
+  gpointer name;
+  gpointer color;
 
-  if ((str == NULL || *str == '\0') && 
+  if ((str == NULL || *str == '\0') &&
       (data->lastentry[source] == NULL || data->lastentry[source][0] == '\0'))
     return FALSE;
 
   if (str && data->lastentry[source] && strcmp (str, data->lastentry[source]) == 0)
     return FALSE;
 
-  /* For the RC_FILE source we merge the values rather than over-writing 
+  /* For the RC_FILE source we merge the values rather than over-writing
    * them, since multiple rc files might define independent sets of colors
    */
-  if ((source != GTK_SETTINGS_SOURCE_RC_FILE) && 
+  if ((source != GTK_SETTINGS_SOURCE_RC_FILE) &&
       data->tables[source] && g_hash_table_size (data->tables[source]) > 0)
     {
       g_hash_table_unref (data->tables[source]);
@@ -2282,22 +2342,36 @@ update_color_hash (ColorSchemeData   *data,
     }
 
   if (data->tables[source] == NULL)
-    data->tables[source] = g_hash_table_new_full (g_str_hash, g_str_equal, 
+    data->tables[source] = g_hash_table_new_full (g_str_hash, g_str_equal,
 						  g_free,
 						  (GDestroyNotify) gdk_color_free);
 
   g_free (data->lastentry[source]);
   data->lastentry[source] = g_strdup (str);
-  
+
   changed |= add_colors_to_hash_from_string (data->tables[source], str);
 
   if (!changed)
     return FALSE;
-    
+
   /* Rebuild the merged hash table. */
-  old_hash = data->color_hash;
-  data->color_hash = g_hash_table_new_full (g_str_hash, g_str_equal, g_free,
-					    (GDestroyNotify) gdk_color_free);
+  if (data->color_hash)
+    {
+      old_hash = g_hash_table_new_full (g_str_hash, g_str_equal, g_free,
+                                        (GDestroyNotify) gdk_color_free);
+
+      g_hash_table_iter_init (&iter, data->color_hash);
+      while (g_hash_table_iter_next (&iter, &name, &color))
+        {
+          g_hash_table_insert (old_hash, name, color);
+          g_hash_table_iter_steal (&iter);
+        }
+    }
+  else
+    {
+      old_hash = NULL;
+    }
+
   for (i = 0; i <= GTK_SETTINGS_SOURCE_APPLICATION; i++)
     {
       if (data->tables[i])
@@ -2324,13 +2398,13 @@ update_color_hash (ColorSchemeData   *data,
                 {
                   changed = TRUE;
                   break;
-                } 
+                }
             }
         }
 
       g_hash_table_unref (old_hash);
     }
-  else 
+  else
     changed = TRUE;
 
   return changed;

@@ -88,7 +88,7 @@ static void                 gtk_print_backend_lpr_print_stream    (GtkPrintBacke
 static void
 gtk_print_backend_lpr_register_type (GTypeModule *module)
 {
-  static const GTypeInfo print_backend_lpr_info =
+  const GTypeInfo print_backend_lpr_info =
   {
     sizeof (GtkPrintBackendLprClass),
     NULL,		/* base_init */
@@ -179,7 +179,7 @@ _cairo_write (void                *closure,
 
   while (length > 0) 
     {
-      g_io_channel_write_chars (io, data, length, &written, &error);
+      g_io_channel_write_chars (io, (const gchar*)data, length, &written, &error);
 
       if (error != NULL)
 	{
@@ -191,7 +191,7 @@ _cairo_write (void                *closure,
 	}    
 
       GTK_NOTE (PRINTING,
-                g_print ("LPR Backend: Wrote %i bytes to temp file\n", written));
+                g_print ("LPR Backend: Wrote %" G_GSIZE_FORMAT " bytes to temp file\n", written));
 
       data += written;
       length -= written;
@@ -303,7 +303,7 @@ lpr_write (GIOChannel   *source,
     }
 
   GTK_NOTE (PRINTING,
-            g_print ("LPR Backend: Writting %i byte chunk to lpr pipe\n", bytes_read));
+            g_print ("LPR Backend: Writting %" G_GSIZE_FORMAT " byte chunk to lpr pipe\n", bytes_read));
 
 
   return TRUE;

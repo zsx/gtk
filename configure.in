@@ -1,6 +1,6 @@
 # Process this file with autoconf to produce a configure script.
 # require autoconf 2.54
-AC_PREREQ(2.54)
+AC_PREREQ(2.62)
 
 # Making releases:
 #   GTK_MICRO_VERSION += 1;
@@ -11,9 +11,9 @@ AC_PREREQ(2.54)
 # set GTK_BINARY_AGE and GTK_INTERFACE_AGE to 0.
 
 m4_define([gtk_major_version], [2])
-m4_define([gtk_minor_version], [18])
-m4_define([gtk_micro_version], [3])
-m4_define([gtk_interface_age], [3])
+m4_define([gtk_minor_version], [20])
+m4_define([gtk_micro_version], [2])
+m4_define([gtk_interface_age], [2])
 m4_define([gtk_binary_age],
           [m4_eval(100 * gtk_minor_version + gtk_micro_version)])
 m4_define([gtk_version],
@@ -31,9 +31,9 @@ m4_define([gtk_api_version], [2.0])
 m4_define([gtk_binary_version], [2.10.0])
 
 # required versions of other packages
-m4_define([glib_required_version], [2.21.3])
+m4_define([glib_required_version], [2.23.6])
 m4_define([pango_required_version], [1.20])
-m4_define([atk_required_version], [1.13.0])
+m4_define([atk_required_version], [1.29.2])
 m4_define([cairo_required_version], [1.6])
 
 
@@ -43,10 +43,12 @@ AC_INIT([gtk+], [gtk_version],
 
 AC_CONFIG_SRCDIR([gdk/gdktypes.h])
 
+AC_CONFIG_MACRO_DIR([m4])
+
 # Save this value here, since automake will set cflags later
 cflags_set=${CFLAGS+set}
 
-AM_INIT_AUTOMAKE(no-define)
+AM_INIT_AUTOMAKE([no-define -Wno-portability dist-bzip2])
 AM_CONFIG_HEADER(config.h)
 
 # Support silent build rules, requires at least automake-1.11. Enable
@@ -129,6 +131,7 @@ AC_CANONICAL_HOST
 MATH_LIB=-lm
 AC_MSG_CHECKING([for native Win32])
 LIB_EXE_MACHINE_FLAG=X86
+EXE_MANIFEST_ARCHITECTURE=X86
 case "$host" in
   *-*-mingw*)
     os_win32=yes
@@ -137,6 +140,7 @@ case "$host" in
     case "$host" in
     x86_64-*-*)
       LIB_EXE_MACHINE_FLAG=X64
+      EXE_MANIFEST_ARCHITECTURE=AMD64
       ;;
     esac
     ;;
@@ -147,6 +151,7 @@ esac
 AC_MSG_RESULT([$os_win32])
 
 AC_SUBST(LIB_EXE_MACHINE_FLAG)
+AC_SUBST(EXE_MANIFEST_ARCHITECTURE)
 
 case $host in
   *-*-linux*)
@@ -580,6 +585,7 @@ case $host in
   ;;
 esac
 
+AC_SUBST(MATH_LIB)
 #
 # see bug 162979
 #
@@ -990,7 +996,7 @@ fi
 # because some important apps like GIMP need to read and write
 # arbitrary tEXt chunks which doesn't seem to be possible through GDI+
 
-all_loaders="ani,icns,pcx,ras,tga,png,pnm,wbmp,xbm,xpm"
+all_loaders="ani,icns,pcx,ras,tga,png,pnm,wbmp,xbm,xpm,qtif"
 if test x$with_libjasper != xno; then
   all_loaders="$all_loaders,jasper"
 fi
@@ -1061,6 +1067,7 @@ AM_CONDITIONAL(INCLUDE_TGA, [test x"$INCLUDE_tga" = xyes])
 AM_CONDITIONAL(INCLUDE_PCX, [test x"$INCLUDE_pcx" = xyes])
 AM_CONDITIONAL(INCLUDE_ICNS, [test x"$INCLUDE_icns" = xyes])
 AM_CONDITIONAL(INCLUDE_JASPER, [test x"$INCLUDE_jasper" = xyes])
+AM_CONDITIONAL(INCLUDE_QTIF, [test x"$INCLUDE_qtif" = xyes])
 # As all GDI+ loaders are either built-in or not, arbitrarily just
 # check one of the variables here
 AM_CONDITIONAL(INCLUDE_GDIPLUS, [test x"$INCLUDE_gdip_ico" = xyes])
@@ -1712,7 +1719,13 @@ fi
 CFLAGS="$saved_cflags"
 LDFLAGS="$saved_ldflags"
 
-GDK_PACKAGES="$PANGO_PACKAGES gio-2.0 $X_PACKAGES cairo-$cairo_backend"
+# Pull in gio-unix for GDesktopAppInfo usage, see at least gdkapplaunchcontext-x11.c
+if test "x$gdktarget" = "xx11"; then
+  GDK_PACKAGES="$PANGO_PACKAGES gio-unix-2.0 $X_PACKAGES cairo-$cairo_backend"
+else
+  GDK_PACKAGES="$PANGO_PACKAGES $X_PACKAGES cairo-$cairo_backend"
+fi
+
 GDK_DEP_LIBS="$GDK_EXTRA_LIBS `$PKG_CONFIG --libs $GDK_PIXBUF_PACKAGES $GDK_PACKAGES` $GDK_PIXBUF_EXTRA_LIBS"
 GDK_DEP_CFLAGS="`$PKG_CONFIG --cflags  gthread-2.0 $GDK_PIXBUF_PACKAGES $GDK_PACKAGES` $GDK_PIXBUF_EXTRA_CFLAGS $GDK_EXTRA_CFLAGS"
 #
@@ -1931,6 +1944,10 @@ if test "$os_win32" != "yes"; then
   AC_CHECK_HEADER(cairo-ps.h,,AC_MSG_ERROR([
 *** Can't find cairo-ps.h. You must build Cairo with the 
 *** postscript backend enabled.]))
+
+  AC_CHECK_HEADER(cairo-svg.h,,AC_MSG_ERROR([
+*** Can't find cairo-svg.h. You must build Cairo with the
+*** svg backend enabled.]))
 fi   
 
 CPPFLAGS="$gtk_save_cppflags"
@@ -1965,6 +1982,11 @@ if test -n "$export_dynamic"; then
   GTK_DEP_LIBS=`echo $GTK_DEP_LIBS | sed -e "s/$export_dynamic//"`
 fi
 
+##################################################
+# GObject introspection
+##################################################
+
+GOBJECT_INTROSPECTION_CHECK([0.6.7])
 
 ##################################################
 # Checks for gtk-doc and docbook-tools

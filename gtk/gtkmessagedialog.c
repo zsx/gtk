@@ -475,20 +475,20 @@ gtk_message_dialog_get_property (GObject     *object,
 
 /**
  * gtk_message_dialog_new:
- * @parent: transient parent, or %NULL for none 
+ * @parent: (allow-none): transient parent, or %NULL for none
  * @flags: flags
  * @type: type of message
  * @buttons: set of buttons to use
- * @message_format: printf()-style format string, or %NULL
+ * @message_format: (allow-none): printf()-style format string, or %NULL
  * @Varargs: arguments for @message_format
- * 
+ *
  * Creates a new message dialog, which is a simple dialog with an icon
  * indicating the dialog type (error, warning, etc.) and some text the
  * user may want to see. When the user clicks a button a "response"
  * signal is emitted with response IDs from #GtkResponseType. See
  * #GtkDialog for more details.
- * 
- * Return value: a new #GtkMessageDialog
+ *
+ * Return value: (transfer none): a new #GtkMessageDialog
  **/
 GtkWidget*
 gtk_message_dialog_new (GtkWindow     *parent,
@@ -544,11 +544,11 @@ gtk_message_dialog_new (GtkWindow     *parent,
 
 /**
  * gtk_message_dialog_new_with_markup:
- * @parent: transient parent, or %NULL for none 
+ * @parent: (allow-none): transient parent, or %NULL for none 
  * @flags: flags
  * @type: type of message
  * @buttons: set of buttons to use
- * @message_format: printf()-style format string, or %NULL
+ * @message_format: (allow-none): printf()-style format string, or %NULL
  * @Varargs: arguments for @message_format
  * 
  * Creates a new message dialog, which is a simple dialog with an icon
@@ -695,7 +695,7 @@ gtk_message_dialog_set_markup (GtkMessageDialog *message_dialog,
 /**
  * gtk_message_dialog_format_secondary_text:
  * @message_dialog: a #GtkMessageDialog
- * @message_format: printf()-style format string, or %NULL
+ * @message_format: (allow-none): printf()-style format string, or %NULL
  * @Varargs: arguments for @message_format
  * 
  * Sets the secondary text of the message dialog to be @message_format 

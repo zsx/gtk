@@ -213,8 +213,8 @@ gtk_hsv_init (GtkHSV *hsv)
   
   hsv->priv = priv;
 
-  GTK_WIDGET_SET_FLAGS (hsv, GTK_NO_WINDOW);
-  GTK_WIDGET_SET_FLAGS (hsv, GTK_CAN_FOCUS);
+  gtk_widget_set_has_window (GTK_WIDGET (hsv), FALSE);
+  gtk_widget_set_can_focus (GTK_WIDGET (hsv), TRUE);
   
   priv->h = 0.0;
   priv->s = 0.0;
@@ -279,7 +279,7 @@ gtk_hsv_realize (GtkWidget *widget)
   hsv = GTK_HSV (widget);
   priv = hsv->priv;
   
-  GTK_WIDGET_SET_FLAGS (widget, GTK_REALIZED);
+  gtk_widget_set_realized (widget, TRUE);
   
   /* Create window */
   
@@ -366,7 +366,7 @@ gtk_hsv_size_allocate (GtkWidget     *widget,
   
   widget->allocation = *allocation;
   
-  if (GTK_WIDGET_REALIZED (widget))
+  if (gtk_widget_get_realized (widget))
     gdk_window_move_resize (priv->window,
 			    allocation->x,
 			    allocation->y,
@@ -1223,7 +1223,7 @@ paint_triangle (GtkHSV      *hsv,
   
   /* Draw focus outline */
 
-  if (GTK_WIDGET_HAS_FOCUS (hsv) &&
+  if (gtk_widget_has_focus (widget) &&
       !priv->focus_on_ring)
     {
       gint focus_width;
@@ -1235,7 +1235,7 @@ paint_triangle (GtkHSV      *hsv,
 			    NULL);
   
       gtk_paint_focus (widget->style, widget->window,
-		       GTK_WIDGET_STATE (widget),
+		       gtk_widget_get_state (widget),
 		       NULL, widget, detail,
 		       widget->allocation.x + xx - FOCUS_RADIUS - focus_width - focus_pad, 
 		       widget->allocation.y + yy - FOCUS_RADIUS - focus_width - focus_pad, 
@@ -1271,7 +1271,7 @@ gtk_hsv_expose (GtkWidget      *widget,
   hsv = GTK_HSV (widget);
   priv = hsv->priv;
   
-  if (!(GTK_WIDGET_DRAWABLE (widget) && event->window == widget->window))
+  if (!(event->window == widget->window && gtk_widget_is_drawable (widget)))
     return FALSE;
 
   rect.x = widget->allocation.x;
@@ -1291,9 +1291,9 @@ gtk_hsv_expose (GtkWidget      *widget,
 	 dest.width, dest.height);
   cairo_destroy (cr);
 
-  if (GTK_WIDGET_HAS_FOCUS (hsv) && priv->focus_on_ring)
+  if (gtk_widget_has_focus (widget) && priv->focus_on_ring)
     gtk_paint_focus (widget->style, widget->window,
-		     GTK_WIDGET_STATE (widget),
+		     gtk_widget_get_state (widget),
 		     &event->area, widget, NULL,
 		     widget->allocation.x,
 		     widget->allocation.y, 
@@ -1313,7 +1313,7 @@ gtk_hsv_focus (GtkWidget       *widget,
   hsv = GTK_HSV (widget);
   priv = hsv->priv;
 
-  if (!GTK_WIDGET_HAS_FOCUS (hsv))
+  if (!gtk_widget_has_focus (widget))
     {
       if (dir == GTK_DIR_TAB_BACKWARD)
         priv->focus_on_ring = FALSE;

@@ -429,11 +429,14 @@ static void _send_to_festival (const gchar *role_name,
 
 static void _festival_write (const gchar *command_string, int fd)
 {
+  gssize n_bytes;
+
   if (fd < 0) {
     perror("socket");
     return;
   }
-  write(fd, command_string, strlen(command_string));
+  n_bytes = write(fd, command_string, strlen(command_string));
+  g_assert (n_bytes == strlen(command_string));
 }
 
 static void _speak_caret_event (AtkObject *aobject)
@@ -1707,7 +1710,7 @@ _create_window (void)
         gtk_container_add (GTK_CONTAINER (vbox1), GTK_WIDGET (notebook));
         gtk_widget_show (GTK_WIDGET (notebook));
     }
-    if (!GTK_WIDGET_VISIBLE (window))
+    if (!gtk_widget_get_visible (window))
         gtk_widget_show (window);
 
     mainWindow = GTK_WIDGET (window);

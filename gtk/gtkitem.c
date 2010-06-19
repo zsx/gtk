@@ -97,7 +97,7 @@ gtk_item_class_init (GtkItemClass *class)
 static void
 gtk_item_init (GtkItem *item)
 {
-  GTK_WIDGET_UNSET_FLAGS (item, GTK_NO_WINDOW);
+  gtk_widget_set_has_window (GTK_WIDGET (item), TRUE);
 }
 
 void
@@ -125,7 +125,7 @@ gtk_item_realize (GtkWidget *widget)
   GdkWindowAttr attributes;
   gint attributes_mask;
 
-  GTK_WIDGET_SET_FLAGS (widget, GTK_REALIZED);
+  gtk_widget_set_realized (widget, TRUE);
 
   attributes.x = widget->allocation.x;
   attributes.y = widget->allocation.y;

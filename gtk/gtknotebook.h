@@ -261,6 +261,7 @@ void gtk_notebook_set_menu_label_text     (GtkNotebook *notebook,
 					   const gchar *menu_text);
 G_CONST_RETURN gchar *gtk_notebook_get_menu_label_text (GtkNotebook *notebook,
 							GtkWidget   *child);
+#ifndef GTK_DISABLE_DEPRECATED
 void gtk_notebook_query_tab_label_packing (GtkNotebook *notebook,
 					   GtkWidget   *child,
 					   gboolean    *expand,
@@ -271,6 +272,7 @@ void gtk_notebook_set_tab_label_packing   (GtkNotebook *notebook,
 					   gboolean     expand,
 					   gboolean     fill,
 					   GtkPackType  pack_type);
+#endif
 void gtk_notebook_reorder_child           (GtkNotebook *notebook,
 					   GtkWidget   *child,
 					   gint         position);
@@ -284,6 +286,12 @@ gboolean gtk_notebook_get_tab_detachable  (GtkNotebook *notebook,
 void gtk_notebook_set_tab_detachable      (GtkNotebook *notebook,
 					   GtkWidget   *child,
 					   gboolean     detachable);
+
+GtkWidget* gtk_notebook_get_action_widget (GtkNotebook *notebook,
+                                           GtkPackType  pack_type);
+void       gtk_notebook_set_action_widget (GtkNotebook *notebook,
+                                           GtkWidget   *widget,
+                                           GtkPackType  pack_type);
 
 #ifndef GTK_DISABLE_DEPRECATED
 #define	gtk_notebook_current_page               gtk_notebook_get_current_page

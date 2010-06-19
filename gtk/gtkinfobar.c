@@ -569,6 +569,11 @@ gtk_info_bar_update_colors (GtkInfoBar *info_bar)
           fg = &other_default_border_color;
           bg = &other_default_fill_color;
           break;
+
+        default:
+          g_assert_not_reached();
+          fg = NULL;
+          bg = NULL;
         }
     }
 
@@ -797,7 +802,7 @@ gtk_info_bar_add_button (GtkInfoBar  *info_bar,
 
   button = gtk_button_new_from_stock (button_text);
 
-  GTK_WIDGET_SET_FLAGS (button, GTK_CAN_DEFAULT);
+  gtk_widget_set_can_default (button, TRUE);
 
   gtk_widget_show (button);
 
@@ -877,7 +882,7 @@ gtk_info_bar_new (void)
 
 /**
  * gtk_info_bar_new_with_buttons:
- * @first_button_text: stock ID or text to go in first button, or %NULL
+ * @first_button_text: (allow-none): stock ID or text to go in first button, or %NULL
  * @...: response ID for first button, then additional buttons, ending
  *    with %NULL
  *
@@ -950,6 +955,9 @@ gtk_info_bar_set_response_sensitive (GtkInfoBar *info_bar,
  * Sets the last widget in the info bar's action area with
  * the given response_id as the default widget for the dialog.
  * Pressing "Enter" normally activates the default widget.
+ *
+ * Note that this function currently requires @info_bar to
+ * be added to a widget hierarchy. 
  *
  * Since: 2.18
  */

@@ -697,8 +697,8 @@ setup_msw_rc_style (void)
   GdkColor text_prelight;
 
   /* Prelight */
-  sys_color_to_gtk_color (XP_THEME_CLASS_TEXT,
-			  get_windows_version () == VISTA_VERSION ? COLOR_MENUTEXT : COLOR_HIGHLIGHTTEXT,
+  sys_color_to_gtk_color (get_windows_version () >= VISTA_VERSION ? XP_THEME_CLASS_MENU : XP_THEME_CLASS_TEXT,
+			  get_windows_version () >= VISTA_VERSION ? COLOR_MENUTEXT : COLOR_HIGHLIGHTTEXT,
 			  &fg_prelight);
   sys_color_to_gtk_color (XP_THEME_CLASS_TEXT, COLOR_HIGHLIGHT, &bg_prelight);
   sys_color_to_gtk_color (XP_THEME_CLASS_TEXT, COLOR_HIGHLIGHT,
@@ -1970,7 +1970,7 @@ draw_push_button (GdkWindow *window, GtkWidget *widget, GtkStyle *style,
     }
   else
     {
-      if (is_default || GTK_WIDGET_HAS_FOCUS (widget))
+      if (is_default || gtk_widget_has_focus (widget))
 	{
 	  FrameRect (dc, &rect, GetSysColorBrush (COLOR_WINDOWFRAME));
 	  InflateRect (&rect, -1, -1);
@@ -2056,7 +2056,7 @@ draw_box (GtkStyle *style,
 	}
       else
 	{
-	  gboolean is_default = GTK_WIDGET_HAS_DEFAULT (widget);
+	  gboolean is_default = gtk_widget_has_default (widget);
 	  if (xp_theme_draw
 	      (window,
 	       is_default ? XP_THEME_ELEMENT_DEFAULT_BUTTON :
@@ -2924,7 +2924,7 @@ draw_flat_box (GtkStyle *style, GdkWindow *window,
       if (state_type == GTK_STATE_SELECTED &&
 	  (!strncmp ("cell_even", detail, 9) || !strncmp ("cell_odd", detail, 8)))
 	{
-	  GdkGC *gc = GTK_WIDGET_HAS_FOCUS (widget) ? style->base_gc[state_type] : style->base_gc[GTK_STATE_ACTIVE];
+	  GdkGC *gc = gtk_widget_has_focus (widget) ? style->base_gc[state_type] : style->base_gc[GTK_STATE_ACTIVE];
 
 	  gdk_draw_rectangle (window, gc, TRUE, x, y, width, height);
 
@@ -3478,7 +3478,7 @@ draw_focus (GtkStyle *style,
   HDC dc;
   RECT rect;
 
-  if (!GTK_WIDGET_CAN_FOCUS (widget))
+  if (!gtk_widget_get_can_focus (widget))
     {
       return;
     }
@@ -3744,7 +3744,7 @@ GType msw_type_style = 0;
 void
 msw_style_register_type (GTypeModule *module)
 {
-  static const GTypeInfo object_info = {
+  const GTypeInfo object_info = {
     sizeof (MswStyleClass),
     (GBaseInitFunc) NULL,
     (GBaseFinalizeFunc) NULL,

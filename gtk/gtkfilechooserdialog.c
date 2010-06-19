@@ -187,7 +187,7 @@ file_chooser_widget_default_size_changed (GtkWidget            *widget,
   /* Unset any previously set size */
   gtk_widget_set_size_request (GTK_WIDGET (dialog), -1, -1);
 
-  if (GTK_WIDGET_DRAWABLE (widget))
+  if (gtk_widget_is_drawable (widget))
     {
       /* Force a size request of everything before we start.  This will make sure
        * that widget->requisition is meaningful. */
@@ -200,7 +200,7 @@ file_chooser_widget_default_size_changed (GtkWidget            *widget,
 
   gtk_window_resize (GTK_WINDOW (dialog), default_width, default_height);
 
-  if (!GTK_WIDGET_MAPPED (dialog))
+  if (!gtk_widget_get_mapped (GTK_WIDGET (dialog)))
     {
 #if 0
       /* FIXME: the code to restore the position does not work yet.  It is not
@@ -358,7 +358,7 @@ gtk_file_chooser_dialog_map (GtkWidget *widget)
 
   ensure_default_response (dialog);
 
-  if (!GTK_WIDGET_MAPPED (priv->widget))
+  if (!gtk_widget_get_mapped (priv->widget))
     gtk_widget_map (priv->widget);
 
   _gtk_file_chooser_embed_initial_focus (GTK_FILE_CHOOSER_EMBED (priv->widget));
@@ -436,10 +436,10 @@ gtk_file_chooser_dialog_new_valist (const gchar          *title,
 
 /**
  * gtk_file_chooser_dialog_new:
- * @title: Title of the dialog, or %NULL
- * @parent: Transient parent of the dialog, or %NULL
+ * @title: (allow-none): Title of the dialog, or %NULL
+ * @parent: (allow-none): Transient parent of the dialog, or %NULL
  * @action: Open or save mode for the dialog
- * @first_button_text: stock ID or text to go in the first button, or %NULL
+ * @first_button_text: (allow-none): stock ID or text to go in the first button, or %NULL
  * @Varargs: response ID for the first button, then additional (button, id) pairs, ending with %NULL
  *
  * Creates a new #GtkFileChooserDialog.  This function is analogous to
@@ -470,11 +470,11 @@ gtk_file_chooser_dialog_new (const gchar         *title,
 
 /**
  * gtk_file_chooser_dialog_new_with_backend:
- * @title: Title of the dialog, or %NULL
- * @parent: Transient parent of the dialog, or %NULL
+ * @title: (allow-none): Title of the dialog, or %NULL
+ * @parent: (allow-none): Transient parent of the dialog, or %NULL
  * @action: Open or save mode for the dialog
  * @backend: The name of the specific filesystem backend to use.
- * @first_button_text: stock ID or text to go in the first button, or %NULL
+ * @first_button_text: (allow-none): stock ID or text to go in the first button, or %NULL
  * @Varargs: response ID for the first button, then additional (button, id) pairs, ending with %NULL
  *
  * Creates a new #GtkFileChooserDialog with a specified backend. This is
@@ -485,7 +485,7 @@ gtk_file_chooser_dialog_new (const gchar         *title,
  * Return value: a new #GtkFileChooserDialog
  *
  * Since: 2.4
- * Deprecated: 2.14
+ * Deprecated: 2.14: Use gtk_file_chooser_dialog_new() instead.
  **/
 GtkWidget *
 gtk_file_chooser_dialog_new_with_backend (const gchar          *title,

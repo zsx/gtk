@@ -347,8 +347,8 @@ gdk_cursor_new_for_display (GdkDisplay    *display,
  *  mask = gdk_bitmap_create_from_data (NULL, cursor1mask_bits,
  *                                      cursor1_width, cursor1_height);
  *  cursor = gdk_cursor_new_from_pixmap (source, mask, &amp;fg, &amp;bg, 8, 8);
- *  gdk_pixmap_unref (source);
- *  gdk_pixmap_unref (mask);
+ *  g_object_unref (source);
+ *  g_object_unref (mask);
  *  
  *  
  *  gdk_window_set_cursor (widget->window, cursor);
@@ -1035,8 +1035,8 @@ gdk_display_get_default_cursor_size (GdkDisplay    *display)
 /**
  * gdk_display_get_maximal_cursor_size:
  * @display: a #GdkDisplay
- * @width: the return location for the maximal cursor width
- * @height: the return location for the maximal cursor height
+ * @width: (out): the return location for the maximal cursor width
+ * @height: (out): the return location for the maximal cursor height
  *
  * Gets the maximal size to use for cursors on @display.
  *

@@ -146,7 +146,7 @@ gtk_arrow_get_property (GObject         *object,
 static void
 gtk_arrow_init (GtkArrow *arrow)
 {
-  GTK_WIDGET_SET_FLAGS (arrow, GTK_NO_WINDOW);
+  gtk_widget_set_has_window (GTK_WIDGET (arrow), FALSE);
 
   GTK_WIDGET (arrow)->requisition.width = MIN_ARROW_SIZE + GTK_MISC (arrow)->xpad * 2;
   GTK_WIDGET (arrow)->requisition.height = MIN_ARROW_SIZE + GTK_MISC (arrow)->ypad * 2;
@@ -174,6 +174,8 @@ gtk_arrow_set (GtkArrow      *arrow,
 	       GtkArrowType   arrow_type,
 	       GtkShadowType  shadow_type)
 {
+  GtkWidget *widget;
+
   g_return_if_fail (GTK_IS_ARROW (arrow));
 
   if (   ((GtkArrowType) arrow->arrow_type != arrow_type)
@@ -195,8 +197,9 @@ gtk_arrow_set (GtkArrow      *arrow,
 
       g_object_thaw_notify (G_OBJECT (arrow));
 
-      if (GTK_WIDGET_DRAWABLE (arrow))
-	gtk_widget_queue_draw (GTK_WIDGET (arrow));
+      widget = GTK_WIDGET (arrow);
+      if (gtk_widget_is_drawable (widget))
+	gtk_widget_queue_draw (widget);
     }
 }
 
@@ -205,7 +208,7 @@ static gboolean
 gtk_arrow_expose (GtkWidget      *widget,
 		  GdkEventExpose *event)
 {
-  if (GTK_WIDGET_DRAWABLE (widget))
+  if (gtk_widget_is_drawable (widget))
     {
       GtkArrow *arrow = GTK_ARROW (widget);
       GtkMisc *misc = GTK_MISC (widget);

@@ -26,8 +26,13 @@ The GtkNoteboopk implementation of the GtkBuildable interface
 supports placing children into tabs by specifying "tab" as the
 "type" attribute of a &lt;child&gt; element. Note that the content
 of the tab must be created before the tab can be filled.
-A tab child can be specified without specifying a &lt;child&gt; 
+A tab child can be specified without specifying a &lt;child&gt;
 type attribute.
+</para>
+<para>
+To add a child widget in the notebooks action area, specify
+"action-start" or "action-end" as the "type" attribute of the &lt;child&gt;
+element.
 </para>
 <example>
 <title>A UI definition fragment with GtkNotebook</title>
@@ -59,6 +64,9 @@ type attribute.
 </para>
 
 <!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### SECTION Image ##### -->
 
 
 <!-- ##### STRUCT GtkNotebook ##### -->
@@ -256,7 +264,8 @@ Emitted when the user or a function changes the current page.
 
 <!-- ##### ARG GtkNotebook:tab-pack ##### -->
 <para>
-
+ Deprecated: 2.20: The tab packing functionality of children should not
+ be used anymore and support will be removed in the future.
 </para>
 
 <!-- ##### ARG GtkNotebook:arrow-spacing ##### -->
@@ -304,6 +313,7 @@ The #GtkNotebookPage is an opaque implementation detail of #GtkNotebook.
 <para>
 </para>
 
+@void: 
 @Returns: 
 
 
@@ -746,6 +756,26 @@ Deprecated compatibility macro.
 </para>
 
 @notebook: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gtk_notebook_set_action_widget ##### -->
+<para>
+
+</para>
+
+@notebook: 
+@widget: 
+@pack_type: 
+
+
+<!-- ##### FUNCTION gtk_notebook_get_action_widget ##### -->
+<para>
+
+</para>
+
+@notebook: 
+@pack_type: 
 @Returns: 
 
 

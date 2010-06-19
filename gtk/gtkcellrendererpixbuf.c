@@ -714,7 +714,7 @@ gtk_cell_renderer_pixbuf_render (GtkCellRenderer      *cell,
   if (!pixbuf)
     return;
 
-  if (GTK_WIDGET_STATE (widget) == GTK_STATE_INSENSITIVE || !cell->sensitive)
+  if (gtk_widget_get_state (widget) == GTK_STATE_INSENSITIVE || !cell->sensitive)
     {
       GtkIconSource *source;
       
@@ -747,7 +747,7 @@ gtk_cell_renderer_pixbuf_render (GtkCellRenderer      *cell,
 
       if ((flags & GTK_CELL_RENDERER_SELECTED) != 0)
 	{
-	  if (GTK_WIDGET_HAS_FOCUS (widget))
+	  if (gtk_widget_has_focus (widget))
 	    state = GTK_STATE_SELECTED;
 	  else
 	    state = GTK_STATE_ACTIVE;

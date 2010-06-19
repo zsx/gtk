@@ -702,7 +702,7 @@ wndproc (HWND   hwnd,
 
 	  if (!Shell_NotifyIconW (NIM_ADD, &priv->nid))
 	    {
-	      g_warning ("%s:%d:Shell_NotifyIcon(NIM_ADD) failed", __FILE__, __LINE__-2);
+	      g_warning (G_STRLOC ": Shell_NotifyIcon(NIM_ADD) failed");
 	      priv->nid.hWnd = NULL;
 	      continue;
 	    }
@@ -861,7 +861,7 @@ gtk_status_icon_init (GtkStatusIcon *status_icon)
   g_signal_connect_swapped (priv->tray_icon, "screen-changed",
 		    	    G_CALLBACK (gtk_status_icon_screen_changed), status_icon);
   priv->image = gtk_image_new ();
-  GTK_WIDGET_SET_FLAGS (priv->image, GTK_CAN_FOCUS);
+  gtk_widget_set_can_focus (priv->image, TRUE);
   gtk_container_add (GTK_CONTAINER (priv->tray_icon), priv->image);
   gtk_widget_show (priv->image);
 
@@ -902,7 +902,7 @@ gtk_status_icon_init (GtkStatusIcon *status_icon)
 
   if (!Shell_NotifyIconW (NIM_ADD, &priv->nid))
     {
-      g_warning ("%s:%d:Shell_NotifyIcon(NIM_ADD) failed", __FILE__, __LINE__-2);
+      g_warning (G_STRLOC ": Shell_NotifyIcon(NIM_ADD) failed");
       priv->nid.hWnd = NULL;
     }
 
@@ -1352,7 +1352,7 @@ find_icon_size (GtkWidget *widget,
   dist = G_MAXINT;
   size = GTK_ICON_SIZE_MENU;
 
-  for (s = GTK_ICON_SIZE_MENU; s < GTK_ICON_SIZE_DIALOG; s++)
+  for (s = GTK_ICON_SIZE_MENU; s <= GTK_ICON_SIZE_DIALOG; s++)
     {
       if (gtk_icon_size_lookup_for_settings (settings, s, &w, &h) &&
 	  w <= pixel_size && h <= pixel_size)
@@ -1391,7 +1391,7 @@ gtk_status_icon_update_image (GtkStatusIcon *status_icon)
       priv->nid.uFlags |= NIF_ICON;
       if (priv->nid.hWnd != NULL && priv->visible)
 	if (!Shell_NotifyIconW (NIM_MODIFY, &priv->nid))
-	  g_warning ("%s:%d:Shell_NotifyIcon(NIM_MODIFY) failed", __FILE__, __LINE__-1);
+	  g_warning (G_STRLOC ": Shell_NotifyIcon(NIM_MODIFY) failed");
       if (prev_hicon)
 	DestroyIcon (prev_hicon);
 #endif
@@ -1440,7 +1440,7 @@ gtk_status_icon_update_image (GtkStatusIcon *status_icon)
 	    priv->nid.uFlags |= NIF_ICON;
 	    if (priv->nid.hWnd != NULL && priv->visible)
 	      if (!Shell_NotifyIconW (NIM_MODIFY, &priv->nid))
-		  g_warning ("%s:%d:Shell_NotifyIcon(NIM_MODIFY) failed", __FILE__, __LINE__-1);
+		  g_warning (G_STRLOC ": Shell_NotifyIcon(NIM_MODIFY) failed");
 	    if (prev_hicon)
 	      DestroyIcon (prev_hicon);
 #endif
@@ -1461,7 +1461,7 @@ gtk_status_icon_update_image (GtkStatusIcon *status_icon)
 	    priv->nid.uFlags &= ~NIF_ICON;
 	    if (priv->nid.hWnd != NULL && priv->visible)
 	      if (!Shell_NotifyIconW (NIM_MODIFY, &priv->nid))
-		g_warning ("%s:%d:Shell_NotifyIcon(NIM_MODIFY) failed", __FILE__, __LINE__-1);
+		g_warning (G_STRLOC ": Shell_NotifyIcon(NIM_MODIFY) failed");
 #endif
 #ifdef GDK_WINDOWING_QUARTZ
       [priv->status_item setImage:NULL];
@@ -1491,7 +1491,7 @@ gtk_status_icon_update_image (GtkStatusIcon *status_icon)
 	  priv->nid.uFlags |= NIF_ICON;
 	  if (priv->nid.hWnd != NULL && priv->visible)
 	    if (!Shell_NotifyIconW (NIM_MODIFY, &priv->nid))
-	      g_warning ("%s:%d:Shell_NotifyIcon(NIM_MODIFY) failed", __FILE__, __LINE__-1);
+	      g_warning (G_STRLOC ": Shell_NotifyIcon(NIM_MODIFY) failed");
 	  if (prev_hicon)
 	    DestroyIcon (prev_hicon);
 	  g_object_unref (pixbuf);
@@ -1535,7 +1535,7 @@ gtk_status_icon_update_image (GtkStatusIcon *status_icon)
 	  priv->nid.uFlags |= NIF_ICON;
 	  if (priv->nid.hWnd != NULL && priv->visible)
 	    if (!Shell_NotifyIconW (NIM_MODIFY, &priv->nid))
-	      g_warning ("%s:%d:Shell_NotifyIcon(NIM_MODIFY) failed", __FILE__, __LINE__-1);
+	      g_warning (G_STRLOC ": Shell_NotifyIcon(NIM_MODIFY) failed");
 	  if (prev_hicon)
 	    DestroyIcon (prev_hicon);
 	  g_object_unref (pixbuf);
@@ -1582,7 +1582,7 @@ gtk_status_icon_update_image (GtkStatusIcon *status_icon)
         priv->nid.uFlags |= NIF_ICON;
         if (priv->nid.hWnd != NULL && priv->visible)
           if (!Shell_NotifyIconW (NIM_MODIFY, &priv->nid))
-            g_warning ("%s:%d:Shell_NotifyIcon(NIM_MODIFY) failed", __FILE__, __LINE__-1);
+            g_warning (G_STRLOC ": Shell_NotifyIcon(NIM_MODIFY) failed");
           if (prev_hicon)
             DestroyIcon (prev_hicon);
           g_object_unref (pixbuf);
@@ -1615,7 +1615,7 @@ gtk_status_icon_update_image (GtkStatusIcon *status_icon)
       priv->nid.uFlags &= ~NIF_ICON;
       if (priv->nid.hWnd != NULL && priv->visible)
 	if (!Shell_NotifyIconW (NIM_MODIFY, &priv->nid))
-	  g_warning ("%s:%d:Shell_NotifyIcon(NIM_MODIFY) failed", __FILE__, __LINE__-1);
+	  g_warning (G_STRLOC ": Shell_NotifyIcon(NIM_MODIFY) failed");
 #endif
 #ifdef GDK_WINDOWING_QUARTZ
         {
@@ -1875,9 +1875,9 @@ gtk_status_icon_set_image (GtkStatusIcon *status_icon,
 /**
  * gtk_status_icon_set_from_pixbuf:
  * @status_icon: a #GtkStatusIcon
- * @pixbuf: a #GdkPixbuf or %NULL
- * 
- * Makes @status_icon display @pixbuf. 
+ * @pixbuf: (allow-none): a #GdkPixbuf or %NULL
+ *
+ * Makes @status_icon display @pixbuf.
  * See gtk_status_icon_new_from_pixbuf() for details.
  *
  * Since: 2.10
@@ -2212,7 +2212,7 @@ gtk_status_icon_get_screen (GtkStatusIcon *status_icon)
 /**
  * gtk_status_icon_set_tooltip:
  * @status_icon: a #GtkStatusIcon
- * @tooltip_text: the tooltip text, or %NULL
+ * @tooltip_text: (allow-none): the tooltip text, or %NULL
  *
  * Sets the tooltip of the status icon.
  *
@@ -2298,7 +2298,7 @@ gtk_status_icon_set_visible (GtkStatusIcon *status_icon,
 #ifdef GDK_WINDOWING_X11
       if (visible)
 	gtk_widget_show (priv->tray_icon);
-      else if (GTK_WIDGET_REALIZED (priv->tray_icon)) 
+      else if (gtk_widget_get_realized (priv->tray_icon))
         {
 	  gtk_widget_hide (priv->tray_icon);
 	  gtk_widget_unrealize (priv->tray_icon);
@@ -2561,13 +2561,13 @@ gtk_status_icon_position_menu (GtkMenu  *menu,
 /**
  * gtk_status_icon_get_geometry:
  * @status_icon: a #GtkStatusIcon
- * @screen: return location for the screen, or %NULL if the
- *          information is not needed 
- * @area: return location for the area occupied by the status 
+ * @screen: (out) (transfer none) (allow-none): return location for the screen, or %NULL if the
+ *          information is not needed
+ * @area: (out) (allow-none): return location for the area occupied by the status
  *        icon, or %NULL
- * @orientation: return location for the orientation of the panel 
- *    in which the status icon is embedded, or %NULL. A panel 
- *    at the top or bottom of the screen is horizontal, a panel 
+ * @orientation: (out) (allow-none): return location for the orientation of the panel
+ *    in which the status icon is embedded, or %NULL. A panel
+ *    at the top or bottom of the screen is horizontal, a panel
  *    at the left or right is vertical.
  *
  * Obtains information about the location of the status icon
@@ -2737,7 +2737,7 @@ gtk_status_icon_set_tooltip_text (GtkStatusIcon *status_icon,
     }
   if (priv->nid.hWnd != NULL && priv->visible)
     if (!Shell_NotifyIconW (NIM_MODIFY, &priv->nid))
-      g_warning ("%s:%d:Shell_NotifyIconW(NIM_MODIFY) failed", __FILE__, __LINE__-1);
+      g_warning (G_STRLOC ": Shell_NotifyIconW(NIM_MODIFY) failed");
 
   g_free (priv->tooltip_text);
   priv->tooltip_text = g_strdup (text);
@@ -2791,7 +2791,7 @@ gtk_status_icon_get_tooltip_text (GtkStatusIcon *status_icon)
 /**
  * gtk_status_icon_set_tooltip_markup:
  * @status_icon: a #GtkStatusIcon
- * @markup: the contents of the tooltip for @status_icon, or %NULL
+ * @markup: (allow-none): the contents of the tooltip for @status_icon, or %NULL
  *
  * Sets @markup as the contents of the tooltip, which is marked up with
  *  the <link linkend="PangoMarkupFormat">Pango text markup language</link>.
@@ -2966,6 +2966,36 @@ gtk_status_icon_get_title (GtkStatusIcon *status_icon)
 #ifdef GDK_WINDOWING_WIN32
   return priv->title;
 #endif
+}
+
+
+/**
+ * gtk_status_icon_set_name:
+ * @status_icon: a #GtkStatusIcon
+ * @name: the name
+ *
+ * Sets the name of this tray icon.
+ * This should be a string identifying this icon. It is may be
+ * used for sorting the icons in the tray and will not be shown to
+ * the user.
+ *
+ * Since: 2.20
+ */
+void
+gtk_status_icon_set_name (GtkStatusIcon *status_icon,
+                          const gchar   *name)
+{
+  GtkStatusIconPrivate *priv;
+
+  g_return_if_fail (GTK_IS_STATUS_ICON (status_icon));
+
+  priv = status_icon->priv;
+
+#ifdef GDK_WINDOWING_X11
+  gtk_window_set_wmclass (GTK_WINDOW (priv->tray_icon), name, name);
+#endif
+
+  g_object_notify (G_OBJECT (status_icon), "name");
 }
 
 

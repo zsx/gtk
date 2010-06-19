@@ -288,7 +288,7 @@ gtk_cell_view_set_property (GObject      *object,
 static void
 gtk_cell_view_init (GtkCellView *cellview)
 {
-  GTK_WIDGET_SET_FLAGS (cellview, GTK_NO_WINDOW);
+  gtk_widget_set_has_window (GTK_WIDGET (cellview), FALSE);
 
   cellview->priv = GTK_CELL_VIEW_GET_PRIVATE (cellview);
 }
@@ -405,7 +405,7 @@ gtk_cell_view_expose (GtkWidget      *widget,
 
   cellview = GTK_CELL_VIEW (widget);
 
-  if (! GTK_WIDGET_DRAWABLE (widget))
+  if (!gtk_widget_is_drawable (widget))
     return FALSE;
 
   /* "blank" background */
@@ -436,9 +436,9 @@ gtk_cell_view_expose (GtkWidget      *widget,
   area.x = widget->allocation.x + (rtl ? widget->allocation.width : 0); 
   area.y = widget->allocation.y;
 
-  if (GTK_WIDGET_STATE (widget) == GTK_STATE_PRELIGHT)
+  if (gtk_widget_get_state (widget) == GTK_STATE_PRELIGHT)
     state = GTK_CELL_RENDERER_PRELIT;
-  else if (GTK_WIDGET_STATE (widget) == GTK_STATE_INSENSITIVE)
+  else if (gtk_widget_get_state (widget) == GTK_STATE_INSENSITIVE)
     state = GTK_CELL_RENDERER_INSENSITIVE;
   else
     state = 0;
@@ -768,7 +768,7 @@ gtk_cell_view_new_with_text (const gchar *text)
  * @markup: the text to display in the cell view
  *
  * Creates a new #GtkCellView widget, adds a #GtkCellRendererText 
- * to it, and makes its show @markup. The text can text can be
+ * to it, and makes it show @markup. The text can be
  * marked up with the <link linkend="PangoMarkupFormat">Pango text 
  * markup language</link>.
  *
@@ -857,10 +857,10 @@ gtk_cell_view_set_value (GtkCellView     *cell_view,
 /**
  * gtk_cell_view_set_model:
  * @cell_view: a #GtkCellView
- * @model: a #GtkTreeModel
+ * @model: (allow-none): a #GtkTreeModel
  *
  * Sets the model for @cell_view.  If @cell_view already has a model
- * set, it will remove it before setting the new model.  If @model is 
+ * set, it will remove it before setting the new model.  If @model is
  * %NULL, then it will unset the old model.
  *
  * Since: 2.6
@@ -910,8 +910,8 @@ gtk_cell_view_get_model (GtkCellView *cell_view)
 /**
  * gtk_cell_view_set_displayed_row:
  * @cell_view: a #GtkCellView
- * @path: a #GtkTreePath or %NULL to unset.
- * 
+ * @path: (allow-none): a #GtkTreePath or %NULL to unset.
+ *
  * Sets the row of the model that is currently displayed
  * by the #GtkCellView. If the path is unset, then the
  * contents of the cellview "stick" at their last value;

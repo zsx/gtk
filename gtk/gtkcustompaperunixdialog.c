@@ -39,7 +39,6 @@
 #include "gtkcustompaperunixdialog.h"
 #include "gtkprintbackend.h"
 #include "gtkprintutils.h"
-#include "gtkprinter-private.h"
 #include "gtkalias.h"
 
 #define CUSTOM_PAPER_FILENAME ".gtk-custom-papers"
@@ -355,8 +354,8 @@ gtk_custom_paper_unix_dialog_finalize (GObject *object)
 
 /**
  * gtk_custom_paper_unix_dialog_new:
- * @title: the title of the dialog, or %NULL
- * @parent: transient parent of the dialog, or %NULL
+ * @title: (allow-none): the title of the dialog, or %NULL
+ * @parent: (allow-none): transient parent of the dialog, or %NULL
  *
  * Creates a new custom paper dialog.
  *
@@ -802,7 +801,8 @@ set_margins_from_printer (GtkCustomPaperUnixDialog *dialog,
   gdouble top, bottom, left, right;
 
   top = bottom = left = right = 0;
-  _gtk_printer_get_hard_margins (printer, &top, &bottom, &left, &right);
+  if (!gtk_printer_get_hard_margins (printer, &top, &bottom, &left, &right))
+    return;
 
   priv->non_user_change = TRUE;
   unit_widget_set (priv->top_widget, _gtk_print_convert_to_mm (top, GTK_UNIT_POINTS));

@@ -100,38 +100,55 @@ _gdk_windowing_init (void)
 
   CoInitialize (NULL);
 
-  _gdk_selection = gdk_atom_intern ("GDK_SELECTION", FALSE);
-  _wm_transient_for = gdk_atom_intern ("WM_TRANSIENT_FOR", FALSE);
-  _targets = gdk_atom_intern ("TARGETS", FALSE);
-  _save_targets = gdk_atom_intern ("SAVE_TARGETS", FALSE);
-  _utf8_string = gdk_atom_intern ("UTF8_STRING", FALSE);
-  _text = gdk_atom_intern ("TEXT", FALSE);
-  _compound_text = gdk_atom_intern ("COMPOUND_TEXT", FALSE);
-  _text_uri_list = gdk_atom_intern ("text/uri-list", FALSE);
+  _gdk_selection = gdk_atom_intern_static_string ("GDK_SELECTION");
+  _wm_transient_for = gdk_atom_intern_static_string ("WM_TRANSIENT_FOR");
+  _targets = gdk_atom_intern_static_string ("TARGETS");
+  _delete = gdk_atom_intern_static_string ("DELETE");
+  _save_targets = gdk_atom_intern_static_string ("SAVE_TARGETS");
+  _utf8_string = gdk_atom_intern_static_string ("UTF8_STRING");
+  _text = gdk_atom_intern_static_string ("TEXT");
+  _compound_text = gdk_atom_intern_static_string ("COMPOUND_TEXT");
+  _text_uri_list = gdk_atom_intern_static_string ("text/uri-list");
+  _text_html = gdk_atom_intern_static_string ("text/html");
+  _image_png = gdk_atom_intern_static_string ("image/png");
+  _image_jpeg = gdk_atom_intern_static_string ("image/jpeg");
+  _image_bmp = gdk_atom_intern_static_string ("image/bmp");
+  _image_gif = gdk_atom_intern_static_string ("image/gif");
 
-  _local_dnd = gdk_atom_intern ("LocalDndSelection", FALSE);
-  _gdk_win32_dropfiles = gdk_atom_intern ("DROPFILES_DND", FALSE);
-  _gdk_ole2_dnd = gdk_atom_intern ("OLE2_DND", FALSE);
+  _local_dnd = gdk_atom_intern_static_string ("LocalDndSelection");
+  _gdk_win32_dropfiles = gdk_atom_intern_static_string ("DROPFILES_DND");
+  _gdk_ole2_dnd = gdk_atom_intern_static_string ("OLE2_DND");
+
+  /* MS Office 2007, at least, offers images in common file formats
+   * using clipboard format names like "PNG" and "JFIF". So we follow
+   * the lead and map the GDK target name "image/png" to the clipboard
+   * format name "PNG" etc.
+   */
+  _cf_png = RegisterClipboardFormat ("PNG");
+  _cf_jfif = RegisterClipboardFormat ("JFIF");
+  _cf_gif = RegisterClipboardFormat ("GIF");
+
+  _cf_url = RegisterClipboardFormat ("UniformResourceLocatorW");
+  _cf_html_format = RegisterClipboardFormat ("HTML Format");
+  _cf_text_html = RegisterClipboardFormat ("text/html");
 
   _gdk_win32_selection_init ();
 }
 
 void
 _gdk_win32_api_failed (const gchar *where,
-		      gint         line,
 		      const gchar *api)
 {
   gchar *msg = g_win32_error_message (GetLastError ());
-  g_warning ("%s:%d: %s failed: %s", where, line, api, msg);
+  g_warning ("%s: %s failed: %s", where, api, msg);
   g_free (msg);
 }
 
 void
 _gdk_other_api_failed (const gchar *where,
-		      gint         line,
 		      const gchar *api)
 {
-  g_warning ("%s:%d: %s failed", where, line, api);
+  g_warning ("%s: %s failed", where, api);
 }
 
 void
@@ -149,14 +166,12 @@ gdk_get_use_xshm (void)
 gint
 gdk_screen_get_width (GdkScreen *screen)
 {
-  //return GDK_WINDOW_IMPL_WIN32 (GDK_WINDOW_OBJECT (_gdk_root)->impl)->width;
   return GDK_WINDOW_OBJECT (_gdk_root)->width;
 }
 
 gint
 gdk_screen_get_height (GdkScreen *screen)
 {
-  //return GDK_WINDOW_IMPL_WIN32 (GDK_WINDOW_OBJECT (_gdk_root)->impl)->height;
   return GDK_WINDOW_OBJECT (_gdk_root)->height;
 }
 gint

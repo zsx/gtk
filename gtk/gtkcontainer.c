@@ -155,7 +155,7 @@ gtk_container_get_type (void)
 	NULL,       /* value_table */
       };
 
-      static const GInterfaceInfo buildable_info =
+      const GInterfaceInfo buildable_info =
       {
 	(GInterfaceInitFunc) gtk_container_buildable_init,
 	NULL,
@@ -246,7 +246,7 @@ gtk_container_class_init (GtkContainerClass *class)
                                                       P_("Border width"),
                                                       P_("The width of the empty border outside the containers children"),
 						      0,
-						      G_MAXINT,
+						      65535,
 						      0,
                                                       GTK_PARAM_READWRITE));
   g_object_class_install_property (gobject_class,
@@ -980,7 +980,7 @@ gtk_container_class_install_child_property (GtkContainerClass *cclass,
  * gtk_container_class_find_child_property:
  * @cclass: a #GtkContainerClass
  * @property_name: the name of the child property to find
- * @returns: the #GParamSpec of the child property or %NULL if @class has no
+ * @returns: (allow-none): the #GParamSpec of the child property or %NULL if @class has no
  *   child property with that name.
  *
  * Finds a child property of a container class by name.
@@ -1143,7 +1143,7 @@ gtk_container_set_border_width (GtkContainer *container,
       container->border_width = border_width;
       g_object_notify (G_OBJECT (container), "border-width");
       
-      if (GTK_WIDGET_REALIZED (container))
+      if (gtk_widget_get_realized (GTK_WIDGET (container)))
 	gtk_widget_queue_resize (GTK_WIDGET (container));
     }
 }
@@ -1261,7 +1261,7 @@ gtk_container_set_resize_mode (GtkContainer  *container,
   g_return_if_fail (GTK_IS_CONTAINER (container));
   g_return_if_fail (resize_mode <= GTK_RESIZE_IMMEDIATE);
   
-  if (GTK_WIDGET_TOPLEVEL (container) &&
+  if (gtk_widget_is_toplevel (GTK_WIDGET (container)) &&
       resize_mode == GTK_RESIZE_PARENT)
     {
       resize_mode = GTK_RESIZE_QUEUE;
@@ -1379,8 +1379,9 @@ _gtk_container_queue_resize (GtkContainer *container)
       
   if (resize_container)
     {
-      if (GTK_WIDGET_VISIBLE (resize_container) &&
- 	  (GTK_WIDGET_TOPLEVEL (resize_container) || GTK_WIDGET_REALIZED (resize_container)))
+      if (gtk_widget_get_visible (GTK_WIDGET (resize_container)) &&
+          (gtk_widget_is_toplevel (GTK_WIDGET (resize_container)) ||
+           gtk_widget_get_realized (GTK_WIDGET (resize_container))))
 	{
 	  switch (resize_container->resize_mode)
 	    {
@@ -1586,7 +1587,7 @@ gtk_container_foreach_full (GtkContainer       *container,
 /**
  * gtk_container_set_focus_child:
  * @container: a #GtkContainer
- * @child: a #GtkWidget, or %NULL
+ * @child: (allow-none): a #GtkWidget, or %NULL
  *
  * Sets, or unsets if @child is %NULL, the focused child of @container.
  *
@@ -1629,9 +1630,9 @@ gtk_container_get_focus_child (GtkContainer *container)
  * @container: a #GtkContainer
  * 
  * Returns the container's non-internal children. See
- * gtk_container_forall() for details on what constitutes an "internal" child. 
+ * gtk_container_forall() for details on what constitutes an "internal" child.
  *
- * Return value: a newly-allocated list of the container's non-internal children.
+ * Return value: (element-type GtkWidget) (transfer container): a newly-allocated list of the container's non-internal children.
  **/
 GList*
 gtk_container_get_children (GtkContainer *container)
@@ -1690,11 +1691,14 @@ gchar*
 _gtk_container_child_composite_name (GtkContainer *container,
 				    GtkWidget    *child)
 {
+  gboolean composite_child;
+
   g_return_val_if_fail (GTK_IS_CONTAINER (container), NULL);
   g_return_val_if_fail (GTK_IS_WIDGET (child), NULL);
   g_return_val_if_fail (child->parent == GTK_WIDGET (container), NULL);
 
-  if (GTK_WIDGET_COMPOSITE_CHILD (child))
+  g_object_get (child, "composite-child", &composite_child, NULL);
+  if (composite_child)
     {
       static GQuark quark_composite_name = 0;
       gchar *name;
@@ -1808,11 +1812,11 @@ gtk_container_focus (GtkWidget        *widget,
 
   return_val = FALSE;
 
-  if (GTK_WIDGET_CAN_FOCUS (container))
+  if (gtk_widget_get_can_focus (widget))
     {
-      if (!GTK_WIDGET_HAS_FOCUS (container))
+      if (!gtk_widget_has_focus (widget))
 	{
-	  gtk_widget_grab_focus (GTK_WIDGET (container));
+	  gtk_widget_grab_focus (widget);
 	  return_val = TRUE;
 	}
     }
@@ -2071,13 +2075,13 @@ gtk_container_focus_sort_up_down (GtkContainer     *container,
 	}
       else
 	{
-	  if (GTK_WIDGET_NO_WINDOW (widget))
+	  if (!gtk_widget_get_has_window (widget))
 	    compare.x = widget->allocation.x + widget->allocation.width / 2;
 	  else
 	    compare.x = widget->allocation.width / 2;
 	}
       
-      if (GTK_WIDGET_NO_WINDOW (widget))
+      if (!gtk_widget_get_has_window (widget))
 	compare.y = (direction == GTK_DIR_DOWN) ? widget->allocation.y : widget->allocation.y + widget->allocation.height;
       else
 	compare.y = (direction == GTK_DIR_DOWN) ? 0 : + widget->allocation.height;
@@ -2198,13 +2202,13 @@ gtk_container_focus_sort_left_right (GtkContainer     *container,
 	}
       else
 	{
-	  if (GTK_WIDGET_NO_WINDOW (widget))
+	  if (!gtk_widget_get_has_window (widget))
 	    compare.y = widget->allocation.y + widget->allocation.height / 2;
 	  else
 	    compare.y = widget->allocation.height / 2;
 	}
       
-      if (GTK_WIDGET_NO_WINDOW (widget))
+      if (!gtk_widget_get_has_window (widget))
 	compare.x = (direction == GTK_DIR_RIGHT) ? widget->allocation.x : widget->allocation.x + widget->allocation.width;
       else
 	compare.x = (direction == GTK_DIR_RIGHT) ? 0 : widget->allocation.width;
@@ -2224,7 +2228,7 @@ gtk_container_focus_sort_left_right (GtkContainer     *container,
  * @children:  a list of descendents of @container (they don't
  *             have to be direct children)
  * @direction: focus direction
- * @old_focus: widget to use for the starting position, or %NULL
+ * @old_focus: (allow-none): widget to use for the starting position, or %NULL
  *             to determine this automatically.
  *             (Note, this argument isn't used for GTK_DIR_TAB_*,
  *              which is the only @direction we use currently,
@@ -2247,7 +2251,7 @@ _gtk_container_focus_sort (GtkContainer     *container,
 
   while (children)
     {
-      if (GTK_WIDGET_REALIZED (children->data))
+      if (gtk_widget_get_realized (children->data))
 	visible_children = g_list_prepend (visible_children, children->data);
       children = children->next;
     }
@@ -2298,7 +2302,7 @@ gtk_container_focus_move (GtkContainer     *container,
 		  return TRUE;
             }
         }
-      else if (GTK_WIDGET_DRAWABLE (child) &&
+      else if (gtk_widget_is_drawable (child) &&
                gtk_widget_is_ancestor (child, GTK_WIDGET (container)))
         {
           if (gtk_widget_child_focus (child, direction))
@@ -2403,7 +2407,8 @@ gtk_container_set_focus_chain (GtkContainer *container,
 /**
  * gtk_container_get_focus_chain:
  * @container:         a #GtkContainer
- * @focusable_widgets: location to store the focus chain of the
+ * @focusable_widgets: (element-type GtkWidget) (out) (transfer container): location
+ *                     to store the focus chain of the
  *                     container, or %NULL. You should free this list
  *                     using g_list_free() when you are done with it, however
  *                     no additional reference count is added to the
@@ -2513,7 +2518,7 @@ gtk_container_set_focus_vadjustment (GtkContainer  *container,
  * Retrieves the vertical focus adjustment for the container. See
  * gtk_container_set_focus_vadjustment().
  *
- * Return value: the vertical focus adjustment, or %NULL if
+ * Return value: (transfer none): the vertical focus adjustment, or %NULL if
  *   none has been set.
  **/
 GtkAdjustment *
@@ -2568,7 +2573,7 @@ gtk_container_set_focus_hadjustment (GtkContainer  *container,
  * Retrieves the horizontal focus adjustment for the container. See
  * gtk_container_set_focus_hadjustment ().
  *
- * Return value: the horizontal focus adjustment, or %NULL if
+ * Return value: (transfer none): the horizontal focus adjustment, or %NULL if
  *   none has been set.
  **/
 GtkAdjustment *
@@ -2634,7 +2639,7 @@ gtk_container_expose (GtkWidget      *widget,
   g_return_val_if_fail (event != NULL, FALSE);
 
   
-  if (GTK_WIDGET_DRAWABLE (widget)) 
+  if (gtk_widget_is_drawable (widget))
     {
       data.container = widget;
       data.event = event;
@@ -2651,31 +2656,31 @@ static void
 gtk_container_map_child (GtkWidget *child,
 			 gpointer   client_data)
 {
-  if (GTK_WIDGET_VISIBLE (child) &&
+  if (gtk_widget_get_visible (child) &&
       GTK_WIDGET_CHILD_VISIBLE (child) &&
-      !GTK_WIDGET_MAPPED (child))
+      !gtk_widget_get_mapped (child))
     gtk_widget_map (child);
 }
 
 static void
 gtk_container_map (GtkWidget *widget)
 {
-  GTK_WIDGET_SET_FLAGS (widget, GTK_MAPPED);
+  gtk_widget_set_mapped (widget, TRUE);
 
   gtk_container_forall (GTK_CONTAINER (widget),
 			gtk_container_map_child,
 			NULL);
 
-  if (!GTK_WIDGET_NO_WINDOW (widget))
+  if (gtk_widget_get_has_window (widget))
     gdk_window_show (widget->window);
 }
 
 static void
 gtk_container_unmap (GtkWidget *widget)
 {
-  GTK_WIDGET_UNSET_FLAGS (widget, GTK_MAPPED);
+  gtk_widget_set_mapped (widget, FALSE);
 
-  if (!GTK_WIDGET_NO_WINDOW (widget))
+  if (gtk_widget_get_has_window (widget))
     gdk_window_hide (widget->window);
   else
     gtk_container_forall (GTK_CONTAINER (widget),
@@ -2716,8 +2721,8 @@ gtk_container_propagate_expose (GtkContainer   *container,
 
   g_assert (child->parent == GTK_WIDGET (container));
   
-  if (GTK_WIDGET_DRAWABLE (child) &&
-      GTK_WIDGET_NO_WINDOW (child) &&
+  if (gtk_widget_is_drawable (child) &&
+      !gtk_widget_get_has_window (child) &&
       (child->window == event->window))
     {
       child_event = gdk_event_new (GDK_EXPOSE);

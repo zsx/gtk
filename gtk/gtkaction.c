@@ -72,6 +72,7 @@ struct _GtkActionPrivate
   guint is_important       : 1;
   guint hide_if_empty      : 1;
   guint visible_overflown  : 1;
+  guint always_show_image  : 1;
   guint recursion_guard    : 1;
   guint activate_blocked   : 1;
 
@@ -110,7 +111,8 @@ enum
   PROP_HIDE_IF_EMPTY,
   PROP_SENSITIVE,
   PROP_VISIBLE,
-  PROP_ACTION_GROUP
+  PROP_ACTION_GROUP,
+  PROP_ALWAYS_SHOW_IMAGE
 };
 
 /* GtkBuildable */
@@ -355,6 +357,25 @@ gtk_action_class_init (GtkActionClass *klass)
 							 GTK_PARAM_READWRITE));
 
   /**
+   * GtkAction:always-show-image:
+   *
+   * If %TRUE, the action's menu item proxies will ignore the #GtkSettings:gtk-menu-images 
+   * setting and always show their image, if available.
+   *
+   * Use this property if the menu item would be useless or hard to use
+   * without their image. 
+   *
+   * Since: 2.20
+   **/
+  g_object_class_install_property (gobject_class,
+                                   PROP_ALWAYS_SHOW_IMAGE,
+                                   g_param_spec_boolean ("always-show-image",
+                                                         P_("Always show image"),
+                                                         P_("Whether the image will always be shown"),
+                                                         FALSE,
+                                                         GTK_PARAM_READWRITE | G_PARAM_CONSTRUCT));
+
+  /**
    * GtkAction::activate:
    * @action: the #GtkAction
    *
@@ -390,6 +411,7 @@ gtk_action_init (GtkAction *action)
   action->private_data->visible_overflown  = TRUE;
   action->private_data->is_important = FALSE;
   action->private_data->hide_if_empty = TRUE;
+  action->private_data->always_show_image = FALSE;
   action->private_data->activate_blocked = FALSE;
 
   action->private_data->sensitive = TRUE;
@@ -441,8 +463,8 @@ gtk_action_buildable_get_name (GtkBuildable *buildable)
 /**
  * gtk_action_new:
  * @name: A unique name for the action
- * @label: the label displayed in menu items and on buttons, or %NULL
- * @tooltip: a tooltip for the action, or %NULL
+ * @label: (allow-none): the label displayed in menu items and on buttons, or %NULL
+ * @tooltip: (allow-none): a tooltip for the action, or %NULL
  * @stock_id: the stock icon to display in widgets representing the
  *   action, or %NULL
  *
@@ -551,6 +573,9 @@ gtk_action_set_property (GObject         *object,
     case PROP_ACTION_GROUP:
       gtk_action_set_action_group (action, g_value_get_object (value));
       break;
+    case PROP_ALWAYS_SHOW_IMAGE:
+      gtk_action_set_always_show_image (action, g_value_get_boolean (value));
+      break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
       break;
@@ -614,6 +639,9 @@ gtk_action_get_property (GObject    *object,
     case PROP_ACTION_GROUP:
       g_value_set_object (value, action->private_data->action_group);
       break;
+    case PROP_ALWAYS_SHOW_IMAGE:
+      g_value_set_boolean (value, action->private_data->always_show_image);
+      break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
       break;
@@ -670,7 +698,7 @@ disconnect_proxy (GtkAction *action,
 
 /**
  * _gtk_action_sync_menu_visible:
- * @action: a #GtkAction, or %NULL to determine the action from @proxy
+ * @action: (allow-none): a #GtkAction, or %NULL to determine the action from @proxy
  * @proxy: a proxy menu item
  * @empty: whether the submenu attached to @proxy is empty
  * 
@@ -797,7 +825,7 @@ gtk_action_unblock_activate (GtkAction *action)
 /**
  * gtk_action_create_icon:
  * @action: the action object
- * @icon_size: the size of the icon that should be created.
+ * @icon_size: (type int): the size of the icon that should be created.
  *
  * This function is intended for use by action implementations to
  * create icons displayed in the proxy widgets.
@@ -950,8 +978,8 @@ gtk_action_disconnect_proxy (GtkAction *action,
  * 
  * Returns the proxy widgets for an action.
  * See also gtk_widget_get_action().
- * 
- * Return value: a #GSList of proxy widgets. The list is owned by GTK+
+ *
+ * Return value: (element-type GtkWidget) (transfer none): a #GSList of proxy widgets. The list is owned by GTK+
  * and must not be modified.
  *
  * Since: 2.4
@@ -1167,8 +1195,6 @@ gtk_action_set_is_important (GtkAction *action,
 {
   g_return_if_fail (GTK_IS_ACTION (action));
 
-  g_return_if_fail (GTK_IS_ACTION (action));
-
   is_important = is_important != FALSE;
   
   if (action->private_data->is_important != is_important)
@@ -1195,6 +1221,59 @@ gtk_action_get_is_important (GtkAction *action)
   g_return_val_if_fail (GTK_IS_ACTION (action), FALSE);
 
   return action->private_data->is_important;
+}
+
+/**
+ * gtk_action_set_always_show_image:
+ * @action: a #GtkAction
+ * @always_show: %TRUE if menuitem proxies should always show their image
+ *
+ * Sets whether @action<!-- -->'s menu item proxies will ignore the
+ * #GtkSettings:gtk-menu-images setting and always show their image, if available.
+ *
+ * Use this if the menu item would be useless or hard to use
+ * without their image.
+ *
+ * Since: 2.20
+ */
+void
+gtk_action_set_always_show_image (GtkAction *action,
+                                  gboolean   always_show)
+{
+  GtkActionPrivate *priv;
+
+  g_return_if_fail (GTK_IS_ACTION (action));
+
+  priv = action->private_data;
+
+  always_show = always_show != FALSE;
+  
+  if (priv->always_show_image != always_show)
+    {
+      priv->always_show_image = always_show;
+
+      g_object_notify (G_OBJECT (action), "always-show-image");
+    }
+}
+
+/**
+ * gtk_action_get_always_show_image:
+ * @action: a #GtkAction
+ *
+ * Returns whether @action<!-- -->'s menu item proxies will ignore the
+ * #GtkSettings:gtk-menu-images setting and always show their image,
+ * if available.
+ *
+ * Returns: %TRUE if the menu item proxies will always show their image
+ *
+ * Since: 2.20
+ */
+gboolean
+gtk_action_get_always_show_image  (GtkAction *action)
+{
+  g_return_val_if_fail (GTK_IS_ACTION (action), FALSE);
+
+  return action->private_data->always_show_image;
 }
 
 /**
@@ -1286,7 +1365,6 @@ gtk_action_set_short_label (GtkAction   *action,
 /**
  * gtk_action_get_short_label:
  * @action: a #GtkAction
- * @label: the label text to set
  *
  * Gets the short label text of @action.
  *
@@ -1733,8 +1811,8 @@ gtk_action_get_accel_closure (GtkAction *action)
 /**
  * gtk_action_set_accel_group:
  * @action: the action object
- * @accel_group: a #GtkAccelGroup or %NULL
- * 
+ * @accel_group: (allow-none): a #GtkAccelGroup or %NULL
+ *
  * Sets the #GtkAccelGroup in which the accelerator for this action
  * will be installed.
  *

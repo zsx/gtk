@@ -652,6 +652,21 @@ gdk_keymap_translate_keyboard_state (GdkKeymap       *keymap,
   return TRUE;
 }
 
+void
+gdk_keymap_add_virtual_modifiers (GdkKeymap       *keymap,
+                                  GdkModifierType *state)
+{
+  /* FIXME: For now, we've mimiced the Windows backend. */
+}
+
+gboolean
+gdk_keymap_map_virtual_modifiers (GdkKeymap       *keymap,
+                                  GdkModifierType *state)
+{
+  /* FIXME: For now, we've mimiced the Windows backend. */
+  return TRUE;
+}
+
 /* What sort of key event is this? Returns one of
  * GDK_KEY_PRESS, GDK_KEY_RELEASE, GDK_NOTHING (should be ignored)
  */

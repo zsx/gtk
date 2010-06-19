@@ -52,7 +52,6 @@
 #include "gtkpagesetupunixdialog.h"
 #include "gtkcustompaperunixdialog.h"
 #include "gtkprintbackend.h"
-#include "gtkprinter-private.h"
 #include "gtkpapersize.h"
 #include "gtkprintutils.h"
 #include "gtkalias.h"
@@ -993,8 +992,8 @@ populate_dialog (GtkPageSetupUnixDialog *ps_dialog)
 
 /**
  * gtk_page_setup_unix_dialog_new:
- * @title: the title of the dialog, or %NULL
- * @parent: transient parent of the dialog, or %NULL
+ * @title: (allow-none): the title of the dialog, or %NULL
+ * @parent: (allow-none): transient parent of the dialog, or %NULL
  *
  * Creates a new page setup dialog.
  *

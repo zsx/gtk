@@ -267,7 +267,7 @@ gail_combo_do_action (AtkAction *action,
      */
     return FALSE;
 
-  if (!GTK_WIDGET_SENSITIVE (widget) || !GTK_WIDGET_VISIBLE (widget))
+  if (!gtk_widget_get_sensitive (widget) || !gtk_widget_get_visible (widget))
     return FALSE;
 
   combo = GAIL_COMBO (action);
@@ -305,12 +305,12 @@ idle_do_action (gpointer data)
   gail_combo->action_idle_handler = 0;
   widget = GTK_ACCESSIBLE (gail_combo)->widget;
   if (widget == NULL /* State is defunct */ ||
-      !GTK_WIDGET_SENSITIVE (widget) || !GTK_WIDGET_VISIBLE (widget))
+      !gtk_widget_get_sensitive (widget) || !gtk_widget_get_visible (widget))
     return FALSE;
 
   combo = GTK_COMBO (widget);
 
-  do_popup = !GTK_WIDGET_MAPPED (combo->popwin);
+  do_popup = !gtk_widget_get_mapped (combo->popwin);
 
   tmp_event.button.type = GDK_BUTTON_PRESS; 
   tmp_event.button.window = widget->window;

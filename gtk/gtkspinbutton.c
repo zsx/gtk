@@ -517,7 +517,7 @@ gtk_spin_button_destroy (GtkObject *object)
 static void
 gtk_spin_button_map (GtkWidget *widget)
 {
-  if (GTK_WIDGET_REALIZED (widget) && !GTK_WIDGET_MAPPED (widget))
+  if (gtk_widget_get_realized (widget) && !gtk_widget_get_mapped (widget))
     {
       GTK_WIDGET_CLASS (gtk_spin_button_parent_class)->map (widget);
       gdk_window_show (GTK_SPIN_BUTTON (widget)->panel);
@@ -527,7 +527,7 @@ gtk_spin_button_map (GtkWidget *widget)
 static void
 gtk_spin_button_unmap (GtkWidget *widget)
 {
-  if (GTK_WIDGET_MAPPED (widget))
+  if (gtk_widget_get_mapped (widget))
     {
       gtk_spin_button_stop_spinning (GTK_SPIN_BUTTON (widget));
 
@@ -713,7 +713,7 @@ gtk_spin_button_size_allocate (GtkWidget     *widget,
 
   GTK_WIDGET_CLASS (gtk_spin_button_parent_class)->size_allocate (widget, allocation);
 
-  if (GTK_WIDGET_REALIZED (widget))
+  if (gtk_widget_get_realized (widget))
     {
       gdk_window_move_resize (GTK_SPIN_BUTTON (widget)->panel, 
 			      panel_allocation.x,
@@ -731,7 +731,7 @@ gtk_spin_button_expose (GtkWidget      *widget,
 {
   GtkSpinButton *spin = GTK_SPIN_BUTTON (widget);
 
-  if (GTK_WIDGET_DRAWABLE (widget))
+  if (gtk_widget_is_drawable (widget))
     {
       if (event->window == spin->panel)
 	{
@@ -804,7 +804,7 @@ gtk_spin_button_draw_arrow (GtkSpinButton *spin_button,
 
   widget = GTK_WIDGET (spin_button);
 
-  if (GTK_WIDGET_DRAWABLE (widget))
+  if (gtk_widget_is_drawable (widget))
     {
       width = spin_button_get_arrow_size (spin_button) + 2 * widget->style->xthickness;
 
@@ -844,7 +844,7 @@ gtk_spin_button_draw_arrow (GtkSpinButton *spin_button,
 		}
 	      else
 		{
-		  state_type = GTK_WIDGET_STATE (widget);
+		  state_type = gtk_widget_get_state (widget);
 		}
 	      
 	      shadow_type = GTK_SHADOW_OUT;
@@ -966,7 +966,7 @@ gtk_spin_button_state_changed (GtkWidget    *widget,
 {
   GtkSpinButton *spin = GTK_SPIN_BUTTON (widget);
 
-  if (!GTK_WIDGET_IS_SENSITIVE (widget))
+  if (!gtk_widget_is_sensitive (widget))
     {
       gtk_spin_button_stop_spinning (spin);    
       gtk_widget_queue_draw (GTK_WIDGET (spin));
@@ -979,7 +979,7 @@ gtk_spin_button_style_set (GtkWidget *widget,
 {
   GtkSpinButton *spin = GTK_SPIN_BUTTON (widget);
 
-  if (previous_style && GTK_WIDGET_REALIZED (widget))
+  if (previous_style && gtk_widget_get_realized (widget))
     gtk_style_set_background (widget->style, spin->panel, GTK_STATE_NORMAL);
 
   GTK_WIDGET_CLASS (gtk_spin_button_parent_class)->style_set (widget, previous_style);
@@ -994,13 +994,13 @@ gtk_spin_button_scroll (GtkWidget      *widget,
 
   if (event->direction == GDK_SCROLL_UP)
     {
-      if (!GTK_WIDGET_HAS_FOCUS (widget))
+      if (!gtk_widget_has_focus (widget))
 	gtk_widget_grab_focus (widget);
       gtk_spin_button_real_spin (spin, spin->adjustment->step_increment);
     }
   else if (event->direction == GDK_SCROLL_DOWN)
     {
-      if (!GTK_WIDGET_HAS_FOCUS (widget))
+      if (!gtk_widget_has_focus (widget))
 	gtk_widget_grab_focus (widget);
       gtk_spin_button_real_spin (spin, -spin->adjustment->step_increment); 
     }
@@ -1067,7 +1067,7 @@ gtk_spin_button_button_press (GtkWidget      *widget,
     {
       if (event->window == spin->panel)
 	{
-	  if (!GTK_WIDGET_HAS_FOCUS (widget))
+	  if (!gtk_widget_has_focus (widget))
 	    gtk_widget_grab_focus (widget);
 	  spin->button = event->button;
 	  
@@ -1596,6 +1596,16 @@ gtk_spin_button_default_output (GtkSpinButton *spin_button)
  ***********************************************************/
 
 
+/**
+ * gtk_spin_button_configure:
+ * @spin_button: a #GtkSpinButton
+ * @adjustment: (allow-none):  a #GtkAdjustment.
+ * @climb_rate: the new climb rate.
+ * @digits: the number of decimal places to display in the spin button.
+ *
+ * Changes the properties of an existing spin button. The adjustment, climb rate,
+ * and number of decimal places are all changed accordingly, after this function call.
+ */
 void
 gtk_spin_button_configure (GtkSpinButton  *spin_button,
 			   GtkAdjustment  *adjustment,
@@ -1839,8 +1849,8 @@ gtk_spin_button_set_increments (GtkSpinButton *spin_button,
 /**
  * gtk_spin_button_get_increments:
  * @spin_button: a #GtkSpinButton
- * @step: location to store step increment, or %NULL
- * @page: location to store page increment, or %NULL
+ * @step: (allow-none): location to store step increment, or %NULL
+ * @page: (allow-none): location to store page increment, or %NULL
  *
  * Gets the current step and page the increments used by @spin_button. See
  * gtk_spin_button_set_increments().
@@ -1891,8 +1901,8 @@ gtk_spin_button_set_range (GtkSpinButton *spin_button,
 /**
  * gtk_spin_button_get_range:
  * @spin_button: a #GtkSpinButton
- * @min: location to store minimum allowed value, or %NULL
- * @max: location to store maximum allowed value, or %NULL
+ * @min: (allow-none): location to store minimum allowed value, or %NULL
+ * @max: (allow-none): location to store maximum allowed value, or %NULL
  *
  * Gets the range allowed for @spin_button. See
  * gtk_spin_button_set_range().

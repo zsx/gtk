@@ -287,7 +287,7 @@ clipboard_display_closed (GdkDisplay   *display,
  * if your application called "Foo" has a special-purpose
  * clipboard, you might call it "_FOO_SPECIAL_CLIPBOARD".
  * 
- * Return value: the appropriate clipboard object. If no
+ * Return value: (transfer none): the appropriate clipboard object. If no
  *             clipboard already exists, a new one will
  *             be created. Once a clipboard object has
  *             been created, it is persistent and, since
@@ -309,20 +309,17 @@ gtk_clipboard_get_for_display (GdkDisplay *display,
 
 
 /**
- * gtk_clipboard_get():
- * @selection: a #GdkAtom which identifies the clipboard
- *             to use.
- * 
+ * gtk_clipboard_get:
+ * @selection: a #GdkAtom which identifies the clipboard to use
+ *
  * Returns the clipboard object for the given selection.
  * See gtk_clipboard_get_for_display() for complete details.
- * 
- * Return value: the appropriate clipboard object. If no
- *             clipboard already exists, a new one will
- *             be created. Once a clipboard object has
- *             been created, it is persistent and, since
- *             it is owned by GTK+, must not be freed or
- *             unrefd.
- **/
+ *
+ * Return value: (transfer none): the appropriate clipboard object. If no clipboard
+ *     already exists, a new one will be created. Once a clipboard
+ *     object has been created, it is persistent and, since it is
+ *     owned by GTK+, must not be freed or unreffed.
+ */
 GtkClipboard *
 gtk_clipboard_get (GdkAtom selection)
 {
@@ -1529,12 +1526,13 @@ clipboard_uris_received_func (GtkClipboard *clipboard,
  * Requests the contents of the clipboard as URIs. This function waits
  * for the data to be received using the main loop, so events,
  * timeouts, etc, may be dispatched during the wait.
- * 
- * Return value: a newly-allocated %NULL-terminated array of strings which must
+ *
+ * Return value: (array zero-terminated=1) (element-type utf8) (transfer full): a newly-allocated
+ * 		 %NULL-terminated array of strings which must
  *               be freed with g_strfreev(), or %NULL if
- *               retrieving the selection data failed. (This 
- *               could happen for various reasons, in particular 
- *               if the clipboard was empty or if the contents of 
+ *               retrieving the selection data failed. (This
+ *               could happen for various reasons, in particular
+ *               if the clipboard was empty or if the contents of
  *               the clipboard could not be converted into URI form.)
  *
  * Since: 2.14

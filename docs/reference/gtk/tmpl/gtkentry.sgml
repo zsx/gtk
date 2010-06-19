@@ -67,6 +67,9 @@ via the context menu of the entry.
 <!-- ##### SECTION Stability_Level ##### -->
 
 
+<!-- ##### SECTION Image ##### -->
+
+
 <!-- ##### STRUCT GtkEntry ##### -->
 <para>
 The #GtkEntry-struct struct contains only private data.
@@ -154,6 +157,14 @@ The #GtkEntry-struct struct contains only private data.
 @entry: the object which received the signal.
 
 <!-- ##### SIGNAL GtkEntry::populate-popup ##### -->
+<para>
+
+</para>
+
+@entry: the object which received the signal.
+@arg1: 
+
+<!-- ##### SIGNAL GtkEntry::preedit-changed ##### -->
 <para>
 
 </para>
@@ -403,6 +414,7 @@ The #GtkEntry-struct struct contains only private data.
 
 </para>
 
+@void: 
 @Returns: 
 
 
@@ -1003,6 +1015,25 @@ Specifies the side of the entry at which an icon is placed.
 
 
 <!-- ##### FUNCTION gtk_entry_get_current_icon_drag_source ##### -->
+<para>
+
+</para>
+
+@entry: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gtk_entry_get_icon_window ##### -->
+<para>
+
+</para>
+
+@entry: 
+@icon_pos: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gtk_entry_get_text_window ##### -->
 <para>
 
 </para>

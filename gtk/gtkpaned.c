@@ -559,7 +559,8 @@ gtk_paned_child_type (GtkContainer *container)
 static void
 gtk_paned_init (GtkPaned *paned)
 {
-  GTK_WIDGET_SET_FLAGS (paned, GTK_NO_WINDOW | GTK_CAN_FOCUS);
+  gtk_widget_set_has_window (GTK_WIDGET (paned), FALSE);
+  gtk_widget_set_can_focus (GTK_WIDGET (paned), TRUE);
 
   /* We only need to redraw when the handle position moves, which is
    * independent of the overall allocation of the GtkPaned
@@ -762,7 +763,7 @@ gtk_paned_size_request (GtkWidget      *widget,
   requisition->width = 0;
   requisition->height = 0;
 
-  if (paned->child1 && GTK_WIDGET_VISIBLE (paned->child1))
+  if (paned->child1 && gtk_widget_get_visible (paned->child1))
     {
       gtk_widget_size_request (paned->child1, &child_requisition);
 
@@ -770,7 +771,7 @@ gtk_paned_size_request (GtkWidget      *widget,
       requisition->width = child_requisition.width;
     }
 
-  if (paned->child2 && GTK_WIDGET_VISIBLE (paned->child2))
+  if (paned->child2 && gtk_widget_get_visible (paned->child2))
     {
       gtk_widget_size_request (paned->child2, &child_requisition);
 
@@ -791,8 +792,8 @@ gtk_paned_size_request (GtkWidget      *widget,
   requisition->width += GTK_CONTAINER (paned)->border_width * 2;
   requisition->height += GTK_CONTAINER (paned)->border_width * 2;
 
-  if (paned->child1 && GTK_WIDGET_VISIBLE (paned->child1) &&
-      paned->child2 && GTK_WIDGET_VISIBLE (paned->child2))
+  if (paned->child1 && gtk_widget_get_visible (paned->child1) &&
+      paned->child2 && gtk_widget_get_visible (paned->child2))
     {
       gint handle_size;
 
@@ -824,8 +825,8 @@ gtk_paned_size_allocate (GtkWidget     *widget,
 
   widget->allocation = *allocation;
 
-  if (paned->child1 && GTK_WIDGET_VISIBLE (paned->child1) &&
-      paned->child2 && GTK_WIDGET_VISIBLE (paned->child2))
+  if (paned->child1 && gtk_widget_get_visible (paned->child1) &&
+      paned->child2 && gtk_widget_get_visible (paned->child2))
     {
       GtkRequisition child1_requisition;
       GtkRequisition child2_requisition;
@@ -893,7 +894,7 @@ gtk_paned_size_allocate (GtkWidget     *widget,
           child2_allocation.height = MAX (1, widget->allocation.y + widget->allocation.height - child2_allocation.y - border_width);
         }
 
-      if (GTK_WIDGET_MAPPED (widget) &&
+      if (gtk_widget_get_mapped (widget) &&
           (old_handle_pos.x != paned->handle_pos.x ||
            old_handle_pos.y != paned->handle_pos.y ||
            old_handle_pos.width != paned->handle_pos.width ||
@@ -903,9 +904,9 @@ gtk_paned_size_allocate (GtkWidget     *widget,
           gdk_window_invalidate_rect (widget->window, &paned->handle_pos, FALSE);
         }
 
-      if (GTK_WIDGET_REALIZED (widget))
+      if (gtk_widget_get_realized (widget))
 	{
-	  if (GTK_WIDGET_MAPPED (widget))
+	  if (gtk_widget_get_mapped (widget))
 	    gdk_window_show (paned->handle);
 
           if (paned->priv->orientation == GTK_ORIENTATION_HORIZONTAL)
@@ -929,7 +930,7 @@ gtk_paned_size_allocate (GtkWidget     *widget,
       /* Now allocate the childen, making sure, when resizing not to
        * overlap the windows
        */
-      if (GTK_WIDGET_MAPPED (widget) &&
+      if (gtk_widget_get_mapped (widget) &&
 
           ((paned->priv->orientation == GTK_ORIENTATION_HORIZONTAL &&
             paned->child1->allocation.width < child1_allocation.width) ||
@@ -950,7 +951,7 @@ gtk_paned_size_allocate (GtkWidget     *widget,
     {
       GtkAllocation child_allocation;
 
-      if (GTK_WIDGET_REALIZED (widget))
+      if (gtk_widget_get_realized (widget))
 	gdk_window_hide (paned->handle);
 
       if (paned->child1)
@@ -963,9 +964,9 @@ gtk_paned_size_allocate (GtkWidget     *widget,
       child_allocation.width = MAX (1, allocation->width - 2 * border_width);
       child_allocation.height = MAX (1, allocation->height - 2 * border_width);
 
-      if (paned->child1 && GTK_WIDGET_VISIBLE (paned->child1))
+      if (paned->child1 && gtk_widget_get_visible (paned->child1))
 	gtk_widget_size_allocate (paned->child1, &child_allocation);
-      else if (paned->child2 && GTK_WIDGET_VISIBLE (paned->child2))
+      else if (paned->child2 && gtk_widget_get_visible (paned->child2))
 	gtk_widget_size_allocate (paned->child2, &child_allocation);
     }
 }
@@ -977,7 +978,7 @@ gtk_paned_realize (GtkWidget *widget)
   GdkWindowAttr attributes;
   gint attributes_mask;
 
-  GTK_WIDGET_SET_FLAGS (widget, GTK_REALIZED);
+  gtk_widget_set_realized (widget, TRUE);
   paned = GTK_PANED (widget);
 
   widget->window = gtk_widget_get_parent_window (widget);
@@ -997,7 +998,7 @@ gtk_paned_realize (GtkWidget *widget)
 			    GDK_POINTER_MOTION_MASK |
 			    GDK_POINTER_MOTION_HINT_MASK);
   attributes_mask = GDK_WA_X | GDK_WA_Y;
-  if (GTK_WIDGET_IS_SENSITIVE (widget))
+  if (gtk_widget_is_sensitive (widget))
     {
       attributes.cursor = gdk_cursor_new_for_display (gtk_widget_get_display (widget),
 						      paned->cursor_type);
@@ -1012,8 +1013,8 @@ gtk_paned_realize (GtkWidget *widget)
 
   widget->style = gtk_style_attach (widget->style, widget->window);
 
-  if (paned->child1 && GTK_WIDGET_VISIBLE (paned->child1) &&
-      paned->child2 && GTK_WIDGET_VISIBLE (paned->child2))
+  if (paned->child1 && gtk_widget_get_visible (paned->child1) &&
+      paned->child2 && gtk_widget_get_visible (paned->child2))
     gdk_window_show (paned->handle);
 }
 
@@ -1069,9 +1070,9 @@ gtk_paned_expose (GtkWidget      *widget,
 {
   GtkPaned *paned = GTK_PANED (widget);
 
-  if (GTK_WIDGET_VISIBLE (widget) && GTK_WIDGET_MAPPED (widget) &&
-      paned->child1 && GTK_WIDGET_VISIBLE (paned->child1) &&
-      paned->child2 && GTK_WIDGET_VISIBLE (paned->child2))
+  if (gtk_widget_get_visible (widget) && gtk_widget_get_mapped (widget) &&
+      paned->child1 && gtk_widget_get_visible (paned->child1) &&
+      paned->child2 && gtk_widget_get_visible (paned->child2))
     {
       GtkStateType state;
       
@@ -1080,7 +1081,7 @@ gtk_paned_expose (GtkWidget      *widget,
       else if (paned->handle_prelit)
 	state = GTK_STATE_PRELIGHT;
       else
-	state = GTK_WIDGET_STATE (widget);
+	state = gtk_widget_get_state (widget);
       
       gtk_paint_handle (widget->style, widget->window,
 			state, GTK_SHADOW_NONE,
@@ -1196,9 +1197,9 @@ gtk_paned_focus (GtkWidget        *widget,
    * excessive cut-and-paste from gtkcontainer.c?
    */
 
-  GTK_WIDGET_UNSET_FLAGS (widget, GTK_CAN_FOCUS);
+  gtk_widget_set_can_focus (widget, FALSE);
   retval = GTK_WIDGET_CLASS (gtk_paned_parent_class)->focus (widget, direction);
-  GTK_WIDGET_SET_FLAGS (widget, GTK_CAN_FOCUS);
+  gtk_widget_set_can_focus (widget, TRUE);
 
   return retval;
 }
@@ -1278,9 +1279,9 @@ gtk_paned_state_changed (GtkWidget    *widget,
   GtkPaned *paned = GTK_PANED (widget);
   GdkCursor *cursor;
 
-  if (GTK_WIDGET_REALIZED (paned))
+  if (gtk_widget_get_realized (widget))
     {
-      if (GTK_WIDGET_IS_SENSITIVE (widget))
+      if (gtk_widget_is_sensitive (widget))
         cursor = gdk_cursor_new_for_display (gtk_widget_get_display (widget),
                                              paned->cursor_type); 
       else
@@ -1423,7 +1424,7 @@ gtk_paned_remove (GtkContainer *container,
   gboolean was_visible;
 
   paned = GTK_PANED (container);
-  was_visible = GTK_WIDGET_VISIBLE (widget);
+  was_visible = gtk_widget_get_visible (widget);
 
   if (paned->child1 == widget)
     {
@@ -1431,7 +1432,7 @@ gtk_paned_remove (GtkContainer *container,
 
       paned->child1 = NULL;
 
-      if (was_visible && GTK_WIDGET_VISIBLE (container))
+      if (was_visible && gtk_widget_get_visible (GTK_WIDGET (container)))
 	gtk_widget_queue_resize_no_redraw (GTK_WIDGET (container));
     }
   else if (paned->child2 == widget)
@@ -1440,7 +1441,7 @@ gtk_paned_remove (GtkContainer *container,
 
       paned->child2 = NULL;
 
-      if (was_visible && GTK_WIDGET_VISIBLE (container))
+      if (was_visible && gtk_widget_get_visible (GTK_WIDGET (container)))
 	gtk_widget_queue_resize_no_redraw (GTK_WIDGET (container));
     }
 }
@@ -1494,6 +1495,9 @@ gtk_paned_set_position (GtkPaned *paned,
   GObject *object;
   
   g_return_if_fail (GTK_IS_PANED (paned));
+
+  if (paned->child1_size == position)
+    return;
 
   object = G_OBJECT (paned);
   
@@ -1707,7 +1711,7 @@ paned_get_focus_widget (GtkPaned *paned)
   GtkWidget *toplevel;
 
   toplevel = gtk_widget_get_toplevel (GTK_WIDGET (paned));
-  if (GTK_WIDGET_TOPLEVEL (toplevel))
+  if (gtk_widget_is_toplevel (toplevel))
     return GTK_WINDOW (toplevel)->focus_widget;
 
   return NULL;
@@ -1890,7 +1894,7 @@ static void
 get_child_panes (GtkWidget  *widget,
 		 GList     **panes)
 {
-  if (!widget || !GTK_WIDGET_REALIZED (widget))
+  if (!widget || !gtk_widget_get_realized (widget))
     return;
 
   if (GTK_IS_PANED (widget))
@@ -2037,7 +2041,7 @@ gtk_paned_restore_focus (GtkPaned *paned)
   if (gtk_widget_is_focus (GTK_WIDGET (paned)))
     {
       if (paned->priv->saved_focus &&
-	  GTK_WIDGET_SENSITIVE (paned->priv->saved_focus))
+	  gtk_widget_get_sensitive (paned->priv->saved_focus))
 	{
 	  gtk_widget_grab_focus (paned->priv->saved_focus);
 	}
@@ -2225,6 +2229,27 @@ gtk_paned_toggle_handle_focus (GtkPaned *paned)
     gtk_paned_accept_position (paned);
 
   return FALSE;
+}
+
+/**
+ * gtk_paned_get_handle_window:
+ * @panede: a #GtkPaned
+ *
+ * Returns the #GdkWindow of the handle. This function is
+ * useful when handling button or motion events because it
+ * enables the callback to distinguish between the window
+ * of the paned, a child and the handle.
+ *
+ * Return value: the paned's handle window.
+ *
+ * Since: 2.20
+ **/
+GdkWindow *
+gtk_paned_get_handle_window (GtkPaned *paned)
+{
+  g_return_val_if_fail (GTK_IS_PANED (paned), NULL);
+
+  return paned->handle;
 }
 
 #define __GTK_PANED_C__

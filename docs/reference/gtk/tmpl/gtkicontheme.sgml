@@ -9,7 +9,7 @@ Looking up icons by name
 #GtkIconTheme provides a facility for looking up icons by name
 and size. The main reason for using a name rather than simply
 providing a filename is to allow different icons to be used
-depending on what <firstterm>icon theme</firstterm> is selecetd
+depending on what <firstterm>icon theme</firstterm> is selected
 by the user. The operation of icon themes on Linux and Unix
 follows the <ulink
 url="http://www.freedesktop.org/Standards/icon-theme-spec">Icon
@@ -103,6 +103,9 @@ else
 <!-- ##### SECTION Stability_Level ##### -->
 
 
+<!-- ##### SECTION Image ##### -->
+
+
 <!-- ##### STRUCT GtkIconInfo ##### -->
 <para>
 Contains information found when looking up an icon in
@@ -160,6 +163,7 @@ The #GQuark used for #GtkIconThemeError errors.
 
 </para>
 
+@void: 
 @Returns: 
 
 
@@ -168,6 +172,7 @@ The #GQuark used for #GtkIconThemeError errors.
 
 </para>
 
+@void: 
 @Returns: 
 
 

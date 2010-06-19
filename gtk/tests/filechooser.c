@@ -517,9 +517,9 @@ test_widgets_for_current_action (GtkFileChooserDialog *dialog,
 
   /* OPEN implies that the "new folder" button is hidden; otherwise it is shown */
   if (impl->action == GTK_FILE_CHOOSER_ACTION_OPEN)
-    passed = passed && !GTK_WIDGET_VISIBLE (impl->browse_new_folder_button);
+    passed = passed && !gtk_widget_get_visible (impl->browse_new_folder_button);
   else
-    passed = passed && GTK_WIDGET_VISIBLE (impl->browse_new_folder_button);
+    passed = passed && gtk_widget_get_visible (impl->browse_new_folder_button);
 
   /* Check that the widgets are present/visible or not */
   if (has_action (open_actions, G_N_ELEMENTS (open_actions), impl->action))
@@ -531,7 +531,7 @@ test_widgets_for_current_action (GtkFileChooserDialog *dialog,
 			  && impl->save_folder_label == NULL
 			  && impl->save_folder_combo == NULL
 			  && impl->save_expander == NULL
-			  && GTK_IS_CONTAINER (impl->browse_widgets) && GTK_WIDGET_DRAWABLE (impl->browse_widgets));
+			  && GTK_IS_CONTAINER (impl->browse_widgets) && gtk_widget_is_drawable (impl->browse_widgets));
     }
   else if (has_action (save_actions, G_N_ELEMENTS (save_actions), impl->action))
     {
@@ -539,11 +539,11 @@ test_widgets_for_current_action (GtkFileChooserDialog *dialog,
        * _gtk_file_chooser_entry_get_type(), which is a non-exported symbol.
        * So, we just test impl->location_entry for being non-NULL
        */
-      passed = passed && (GTK_IS_CONTAINER (impl->save_widgets) && GTK_WIDGET_DRAWABLE (impl->save_widgets)
-			  && impl->location_entry != NULL && GTK_WIDGET_DRAWABLE (impl->location_entry)
-			  && GTK_IS_LABEL (impl->save_folder_label) && GTK_WIDGET_DRAWABLE (impl->save_folder_label)
-			  && GTK_IS_COMBO_BOX (impl->save_folder_combo) && GTK_WIDGET_DRAWABLE (impl->save_folder_combo)
-			  && GTK_IS_EXPANDER (impl->save_expander) && GTK_WIDGET_DRAWABLE (impl->save_expander)
+      passed = passed && (GTK_IS_CONTAINER (impl->save_widgets) && gtk_widget_is_drawable (impl->save_widgets)
+			  && impl->location_entry != NULL && gtk_widget_is_drawable (impl->location_entry)
+			  && GTK_IS_LABEL (impl->save_folder_label) && gtk_widget_is_drawable (impl->save_folder_label)
+			  && GTK_IS_COMBO_BOX (impl->save_folder_combo) && gtk_widget_is_drawable (impl->save_folder_combo)
+			  && GTK_IS_EXPANDER (impl->save_expander) && gtk_widget_is_drawable (impl->save_expander)
 			  && GTK_IS_CONTAINER (impl->browse_widgets));
 
       /* FIXME: we are in a SAVE mode; test the visibility and sensitivity of
@@ -705,7 +705,7 @@ test_reload_sequence (gboolean set_folder_before_map)
       wait_for_idle ();
 
       folder = gtk_file_chooser_get_current_folder (GTK_FILE_CHOOSER (dialog));
-      passed = passed && (folder != NULL && strcmp (folder, g_get_home_dir()) == 0);
+      passed = passed && (g_strcmp0 (folder, g_get_home_dir()) == 0);
       g_free (folder);
     }
   else
@@ -721,7 +721,7 @@ test_reload_sequence (gboolean set_folder_before_map)
       wait_for_idle ();
 
       folder = gtk_file_chooser_get_current_folder (GTK_FILE_CHOOSER (dialog));
-      passed = passed && (folder != NULL && strcmp (folder, current_working_dir) == 0);
+      passed = passed && (g_strcmp0 (folder, current_working_dir) == 0);
     }
 
   log_test (passed, "test_reload_sequence(): initial status");
@@ -743,9 +743,9 @@ test_reload_sequence (gboolean set_folder_before_map)
 
   folder = gtk_file_chooser_get_current_folder (GTK_FILE_CHOOSER (dialog));
   if (set_folder_before_map)
-    passed = passed && (folder != NULL && strcmp (folder, g_get_home_dir()) == 0);
+    passed = passed && (g_strcmp0 (folder, g_get_home_dir()) == 0);
   else
-    passed = passed && (folder != NULL && strcmp (folder, current_working_dir) == 0);
+    passed = passed && (g_strcmp0 (folder, current_working_dir) == 0);
 
   g_free (folder);
 
@@ -768,9 +768,9 @@ test_reload_sequence (gboolean set_folder_before_map)
 
   folder = gtk_file_chooser_get_current_folder (GTK_FILE_CHOOSER (dialog));
   if (set_folder_before_map)
-    passed = passed && (folder != NULL && strcmp (folder, g_get_home_dir()) == 0);
+    passed = passed && (g_strcmp0 (folder, g_get_home_dir()) == 0);
   else
-    passed = passed && (folder != NULL && strcmp (folder, current_working_dir) == 0);
+    passed = passed && (g_strcmp0 (folder, current_working_dir) == 0);
 
   g_free (folder);
 
@@ -793,9 +793,9 @@ test_reload_sequence (gboolean set_folder_before_map)
 
   folder = gtk_file_chooser_get_current_folder (GTK_FILE_CHOOSER (dialog));
   if (set_folder_before_map)
-    passed = passed && (folder != NULL && strcmp (folder, g_get_home_dir()) == 0);
+    passed = passed && (g_strcmp0 (folder, g_get_home_dir()) == 0);
   else
-    passed = passed && (folder != NULL && strcmp (folder, current_working_dir) == 0);
+    passed = passed && (g_strcmp0 (folder, current_working_dir) == 0);
 
   g_free (folder);
 
@@ -863,9 +863,9 @@ test_button_folder_states_for_action (GtkFileChooserAction action, gboolean use_
 
   folder = gtk_file_chooser_get_current_folder (GTK_FILE_CHOOSER (button));
   if (must_have_cwd)
-    passed = passed && (folder != NULL && strcmp (folder, current_working_dir) == 0);
+    passed = passed && (g_strcmp0 (folder, current_working_dir) == 0);
   else
-    passed = passed && (folder != NULL && strcmp (folder, g_get_home_dir()) == 0);
+    passed = passed && (g_strcmp0 (folder, g_get_home_dir()) == 0);
 
   log_test (passed, "test_button_folder_states_for_action(): %s, use_dialog=%d, set_folder_on_dialog=%d, pre-map, %s",
 	    get_action_name (action),
@@ -883,9 +883,9 @@ test_button_folder_states_for_action (GtkFileChooserAction action, gboolean use_
   folder = gtk_file_chooser_get_current_folder (GTK_FILE_CHOOSER (button));
 
   if (must_have_cwd)
-    passed = passed && (folder != NULL && strcmp (folder, current_working_dir) == 0);
+    passed = passed && (g_strcmp0 (folder, current_working_dir) == 0);
   else
-    passed = passed && (folder != NULL && strcmp (folder, g_get_home_dir()) == 0);
+    passed = passed && (g_strcmp0 (folder, g_get_home_dir()) == 0);
 
   log_test (passed, "test_button_folder_states_for_action(): %s, use_dialog=%d, set_folder_on_dialog=%d, mapped, %s",
 	    get_action_name (action),
@@ -901,9 +901,9 @@ test_button_folder_states_for_action (GtkFileChooserAction action, gboolean use_
   folder = gtk_file_chooser_get_current_folder (GTK_FILE_CHOOSER (button));
 
   if (must_have_cwd)
-    passed = passed && (folder != NULL && strcmp (folder, current_working_dir) == 0);
+    passed = passed && (g_strcmp0 (folder, current_working_dir) == 0);
   else
-    passed = passed && (folder != NULL && strcmp (folder, g_get_home_dir()) == 0);
+    passed = passed && (g_strcmp0 (folder, g_get_home_dir()) == 0);
 
   log_test (passed, "test_button_folder_states_for_action(): %s, use_dialog=%d, set_folder_on_dialog=%d, unmapped, %s",
 	    get_action_name (action),
@@ -918,9 +918,9 @@ test_button_folder_states_for_action (GtkFileChooserAction action, gboolean use_
   folder = gtk_file_chooser_get_current_folder (GTK_FILE_CHOOSER (button));
 
   if (must_have_cwd)
-    passed = passed && (folder != NULL && strcmp (folder, current_working_dir) == 0);
+    passed = passed && (g_strcmp0 (folder, current_working_dir) == 0);
   else
-    passed = passed && (folder != NULL && strcmp (folder, g_get_home_dir()) == 0);
+    passed = passed && (g_strcmp0 (folder, g_get_home_dir()) == 0);
   wait_for_idle ();
   log_test (passed, "test_button_folder_states_for_action(): %s, use_dialog=%d, set_folder_on_dialog=%d, re-mapped, %s",
 	    get_action_name (action),

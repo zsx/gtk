@@ -79,7 +79,7 @@ struct _GtkTooltipClass
   GObjectClass parent_class;
 };
 
-#define GTK_TOOLTIP_VISIBLE(tooltip) ((tooltip)->current_window && GTK_WIDGET_VISIBLE ((tooltip)->current_window))
+#define GTK_TOOLTIP_VISIBLE(tooltip) ((tooltip)->current_window && gtk_widget_get_visible (GTK_WIDGET((tooltip)->current_window)))
 
 
 static void       gtk_tooltip_class_init           (GtkTooltipClass *klass);
@@ -205,7 +205,7 @@ gtk_tooltip_dispose (GObject *object)
 /**
  * gtk_tooltip_set_markup:
  * @tooltip: a #GtkTooltip
- * @markup: a markup string (see <link linkend="PangoMarkupFormat">Pango markup format</link>) or %NULL
+ * @markup: (allow-none): a markup string (see <link linkend="PangoMarkupFormat">Pango markup format</link>) or %NULL
  *
  * Sets the text of the tooltip to be @markup, which is marked up
  * with the <link
@@ -231,7 +231,7 @@ gtk_tooltip_set_markup (GtkTooltip  *tooltip,
 /**
  * gtk_tooltip_set_text:
  * @tooltip: a #GtkTooltip
- * @text: a text string or %NULL
+ * @text: (allow-none): a text string or %NULL
  *
  * Sets the text of the tooltip to be @text. If @text is %NULL, the label
  * will be hidden. See also gtk_tooltip_set_markup().
@@ -255,7 +255,7 @@ gtk_tooltip_set_text (GtkTooltip  *tooltip,
 /**
  * gtk_tooltip_set_icon:
  * @tooltip: a #GtkTooltip
- * @pixbuf: a #GdkPixbuf, or %NULL
+ * @pixbuf: (allow-none): a #GdkPixbuf, or %NULL
  *
  * Sets the icon of the tooltip (which is in front of the text) to be
  * @pixbuf.  If @pixbuf is %NULL, the image will be hidden.
@@ -281,8 +281,8 @@ gtk_tooltip_set_icon (GtkTooltip *tooltip,
 /**
  * gtk_tooltip_set_icon_from_stock:
  * @tooltip: a #GtkTooltip
- * @stock_id: a stock id, or %NULL
- * @size: a stock icon size
+ * @stock_id: (allow-none): a stock id, or %NULL
+ * @size: (type int): a stock icon size
  *
  * Sets the icon of the tooltip (which is in front of the text) to be
  * the stock item indicated by @stock_id with the size indicated
@@ -308,8 +308,8 @@ gtk_tooltip_set_icon_from_stock (GtkTooltip  *tooltip,
 /**
  * gtk_tooltip_set_icon_from_icon_name:
  * @tooltip: a #GtkTooltip
- * @icon_name: an icon name, or %NULL
- * @size: a stock icon size
+ * @icon_name: (allow-none): an icon name, or %NULL
+ * @size: (type int): a stock icon size
  *
  * Sets the icon of the tooltip (which is in front of the text) to be
  * the icon indicated by @icon_name with the size indicated
@@ -318,9 +318,9 @@ gtk_tooltip_set_icon_from_stock (GtkTooltip  *tooltip,
  * Since: 2.14
  */
 void
-gtk_tooltip_set_icon_from_icon_name(GtkTooltip  *tooltip,
-				    const gchar *icon_name,
-				    GtkIconSize  size)
+gtk_tooltip_set_icon_from_icon_name (GtkTooltip  *tooltip,
+				     const gchar *icon_name,
+				     GtkIconSize  size)
 {
   g_return_if_fail (GTK_IS_TOOLTIP (tooltip));
 
@@ -333,9 +333,36 @@ gtk_tooltip_set_icon_from_icon_name(GtkTooltip  *tooltip,
 }
 
 /**
+ * gtk_tooltip_set_icon_from_gicon:
+ * @tooltip: a #GtkTooltip
+ * @gicon: (allow-none): a #GIcon representing the icon, or %NULL
+ * @size: (type int): a stock icon size
+ *
+ * Sets the icon of the tooltip (which is in front of the text)
+ * to be the icon indicated by @gicon with the size indicated
+ * by @size. If @gicon is %NULL, the image will be hidden.
+ *
+ * Since: 2.20
+ */
+void
+gtk_tooltip_set_icon_from_gicon (GtkTooltip  *tooltip,
+				 GIcon       *gicon,
+				 GtkIconSize  size)
+{
+  g_return_if_fail (GTK_IS_TOOLTIP (tooltip));
+
+  gtk_image_set_from_gicon (GTK_IMAGE (tooltip->image), gicon, size);
+
+  if (gicon)
+    gtk_widget_show (tooltip->image);
+  else
+    gtk_widget_hide (tooltip->image);
+}
+
+/**
  * gtk_tooltip_set_custom:
  * @tooltip: a #GtkTooltip
- * @custom_widget: a #GtkWidget, or %NULL to unset the old custom widget.
+ * @custom_widget: (allow-none): a #GtkWidget, or %NULL to unset the old custom widget.
  *
  * Replaces the widget packed into the tooltip with
  * @custom_widget. @custom_widget does not get destroyed when the tooltip goes
@@ -475,6 +502,8 @@ gtk_tooltip_window_style_set (GtkTooltip *tooltip)
 			     tooltip->window->style->ythickness,
 			     tooltip->window->style->xthickness,
 			     tooltip->window->style->xthickness);
+  gtk_box_set_spacing (GTK_BOX (tooltip->box),
+		       tooltip->window->style->xthickness);
 
   gtk_widget_queue_draw (tooltip->window);
 }
@@ -524,7 +553,7 @@ child_location_foreach (GtkWidget *child,
   struct ChildLocation *child_loc = data;
 
   /* Ignore invisible widgets */
-  if (!GTK_WIDGET_DRAWABLE (child))
+  if (!gtk_widget_is_drawable (child))
     return;
 
   x = 0;
@@ -590,7 +619,7 @@ window_to_alloc (GtkWidget *dest_widget,
 		 gint      *dest_y)
 {
   /* Translate from window relative to allocation relative */
-  if (!GTK_WIDGET_NO_WINDOW (dest_widget) && dest_widget->parent)
+  if (gtk_widget_get_has_window (dest_widget) && dest_widget->parent)
     {
       gint wx, wy;
       gdk_window_get_position (dest_widget->window, &wx, &wy);
@@ -845,7 +874,7 @@ gtk_tooltip_position (GtkTooltip *tooltip,
   if (tooltip->keyboard_mode_enabled)
     {
       gdk_window_get_origin (new_tooltip_widget->window, &x, &y);
-      if (GTK_WIDGET_NO_WINDOW (new_tooltip_widget))
+      if (!gtk_widget_get_has_window (new_tooltip_widget))
         {
 	  x += new_tooltip_widget->allocation.x;
 	  y += new_tooltip_widget->allocation.y;

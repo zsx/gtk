@@ -1106,7 +1106,7 @@ gtk_icon_view_init (GtkIconView *icon_view)
   icon_view->priv->pixbuf_cell = -1;  
   icon_view->priv->tooltip_column = -1;  
 
-  GTK_WIDGET_SET_FLAGS (icon_view, GTK_CAN_FOCUS);
+  gtk_widget_set_can_focus (GTK_WIDGET (icon_view), TRUE);
   
   gtk_icon_view_set_adjustments (icon_view, NULL, NULL);
 
@@ -1318,7 +1318,7 @@ gtk_icon_view_realize (GtkWidget *widget)
   
   icon_view = GTK_ICON_VIEW (widget);
 
-  GTK_WIDGET_SET_FLAGS (widget, GTK_REALIZED);
+  gtk_widget_set_realized (widget, TRUE);
 
   /* Make the main, clipping window */
   attributes.window_type = GDK_WINDOW_CHILD;
@@ -1382,7 +1382,7 @@ gtk_icon_view_state_changed (GtkWidget      *widget,
 {
   GtkIconView *icon_view = GTK_ICON_VIEW (widget);
 
-  if (GTK_WIDGET_REALIZED (widget))
+  if (gtk_widget_get_realized (widget))
     {
       gdk_window_set_background (widget->window, &widget->style->base[widget->state]);
       gdk_window_set_background (icon_view->priv->bin_window, &widget->style->base[widget->state]);
@@ -1397,7 +1397,7 @@ gtk_icon_view_style_set (GtkWidget *widget,
 {
   GtkIconView *icon_view = GTK_ICON_VIEW (widget);
 
-  if (GTK_WIDGET_REALIZED (widget))
+  if (gtk_widget_get_realized (widget))
     {
       gdk_window_set_background (widget->window, &widget->style->base[widget->state]);
       gdk_window_set_background (icon_view->priv->bin_window, &widget->style->base[widget->state]);
@@ -1425,7 +1425,7 @@ gtk_icon_view_size_request (GtkWidget      *widget,
 
       tmp_list = tmp_list->next;
 
-      if (GTK_WIDGET_VISIBLE (child->widget))
+      if (gtk_widget_get_visible (child->widget))
         gtk_widget_size_request (child->widget, &child_requisition);
     }  
 }
@@ -1472,7 +1472,7 @@ gtk_icon_view_size_allocate (GtkWidget      *widget,
 
   widget->allocation = *allocation;
   
-  if (GTK_WIDGET_REALIZED (widget))
+  if (gtk_widget_get_realized (widget))
     {
       gdk_window_move_resize (widget->window,
 			      allocation->x, allocation->y,
@@ -1507,7 +1507,7 @@ gtk_icon_view_size_allocate (GtkWidget      *widget,
   if (vadjustment->value > vadjustment->upper - vadjustment->page_size)
     gtk_adjustment_set_value (vadjustment, MAX (0, vadjustment->upper - vadjustment->page_size));
 
-  if (GTK_WIDGET_REALIZED (widget) &&
+  if (gtk_widget_get_realized (widget) &&
       icon_view->priv->scroll_to_path)
     {
       GtkTreePath *path;
@@ -1544,6 +1544,11 @@ gtk_icon_view_expose (GtkWidget *widget,
 
   if (expose->window != icon_view->priv->bin_window)
     return FALSE;
+
+  /* If a layout has been scheduled, do it now so that all
+   * cell view items have valid sizes before we proceed. */
+  if (icon_view->priv->layout_idle_id != 0)
+    gtk_icon_view_layout (icon_view);
 
   cr = gdk_cairo_create (icon_view->priv->bin_window);
   cairo_set_line_width (cr, 1.);
@@ -1587,7 +1592,7 @@ gtk_icon_view_expose (GtkWidget *widget,
 	case GTK_ICON_VIEW_DROP_INTO:
 	  gtk_paint_focus (widget->style,
 			   icon_view->priv->bin_window,
-			   GTK_WIDGET_STATE (widget),
+			   gtk_widget_get_state (widget),
 			   NULL,
 			   widget,
 			   "iconview-drop-indicator",
@@ -1597,7 +1602,7 @@ gtk_icon_view_expose (GtkWidget *widget,
 	case GTK_ICON_VIEW_DROP_ABOVE:
 	  gtk_paint_focus (widget->style,
 			   icon_view->priv->bin_window,
-			   GTK_WIDGET_STATE (widget),
+			   gtk_widget_get_state (widget),
 			   NULL,
 			   widget,
 			   "iconview-drop-indicator",
@@ -1607,7 +1612,7 @@ gtk_icon_view_expose (GtkWidget *widget,
 	case GTK_ICON_VIEW_DROP_LEFT:
 	  gtk_paint_focus (widget->style,
 			   icon_view->priv->bin_window,
-			   GTK_WIDGET_STATE (widget),
+			   gtk_widget_get_state (widget),
 			   NULL,
 			   widget,
 			   "iconview-drop-indicator",
@@ -1617,7 +1622,7 @@ gtk_icon_view_expose (GtkWidget *widget,
 	case GTK_ICON_VIEW_DROP_BELOW:
 	  gtk_paint_focus (widget->style,
 			   icon_view->priv->bin_window,
-			   GTK_WIDGET_STATE (widget),
+			   gtk_widget_get_state (widget),
 			   NULL,
 			   widget,
 			   "iconview-drop-indicator",
@@ -1627,7 +1632,7 @@ gtk_icon_view_expose (GtkWidget *widget,
 	case GTK_ICON_VIEW_DROP_RIGHT:
 	  gtk_paint_focus (widget->style,
 			   icon_view->priv->bin_window,
-			   GTK_WIDGET_STATE (widget),
+			   gtk_widget_get_state (widget),
 			   NULL,
 			   widget,
 			   "iconview-drop-indicator",
@@ -1844,7 +1849,7 @@ gtk_icon_view_put (GtkIconView     *icon_view,
 
   icon_view->priv->children = g_list_append (icon_view->priv->children, child);
 
-  if (GTK_WIDGET_REALIZED (icon_view))
+  if (gtk_widget_get_realized (GTK_WIDGET (icon_view)))
     gtk_widget_set_parent_window (child->widget, icon_view->priv->bin_window);
   
   gtk_widget_set_parent (widget, GTK_WIDGET (icon_view));
@@ -1870,7 +1875,7 @@ gtk_icon_view_remove_widget (GtkCellEditable *editable,
       info->editing = FALSE;
     }
 
-  if (GTK_WIDGET_HAS_FOCUS (editable))
+  if (gtk_widget_has_focus (GTK_WIDGET (editable)))
     gtk_widget_grab_focus (GTK_WIDGET (icon_view));
   
   g_signal_handlers_disconnect_by_func (editable,
@@ -1987,11 +1992,11 @@ gtk_icon_view_stop_editing (GtkIconView *icon_view,
  * gtk_icon_view_set_cursor:
  * @icon_view: A #GtkIconView
  * @path: A #GtkTreePath
- * @cell: One of the cell renderers of @icon_view, or %NULL
+ * @cell: (allow-none): One of the cell renderers of @icon_view, or %NULL
  * @start_editing: %TRUE if the specified cell should start being edited.
  *
  * Sets the current keyboard focus to be at @path, and selects it.  This is
- * useful when you want to focus the user's attention on a particular item.  
+ * useful when you want to focus the user's attention on a particular item.
  * If @cell is not %NULL, then focus is given to the cell specified by 
  * it. Additionally, if @start_editing is %TRUE, then editing should be 
  * started in the specified cell.  
@@ -2052,8 +2057,8 @@ gtk_icon_view_set_cursor (GtkIconView     *icon_view,
 /**
  * gtk_icon_view_get_cursor:
  * @icon_view: A #GtkIconView
- * @path: Return location for the current cursor path, or %NULL
- * @cell: Return location the current focus cell, or %NULL
+ * @path: (allow-none): Return location for the current cursor path, or %NULL
+ * @cell: (allow-none): Return location the current focus cell, or %NULL
  *
  * Fills in @path and @cell with the current cursor path and cell. 
  * If the cursor isn't currently set, then *@path will be %NULL.  
@@ -2117,7 +2122,7 @@ gtk_icon_view_button_press (GtkWidget      *widget,
   if (event->window != icon_view->priv->bin_window)
     return FALSE;
 
-  if (!GTK_WIDGET_HAS_FOCUS (widget))
+  if (!gtk_widget_has_focus (widget))
     gtk_widget_grab_focus (widget);
 
   if (event->button == 1 && event->type == GDK_BUTTON_PRESS)
@@ -2647,7 +2652,7 @@ static void
 gtk_icon_view_adjustment_changed (GtkAdjustment *adjustment,
 				  GtkIconView   *icon_view)
 {
-  if (GTK_WIDGET_REALIZED (icon_view))
+  if (gtk_widget_get_realized (GTK_WIDGET (icon_view)))
     {
       gdk_window_move (icon_view->priv->bin_window,
 		       - icon_view->priv->hadjustment->value,
@@ -2849,7 +2854,7 @@ gtk_icon_view_layout (GtkIconView *icon_view)
       icon_view->priv->height != widget->requisition.height)
     gtk_widget_queue_resize_no_redraw (widget);
 
-  if (GTK_WIDGET_REALIZED (icon_view))
+  if (gtk_widget_get_realized (GTK_WIDGET (icon_view)))
     gdk_window_resize (icon_view->priv->bin_window,
 		       MAX (icon_view->priv->width, widget->allocation.width),
 		       MAX (icon_view->priv->height, widget->allocation.height));
@@ -3157,7 +3162,7 @@ gtk_icon_view_paint_item (GtkIconView     *icon_view,
   if (item->selected)
     {
       flags = GTK_CELL_RENDERER_SELECTED;
-      if (GTK_WIDGET_HAS_FOCUS (icon_view))
+      if (gtk_widget_has_focus (GTK_WIDGET (icon_view)))
 	state = GTK_STATE_SELECTED;
       else
 	state = GTK_STATE_ACTIVE;
@@ -3226,7 +3231,7 @@ gtk_icon_view_paint_item (GtkIconView     *icon_view,
     }
 
   if (draw_focus &&
-      GTK_WIDGET_HAS_FOCUS (icon_view) &&
+      gtk_widget_has_focus (GTK_WIDGET (icon_view)) &&
       item == icon_view->priv->cursor_item)
     {
       for (l = icon_view->priv->cell_list, i = 0; l; l = l->next, i++)
@@ -3821,7 +3826,7 @@ gtk_icon_view_real_move_cursor (GtkIconView     *icon_view,
 			step == GTK_MOVEMENT_PAGES ||
 			step == GTK_MOVEMENT_BUFFER_ENDS, FALSE);
 
-  if (!GTK_WIDGET_HAS_FOCUS (GTK_WIDGET (icon_view)))
+  if (!gtk_widget_has_focus (GTK_WIDGET (icon_view)))
     return FALSE;
 
   gtk_icon_view_stop_editing (icon_view, FALSE);
@@ -4076,7 +4081,7 @@ gtk_icon_view_move_cursor_up_down (GtkIconView *icon_view,
   gboolean dirty = FALSE;
   gint step;
   
-  if (!GTK_WIDGET_HAS_FOCUS (icon_view))
+  if (!gtk_widget_has_focus (GTK_WIDGET (icon_view)))
     return;
   
   if (!icon_view->priv->cursor_item)
@@ -4145,7 +4150,7 @@ gtk_icon_view_move_cursor_page_up_down (GtkIconView *icon_view,
   GtkIconViewItem *item;
   gboolean dirty = FALSE;
   
-  if (!GTK_WIDGET_HAS_FOCUS (icon_view))
+  if (!gtk_widget_has_focus (GTK_WIDGET (icon_view)))
     return;
   
   if (!icon_view->priv->cursor_item)
@@ -4202,7 +4207,7 @@ gtk_icon_view_move_cursor_left_right (GtkIconView *icon_view,
   gboolean dirty = FALSE;
   gint step;
   
-  if (!GTK_WIDGET_HAS_FOCUS (icon_view))
+  if (!gtk_widget_has_focus (GTK_WIDGET (icon_view)))
     return;
   
   if (!icon_view->priv->cursor_item)
@@ -4271,7 +4276,7 @@ gtk_icon_view_move_cursor_start_end (GtkIconView *icon_view,
   GList *list;
   gboolean dirty = FALSE;
   
-  if (!GTK_WIDGET_HAS_FOCUS (icon_view))
+  if (!gtk_widget_has_focus (GTK_WIDGET (icon_view)))
     return;
   
   if (count < 0)
@@ -4353,7 +4358,8 @@ gtk_icon_view_scroll_to_path (GtkIconView *icon_view,
     item = g_list_nth_data (icon_view->priv->items,
 			    gtk_tree_path_get_indices(path)[0]);
   
-  if (!GTK_WIDGET_REALIZED (icon_view) || !item || item->width < 0)
+  if (!item || item->width < 0 ||
+      !gtk_widget_get_realized (GTK_WIDGET (icon_view)))
     {
       if (icon_view->priv->scroll_to_path)
 	gtk_tree_row_reference_free (icon_view->priv->scroll_to_path);
@@ -4821,7 +4827,7 @@ gtk_icon_view_get_path_at_pos (GtkIconView *icon_view,
  * @icon_view: A #GtkIconView.
  * @x: The x position to be identified
  * @y: The y position to be identified
- * @path: Return location for the path, or %NULL
+ * @path: (allow-none): Return location for the path, or %NULL
  * @cell: Return location for the renderer responsible for the cell
  *   at (@x, @y), or %NULL
  * 
@@ -4897,7 +4903,7 @@ gtk_icon_view_set_tooltip_item (GtkIconView     *icon_view,
  * @icon_view: a #GtkIconView
  * @tooltip: a #GtkTooltip
  * @path: a #GtkTreePath
- * @cell: a #GtkCellRenderer or %NULL
+ * @cell: (allow-none): a #GtkCellRenderer or %NULL
  *
  * Sets the tip area of @tooltip to the area which @cell occupies in
  * the item pointed to by @path. See also gtk_tooltip_set_tip_area().
@@ -4958,9 +4964,9 @@ gtk_icon_view_set_tooltip_cell (GtkIconView     *icon_view,
  * @x: the x coordinate (relative to widget coordinates)
  * @y: the y coordinate (relative to widget coordinates)
  * @keyboard_tip: whether this is a keyboard tooltip or not
- * @model: a pointer to receive a #GtkTreeModel or %NULL
- * @path: a pointer to receive a #GtkTreePath or %NULL
- * @iter: a pointer to receive a #GtkTreeIter or %NULL
+ * @model: (allow-none): a pointer to receive a #GtkTreeModel or %NULL
+ * @path: (allow-none): a pointer to receive a #GtkTreePath or %NULL
+ * @iter: (allow-none): a pointer to receive a #GtkTreeIter or %NULL
  *
  * This function is supposed to be used in a #GtkWidget::query-tooltip
  * signal handler for #GtkIconView.  The @x, @y and @keyboard_tip values
@@ -5130,8 +5136,8 @@ gtk_icon_view_get_tooltip_column (GtkIconView *icon_view)
 /**
  * gtk_icon_view_get_visible_range:
  * @icon_view: A #GtkIconView
- * @start_path: Return location for start of region, or %NULL
- * @end_path: Return location for end of region, or %NULL
+ * @start_path: (allow-none): Return location for start of region, or %NULL
+ * @end_path: (allow-none): Return location for end of region, or %NULL
  * 
  * Sets @start_path and @end_path to be the first and last visible path. 
  * Note that there may be invisible paths in between.
@@ -5261,10 +5267,10 @@ gtk_icon_view_get_selection_mode (GtkIconView *icon_view)
 /**
  * gtk_icon_view_set_model:
  * @icon_view: A #GtkIconView.
- * @model: The model.
+ * @model: (allow-none): The model.
  *
- * Sets the model for a #GtkIconView.  
- * If the @icon_view already has a model set, it will remove 
+ * Sets the model for a #GtkIconView.
+ * If the @icon_view already has a model set, it will remove
  * it before setting the new model.  If @model is %NULL, then
  * it will unset the old model.
  *
@@ -5376,7 +5382,7 @@ gtk_icon_view_set_model (GtkIconView *icon_view,
 
   g_object_notify (G_OBJECT (icon_view), "model");  
 
-  if (GTK_WIDGET_REALIZED (icon_view))
+  if (gtk_widget_get_realized (GTK_WIDGET (icon_view)))
     gtk_widget_queue_resize (GTK_WIDGET (icon_view));
 }
 
@@ -5789,11 +5795,11 @@ gtk_icon_view_unselect_path (GtkIconView *icon_view,
  *
  * To free the return value, use:
  * |[
- * g_list_foreach (list, gtk_tree_path_free, NULL);
+ * g_list_foreach (list, (GFunc)gtk_tree_path_free, NULL);
  * g_list_free (list);
  * ]|
  *
- * Return value: A #GList containing a #GtkTreePath for each selected row.
+ * Return value: (element-type GtkTreePath) (transfer full): A #GList containing a #GtkTreePath for each selected row.
  *
  * Since: 2.6
  **/
@@ -6267,14 +6273,14 @@ gtk_icon_view_get_margin (GtkIconView *icon_view)
 /**
  * gtk_icon_view_set_item_padding:
  * @icon_view: a #GtkIconView
- * @column_spacing: the item padding
- * 
- * Sets the ::item-padding property which specifies the padding 
+ * @item_padding: the item padding
+ *
+ * Sets the #GtkIconView:item-padding property which specifies the padding
  * around each of the icon view's items.
  *
  * Since: 2.18
  */
-void 
+void
 gtk_icon_view_set_item_padding (GtkIconView *icon_view,
 				gint         item_padding)
 {
@@ -7194,9 +7200,9 @@ gtk_icon_view_unset_model_drag_dest (GtkIconView *icon_view)
 /**
  * gtk_icon_view_set_drag_dest_item:
  * @icon_view: a #GtkIconView
- * @path: The path of the item to highlight, or %NULL.
+ * @path: (allow-none): The path of the item to highlight, or %NULL.
  * @pos: Specifies where to drop, relative to the item
- * 
+ *
  * Sets the item that is highlighted for feedback.
  *
  * Since: 2.8
@@ -7253,8 +7259,8 @@ gtk_icon_view_set_drag_dest_item (GtkIconView              *icon_view,
 /**
  * gtk_icon_view_get_drag_dest_item:
  * @icon_view: a #GtkIconView
- * @path: Return location for the path of the highlighted item, or %NULL.
- * @pos: Return location for the drop position, or %NULL
+ * @path: (allow-none): Return location for the path of the highlighted item, or %NULL.
+ * @pos: (allow-none): Return location for the drop position, or %NULL
  * 
  * Gets information about the item that is highlighted for feedback.
  *
@@ -7284,8 +7290,8 @@ gtk_icon_view_get_drag_dest_item (GtkIconView              *icon_view,
  * @icon_view: a #GtkIconView
  * @drag_x: the position to determine the destination item for
  * @drag_y: the position to determine the destination item for
- * @path: Return location for the path of the item, or %NULL.
- * @pos: Return location for the drop position, or %NULL
+ * @path: (allow-none): Return location for the path of the item, or %NULL.
+ * @pos: (allow-none): Return location for the drop position, or %NULL
  * 
  * Determines the destination item for a given position.
  * 
@@ -7371,7 +7377,7 @@ gtk_icon_view_create_drag_icon (GtkIconView *icon_view,
 
   widget = GTK_WIDGET (icon_view);
 
-  if (!GTK_WIDGET_REALIZED (widget))
+  if (!gtk_widget_get_realized (widget))
     return NULL;
 
   index = gtk_tree_path_get_indices (path)[0];
@@ -7391,7 +7397,7 @@ gtk_icon_view_create_drag_icon (GtkIconView *icon_view,
 	  cairo_set_line_width (cr, 1.);
 
 	  gdk_cairo_set_source_color
-	    (cr, &widget->style->base[GTK_WIDGET_STATE (widget)]);
+	    (cr, &widget->style->base[gtk_widget_get_state (widget)]);
 	  cairo_rectangle (cr, 0, 0, item->width + 2, item->height + 2);
 	  cairo_fill (cr);
 
@@ -8482,7 +8488,7 @@ gtk_icon_view_item_accessible_grab_focus (AtkComponent *component)
   gtk_widget_grab_focus (item->widget);
   gtk_icon_view_set_cursor_item (GTK_ICON_VIEW (item->widget), item->item, -1);
   toplevel = gtk_widget_get_toplevel (GTK_WIDGET (item->widget));
-  if (GTK_WIDGET_TOPLEVEL (toplevel))
+  if (gtk_widget_is_toplevel (toplevel))
     gtk_window_present (GTK_WINDOW (toplevel));
 
   return TRUE;
@@ -8763,25 +8769,25 @@ gtk_icon_view_item_accessible_get_type (void)
         NULL /* value table */
       };
 
-      static const GInterfaceInfo atk_component_info =
+      const GInterfaceInfo atk_component_info =
       {
         (GInterfaceInitFunc) atk_component_item_interface_init,
         (GInterfaceFinalizeFunc) NULL,
         NULL
       };
-      static const GInterfaceInfo atk_action_info =
+      const GInterfaceInfo atk_action_info =
       {
         (GInterfaceInitFunc) atk_action_item_interface_init,
         (GInterfaceFinalizeFunc) NULL,
         NULL
       };
-      static const GInterfaceInfo atk_image_info =
+      const GInterfaceInfo atk_image_info =
       {
         (GInterfaceInitFunc) atk_image_item_interface_init,
         (GInterfaceFinalizeFunc) NULL,
         NULL
       };
-      static const GInterfaceInfo atk_text_info =
+      const GInterfaceInfo atk_text_info =
       {
         (GInterfaceInitFunc) atk_text_item_interface_init,
         (GInterfaceFinalizeFunc) NULL,
@@ -9706,7 +9712,7 @@ gtk_icon_view_accessible_get_type (void)
 
   if (!type)
     {
-      static GTypeInfo tinfo =
+      GTypeInfo tinfo =
       {
         0, /* class size */
         (GBaseInitFunc) NULL, /* base init */
@@ -9719,13 +9725,13 @@ gtk_icon_view_accessible_get_type (void)
         (GInstanceInitFunc) NULL, /* instance init */
         NULL /* value table */
       };
-      static const GInterfaceInfo atk_component_info =
+      const GInterfaceInfo atk_component_info =
       {
         (GInterfaceInitFunc) atk_component_interface_init,
         (GInterfaceFinalizeFunc) NULL,
         NULL
       };
-      static const GInterfaceInfo atk_selection_info = 
+      const GInterfaceInfo atk_selection_info =
       {
         (GInterfaceInitFunc) gtk_icon_view_accessible_selection_interface_init,
         (GInterfaceFinalizeFunc) NULL,

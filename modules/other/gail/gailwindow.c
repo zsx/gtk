@@ -240,7 +240,7 @@ gail_window_real_initialize (AtkObject *obj,
    * Notify that tooltip is showing
    */
   if (obj->role == ATK_ROLE_TOOL_TIP &&
-      GTK_WIDGET_MAPPED (widget))
+      gtk_widget_get_mapped (widget))
     atk_object_notify_state_change (obj, ATK_STATE_SHOWING, 1);
 }
 
@@ -418,7 +418,7 @@ gail_window_ref_relation_set (AtkObject *obj)
         {
           atk_relation_set_remove (relation_set, relation);
         }
-      if (GTK_WIDGET_VISIBLE(widget) && gtk_tooltips_get_info_from_tip_window (GTK_WINDOW (widget), NULL, &current_widget))
+      if (gtk_widget_get_visible(widget) && gtk_tooltips_get_info_from_tip_window (GTK_WINDOW (widget), NULL, &current_widget))
         {
           array [0] = gtk_widget_get_accessible (current_widget);
 
@@ -563,7 +563,7 @@ gail_window_get_extents (AtkComponent  *component,
 
   gail_return_if_fail (GTK_IS_WINDOW (widget));
 
-  if (!GTK_WIDGET_TOPLEVEL (widget))
+  if (!gtk_widget_is_toplevel (widget))
     {
       AtkComponentIface *parent_iface;
 
@@ -576,7 +576,7 @@ gail_window_get_extents (AtkComponent  *component,
 
   *width = rect.width;
   *height = rect.height;
-  if (!GTK_WIDGET_DRAWABLE (widget))
+  if (!gtk_widget_is_drawable (widget))
     {
       *x = G_MININT;
       *y = G_MININT;
@@ -608,7 +608,7 @@ gail_window_get_size (AtkComponent *component,
 
   gail_return_if_fail (GTK_IS_WINDOW (widget));
 
-  if (!GTK_WIDGET_TOPLEVEL (widget))
+  if (!gtk_widget_is_toplevel (widget))
     {
       AtkComponentIface *parent_iface;
 

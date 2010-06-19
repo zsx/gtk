@@ -888,6 +888,7 @@ gail_entry_insert_text (AtkEditableText *text,
     return;
 
   gtk_editable_insert_text (editable, string, length, position);
+  gtk_editable_set_position (editable, *position);
 }
 
 static void
@@ -1203,7 +1204,7 @@ gail_entry_do_action (AtkAction *action,
      */
     return FALSE;
 
-  if (!GTK_WIDGET_SENSITIVE (widget) || !GTK_WIDGET_VISIBLE (widget))
+  if (!gtk_widget_get_sensitive (widget) || !gtk_widget_get_visible (widget))
     return FALSE;
 
   switch (i)
@@ -1231,7 +1232,7 @@ idle_do_action (gpointer data)
   entry->action_idle_handler = 0;
   widget = GTK_ACCESSIBLE (entry)->widget;
   if (widget == NULL /* State is defunct */ ||
-      !GTK_WIDGET_SENSITIVE (widget) || !GTK_WIDGET_VISIBLE (widget))
+      !gtk_widget_get_sensitive (widget) || !gtk_widget_get_visible (widget))
     return FALSE;
 
   gtk_widget_activate (widget);

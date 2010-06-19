@@ -197,10 +197,10 @@ gtk_win32_embed_widget_realize (GtkWidget *widget)
       
       _gtk_container_queue_resize (GTK_CONTAINER (widget));
 
-      g_return_if_fail (!GTK_WIDGET_REALIZED (widget));
+      g_return_if_fail (!gtk_widget_get_realized (widget));
     }
 
-  GTK_WIDGET_SET_FLAGS (widget, GTK_REALIZED);
+  gtk_widget_set_realized (widget, TRUE);
 
   attributes.window_type = GDK_WINDOW_CHILD;
   attributes.title = window->title;
@@ -267,11 +267,11 @@ gtk_win32_embed_widget_map (GtkWidget *widget)
 {
   GtkBin *bin = GTK_BIN (widget);
   
-  GTK_WIDGET_SET_FLAGS (widget, GTK_MAPPED);
+  gtk_widget_set_mapped (widget, TRUE);
   
   if (bin->child &&
-      GTK_WIDGET_VISIBLE (bin->child) &&
-      !GTK_WIDGET_MAPPED (bin->child))
+      gtk_widget_get_visible (bin->child) &&
+      !gtk_widget_get_mapped (bin->child))
     gtk_widget_map (bin->child);
 
   gdk_window_show (widget->window);
@@ -280,7 +280,7 @@ gtk_win32_embed_widget_map (GtkWidget *widget)
 static void
 gtk_win32_embed_widget_unmap (GtkWidget *widget)
 {
-  GTK_WIDGET_UNSET_FLAGS (widget, GTK_MAPPED);
+  gtk_widget_set_mapped (widget, FALSE);
   gdk_window_hide (widget->window);
 }
 
@@ -292,12 +292,12 @@ gtk_win32_embed_widget_size_allocate (GtkWidget     *widget,
   
   widget->allocation = *allocation;
   
-  if (GTK_WIDGET_REALIZED (widget))
+  if (gtk_widget_get_realized (widget))
     gdk_window_move_resize (widget->window,
 			    allocation->x, allocation->y,
 			    allocation->width, allocation->height);
   
-  if (bin->child && GTK_WIDGET_VISIBLE (bin->child))
+  if (bin->child && gtk_widget_get_visible (bin->child))
     {
       GtkAllocation child_allocation;
       

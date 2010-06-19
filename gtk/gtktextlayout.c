@@ -299,6 +299,10 @@ gtk_text_layout_finalize (GObject *object)
   G_OBJECT_CLASS (gtk_text_layout_parent_class)->finalize (object);
 }
 
+/**
+ * gtk_text_layout_set_buffer:
+ * @buffer: (allow-none):
+ */
 void
 gtk_text_layout_set_buffer (GtkTextLayout *layout,
                             GtkTextBuffer *buffer)
@@ -703,6 +707,12 @@ gtk_text_layout_wrap (GtkTextLayout *layout,
   return GTK_TEXT_LAYOUT_GET_CLASS (layout)->wrap (layout, line, line_data);
 }
 
+
+/**
+ * gtk_text_layout_get_lines:
+ *
+ * Return value: (element-type GtkTextLine) (transfer container):
+ */
 GSList*
 gtk_text_layout_get_lines (GtkTextLayout *layout,
                            /* [top_y, bottom_y) */
@@ -2700,8 +2710,8 @@ void gtk_text_layout_get_iter_at_position (GtkTextLayout     *layout,
  * gtk_text_layout_get_cursor_locations:
  * @layout: a #GtkTextLayout
  * @iter: a #GtkTextIter
- * @strong_pos: location to store the strong cursor position (may be %NULL)
- * @weak_pos: location to store the weak cursor position (may be %NULL)
+ * @strong_pos: (allow-none): location to store the strong cursor position (may be %NULL)
+ * @weak_pos: (allow-none): location to store the weak cursor position (may be %NULL)
  *
  * Given an iterator within a text layout, determine the positions of the
  * strong and weak cursors if the insertion point is at that

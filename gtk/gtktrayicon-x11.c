@@ -248,7 +248,7 @@ gtk_tray_icon_expose (GtkWidget      *widget,
     retval = GTK_WIDGET_CLASS (gtk_tray_icon_parent_class)->expose_event (widget, event);
 
   focus_child = GTK_CONTAINER (widget)->focus_child;
-  if (focus_child && GTK_WIDGET_HAS_FOCUS (focus_child))
+  if (focus_child && gtk_widget_has_focus (focus_child))
     {
       border_width = GTK_CONTAINER (widget)->border_width;
 
@@ -259,7 +259,7 @@ gtk_tray_icon_expose (GtkWidget      *widget,
       height = widget->allocation.height - 2 * border_width;
 
       gtk_paint_focus (widget->style, widget->window,
-                       GTK_WIDGET_STATE (widget),
+                       gtk_widget_get_state (widget),
                        &event->area, widget, "tray_icon",
                        x, y, width, height);
     }
@@ -505,7 +505,7 @@ gtk_tray_icon_update_manager_window (GtkTrayIcon *icon)
       gtk_tray_icon_get_orientation_property (icon);
       gtk_tray_icon_get_visual_property (icon);
 
-      if (GTK_WIDGET_REALIZED (icon))
+      if (gtk_widget_get_realized (GTK_WIDGET (icon)))
 	{
 	  if ((icon->priv->manager_visual == NULL &&
 	       gtk_widget_get_visual (widget) == gdk_screen_get_system_visual (screen)) ||
@@ -545,7 +545,9 @@ static gboolean
 gtk_tray_icon_delete (GtkWidget   *widget,
 		      GdkEventAny *event)
 {
+#ifdef G_ENABLE_DEBUG
   GtkTrayIcon *icon = GTK_TRAY_ICON (widget);
+#endif
 
   GTK_NOTE (PLUGSOCKET,
 	    g_print ("GtkStatusIcon %p: delete notify, tray manager window %lx\n",

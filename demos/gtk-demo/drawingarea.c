@@ -57,7 +57,7 @@ scribble_expose_event (GtkWidget      *widget,
    */
 
   gdk_draw_drawable (widget->window,
-                     widget->style->fg_gc[GTK_WIDGET_STATE (widget)],
+                     widget->style->fg_gc[gtk_widget_get_state (widget)],
                      pixmap,
                      /* Only copy the area that was exposed. */
                      event->area.x, event->area.y,
@@ -318,7 +318,7 @@ do_drawingarea (GtkWidget *do_widget)
 
     }
 
-  if (!GTK_WIDGET_VISIBLE (window))
+  if (!gtk_widget_get_visible (window))
       gtk_widget_show_all (window);
   else
       gtk_widget_destroy (window);

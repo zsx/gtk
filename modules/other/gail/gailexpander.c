@@ -257,7 +257,7 @@ gail_expander_real_initialize (AtkObject *obj,
   ATK_OBJECT_CLASS (gail_expander_parent_class)->initialize (obj, data);
 
   expander = GTK_WIDGET (data);
-  if (GTK_WIDGET_MAPPED (expander))
+  if (gtk_widget_get_mapped (expander))
     gail_expander_init_textutil (gail_expander, GTK_EXPANDER (expander));
   else 
     g_signal_connect (expander,
@@ -374,7 +374,7 @@ gail_expander_do_action (AtkAction *action,
      */
     return FALSE;
 
-  if (!GTK_WIDGET_IS_SENSITIVE (widget) || !GTK_WIDGET_VISIBLE (widget))
+  if (!gtk_widget_is_sensitive (widget) || !gtk_widget_get_visible (widget))
     return FALSE;
 
   expander = GAIL_EXPANDER (action);
@@ -404,7 +404,7 @@ idle_do_action (gpointer data)
 
   widget = GTK_ACCESSIBLE (gail_expander)->widget;
   if (widget == NULL /* State is defunct */ ||
-      !GTK_WIDGET_IS_SENSITIVE (widget) || !GTK_WIDGET_VISIBLE (widget))
+      !gtk_widget_is_sensitive (widget) || !gtk_widget_get_visible (widget))
     return FALSE;
 
   gtk_widget_activate (widget);

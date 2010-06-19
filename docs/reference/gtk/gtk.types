@@ -29,6 +29,7 @@ gtk_cell_renderer_get_type
 gtk_cell_renderer_pixbuf_get_type
 gtk_cell_renderer_progress_get_type
 gtk_cell_renderer_spin_get_type
+gtk_cell_renderer_spinner_get_type
 gtk_cell_renderer_text_get_type
 gtk_cell_renderer_toggle_get_type
 gtk_cell_view_get_type
@@ -103,6 +104,7 @@ gtk_misc_get_type
 gtk_mount_operation_get_type
 gtk_notebook_get_type
 gtk_object_get_type
+gtk_offscreen_window_get_type
 gtk_old_editable_get_type
 gtk_option_menu_get_type
 gtk_orientable_get_type
@@ -146,6 +148,7 @@ gtk_settings_get_type
 gtk_size_group_get_type
 gtk_socket_get_type
 gtk_spin_button_get_type
+gtk_spinner_get_type
 gtk_statusbar_get_type
 gtk_status_icon_get_type
 gtk_style_get_type
@@ -166,6 +169,8 @@ gtk_toggle_tool_button_get_type
 gtk_toolbar_get_type
 gtk_tool_button_get_type
 gtk_tool_item_get_type
+gtk_tool_item_group_get_type
+gtk_tool_palette_get_type
 gtk_tooltips_get_type
 gtk_tree_drag_dest_get_type
 gtk_tree_drag_source_get_type

@@ -866,6 +866,7 @@ gtk_file_chooser_button_get_property (GObject    *object,
     case GTK_FILE_CHOOSER_PROP_SELECT_MULTIPLE:
     case GTK_FILE_CHOOSER_PROP_SHOW_HIDDEN:
     case GTK_FILE_CHOOSER_PROP_DO_OVERWRITE_CONFIRMATION:
+    case GTK_FILE_CHOOSER_PROP_CREATE_FOLDERS:
       g_object_get_property (G_OBJECT (priv->dialog), pspec->name, value);
       break;
 
@@ -1585,7 +1586,7 @@ model_free_row_data (GtkFileChooserButton *button,
       g_object_unref (data);
       break;
     case ROW_TYPE_VOLUME:
-      _gtk_file_system_volume_free (data);
+      _gtk_file_system_volume_unref (data);
       break;
     default:
       break;
@@ -1776,11 +1777,16 @@ model_add_volumes (GtkFileChooserButton *button,
 	      GFile *base_file;
 
 	      base_file = _gtk_file_system_volume_get_root (volume);
-	      if (base_file != NULL && !g_file_is_native (base_file))
-		{
-		  _gtk_file_system_volume_free (volume);
-		  continue;
-		}
+	      if (base_file != NULL)
+                {
+                  if (!g_file_is_native (base_file))
+                    {
+                      g_object_unref (base_file);
+                      continue;
+                    }
+                  else
+                    g_object_unref (base_file);
+                }
 	    }
 	}
 
@@ -1795,7 +1801,7 @@ model_add_volumes (GtkFileChooserButton *button,
 			  ICON_COLUMN, pixbuf,
 			  DISPLAY_NAME_COLUMN, display_name,
 			  TYPE_COLUMN, ROW_TYPE_VOLUME,
-			  DATA_COLUMN, volume,
+			  DATA_COLUMN, _gtk_file_system_volume_ref (volume),
 			  IS_FOLDER_COLUMN, TRUE,
 			  -1);
 
@@ -2302,6 +2308,12 @@ update_label_and_image (GtkFileChooserButton *button)
   label_text = NULL;
   pixbuf = NULL;
 
+  if (priv->update_button_cancellable)
+    {
+      g_cancellable_cancel (priv->update_button_cancellable);
+      priv->update_button_cancellable = NULL;
+    }
+
   if (files && files->data)
     {
       GFile *file;
@@ -2327,16 +2339,10 @@ update_label_and_image (GtkFileChooserButton *button)
 	  if (base_file)
 	    g_object_unref (base_file);
 
-	  _gtk_file_system_volume_free (volume);
+	  _gtk_file_system_volume_unref (volume);
 
 	  if (label_text)
 	    goto out;
-	}
-
-      if (priv->update_button_cancellable)
-	{
-	  g_cancellable_cancel (priv->update_button_cancellable);
-	  priv->update_button_cancellable = NULL;
 	}
 
       if (g_file_is_native (file))
@@ -2442,13 +2448,13 @@ open_dialog (GtkFileChooserButton *button)
 
   /* Setup the dialog parent to be chooser button's toplevel, and be modal
      as needed. */
-  if (!GTK_WIDGET_VISIBLE (priv->dialog))
+  if (!gtk_widget_get_visible (priv->dialog))
     {
       GtkWidget *toplevel;
 
       toplevel = gtk_widget_get_toplevel (GTK_WIDGET (button));
 
-      if (GTK_WIDGET_TOPLEVEL (toplevel) && GTK_IS_WINDOW (toplevel))
+      if (gtk_widget_is_toplevel (toplevel) && GTK_IS_WINDOW (toplevel))
         {
           if (GTK_WINDOW (toplevel) != gtk_window_get_transient_for (GTK_WINDOW (priv->dialog)))
  	    gtk_window_set_transient_for (GTK_WINDOW (priv->dialog),

@@ -22,6 +22,7 @@
 #include <string.h>
 
 #include <gdk/gdkkeysyms.h>
+#include "gtkprivate.h"
 #include "gtkaccelgroup.h"
 #include "gtkimcontextsimple.h"
 #include "gtksettings.h"
@@ -61,7 +62,7 @@ struct _GtkComposeTableCompact
 static const GtkComposeTableCompact gtk_compose_table_compact = {
   gtk_compose_seqs_compact,
   5,
-  23,
+  24,
   6
 };
 
@@ -595,7 +596,7 @@ check_algorithmically (GtkIMContextSimple    *context_simple,
  * with Ctrl-Shift-U, then release the modifiers before typing any
  * digits, and enter the digits without modifiers.
  */
-#define HEX_MOD_MASK (GDK_CONTROL_MASK | GDK_SHIFT_MASK)
+#define HEX_MOD_MASK (GTK_DEFAULT_ACCEL_MOD_MASK | GDK_SHIFT_MASK)
 
 static gboolean
 check_hex (GtkIMContextSimple *context_simple,
@@ -858,8 +859,11 @@ gtk_im_context_simple_filter_keypress (GtkIMContext *context,
   hex_keyval = canonical_hex_keyval (event);
 
   /* If we are already in a non-hex sequence, or
-   * this keystroke is not hex modifiers + hex digit, don't filter 
-   * key events with accelerator modifiers held down.
+   * this keystroke is not hex modifiers + hex digit, don't filter
+   * key events with accelerator modifiers held down. We only treat
+   * Control and Alt as accel modifiers here, since Super, Hyper and
+   * Meta are often co-located with Mode_Switch, Multi_Key or
+   * ISO_Level3_Switch.
    */
   if (!have_hex_mods ||
       (n_compose > 0 && !context_simple->in_hex_sequence) || 
@@ -867,7 +871,7 @@ gtk_im_context_simple_filter_keypress (GtkIMContext *context,
       (context_simple->in_hex_sequence && !hex_keyval && 
        !is_hex_start && !is_hex_end && !is_escape && !is_backspace))
     {
-      if (event->state & (gtk_accelerator_get_default_mod_mask () & ~GDK_SHIFT_MASK) ||
+      if (event->state & (GDK_MOD1_MASK | GDK_CONTROL_MASK) ||
 	  (context_simple->in_hex_sequence && context_simple->modifiers_dropped &&
 	   (event->keyval == GDK_Return || 
 	    event->keyval == GDK_ISO_Enter ||

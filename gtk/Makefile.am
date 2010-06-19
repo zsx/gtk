@@ -1,5 +1,15 @@
 # Makefile.am for gtk+/gtk
 include $(top_srcdir)/Makefile.decl
+-include $(INTROSPECTION_MAKEFILE)
+INTROSPECTION_GIRS =
+INTROSPECTION_SCANNER_ARGS = \
+	--add-include-path=../gdk-pixbuf \
+	--add-include-path=../gdk
+INTROSPECTION_COMPILER_ARGS = \
+	--includedir=$(srcdir) \
+    --includedir=. \
+    --includedir=../gdk-pixbuf \
+    --includedir=../gdk
 
 if USE_QUARTZ
 GTK_PRINT_PREVIEW_COMMAND="open -a /Applications/Preview.app %f"
@@ -178,6 +188,7 @@ gtk_public_h_sources =          \
 	gtkcellrendererpixbuf.h	\
 	gtkcellrendererprogress.h \
 	gtkcellrendererspin.h   \
+	gtkcellrendererspinner.h\
 	gtkcellrenderertext.h	\
 	gtkcellrenderertoggle.h	\
 	gtkcellview.h		\
@@ -190,7 +201,6 @@ gtk_public_h_sources =          \
 	gtkcombobox.h		\
 	gtkcomboboxentry.h	\
 	gtkcontainer.h		\
-	gtkcurve.h		\
 	gtkdebug.h              \
 	gtkdialog.h		\
 	gtkdnd.h		\
@@ -211,7 +221,6 @@ gtk_public_h_sources =          \
 	gtkfontbutton.h		\
 	gtkfontsel.h		\
 	gtkframe.h		\
-	gtkgamma.h		\
 	gtkgc.h			\
 	gtkhandlebox.h		\
 	gtkhbbox.h		\
@@ -232,7 +241,6 @@ gtk_public_h_sources =          \
 	gtkimmodule.h		\
 	gtkimmulticontext.h	\
 	gtkinfobar.h		\
-	gtkinputdialog.h	\
 	gtkinvisible.h		\
 	gtkitem.h		\
 	gtklabel.h		\
@@ -251,6 +259,7 @@ gtk_public_h_sources =          \
 	gtkmountoperation.h     \
 	gtknotebook.h		\
 	gtkobject.h		\
+	gtkoffscreenwindow.h	\
 	gtkorientable.h		\
 	gtkpagesetup.h		\
 	gtkpaned.h		\
@@ -289,6 +298,7 @@ gtk_public_h_sources =          \
 	gtksizegroup.h		\
 	gtksocket.h		\
 	gtkspinbutton.h		\
+	gtkspinner.h		\
 	gtkstatusbar.h		\
 	gtkstatusicon.h		\
 	gtkstock.h		\
@@ -311,6 +321,8 @@ gtk_public_h_sources =          \
 	gtktoolbar.h		\
 	gtktoolbutton.h		\
 	gtktoolitem.h		\
+	gtktoolitemgroup.h	\
+	gtktoolpalette.h	\
 	gtktoolshell.h		\
 	gtktooltip.h		\
 	gtktreednd.h		\
@@ -392,6 +404,7 @@ gtk_private_h_sources =		\
 	gtktextutil.h		\
 	gtkthemes.h		\
 	gtktoggleactionprivate.h\
+	gtktoolpaletteprivate.h	\
 	gtktreedatalist.h	\
 	gtktreeprivate.h	\
 	gtkwindow-decorate.h	\
@@ -433,6 +446,7 @@ gtk_base_c_sources =            \
 	gtkcellrendererpixbuf.c	\
 	gtkcellrendererprogress.c \
 	gtkcellrendererspin.c   \
+	gtkcellrendererspinner.c\
 	gtkcellrenderertext.c	\
 	gtkcellrenderertoggle.c	\
 	gtkcellview.c		\
@@ -444,7 +458,6 @@ gtk_base_c_sources =            \
 	gtkcombobox.c		\
 	gtkcomboboxentry.c	\
 	gtkcontainer.c		\
-	gtkcurve.c		\
 	gtkdialog.c		\
 	gtkdrawingarea.c	\
 	gtkeditable.c           \
@@ -469,7 +482,6 @@ gtk_base_c_sources =            \
 	gtkfontbutton.c         \
 	gtkfontsel.c            \
 	gtkframe.c		\
-	gtkgamma.c		\
 	gtkgc.c			\
 	gtkhandlebox.c		\
 	gtkhbbox.c		\
@@ -515,6 +527,7 @@ gtk_base_c_sources =            \
 	gtkmountoperation.c     \
 	gtknotebook.c		\
 	gtkobject.c		\
+	gtkoffscreenwindow.c	\
 	gtkorientable.c		\
 	gtkpagesetup.c		\
 	gtkpaned.c		\
@@ -557,6 +570,7 @@ gtk_base_c_sources =            \
 	gtkshow.c		\
 	gtksocket.c		\
 	gtkspinbutton.c		\
+	gtkspinner.c		\
 	gtkstatusbar.c		\
 	gtkstatusicon.c		\
 	gtkstock.c		\
@@ -586,6 +600,8 @@ gtk_base_c_sources =            \
 	gtktoolbar.c		\
 	gtktoolbutton.c		\
 	gtktoolitem.c		\
+	gtktoolitemgroup.c		\
+	gtktoolpalette.c	\
 	gtktoolshell.c		\
 	gtktooltip.c		\
 	gtktreedatalist.c	\
@@ -630,7 +646,10 @@ gtk_public_h_sources += \
 	gtkclist.h		\
 	gtkcombo.h		\
 	gtkctree.h		\
+ 	gtkcurve.h		\
 	gtkfilesel.h		\
+ 	gtkgamma.h		\
+	gtkinputdialog.h	\
 	gtkitemfactory.h	\
 	gtklist.h		\
 	gtklistitem.h		\
@@ -646,7 +665,9 @@ gtk_base_c_sources += \
 	gtkclist.c		\
 	gtkcombo.c		\
 	gtkctree.c		\
+	gtkcurve.c		\
 	gtkfilesel.c		\
+	gtkgamma.c		\
 	gtkitemfactory.c	\
 	gtklist.c		\
 	gtklistitem.c		\
@@ -911,8 +932,19 @@ if DISABLE_EXPLICIT_DEPS
 	$(SHELL) $(top_srcdir)/sanitize-la.sh $(DESTDIR)$(libdir)/$(gtktargetlib)
 endif
 
+if USE_QUARTZ
+install-mac-key-theme:
+	$(mkinstalldirs) $(DESTDIR)$(datadir)/themes/Mac/gtk-2.0-key
+	$(INSTALL_DATA) $(srcdir)/gtkrc.key.mac $(DESTDIR)$(datadir)/themes/Mac/gtk-2.0-key/gtkrc
+uninstall-mac-key-theme:
+	rm -f $(DESTDIR)$(datadir)/themes/Mac/gtk-2.0-key/gtkrc
+else
+install-mac-key-theme:
+uninstall-mac-key-theme:
+endif
+
 # Install a RC file for the default GTK+ theme, and key themes
-install-data-local: install-ms-lib install-def-file
+install-data-local: install-ms-lib install-def-file install-mac-key-theme
 	$(mkinstalldirs) $(DESTDIR)$(datadir)/themes/Raleigh/gtk-2.0
 	$(INSTALL_DATA) $(srcdir)/gtkrc.default $(DESTDIR)$(datadir)/themes/Raleigh/gtk-2.0/gtkrc
 	$(mkinstalldirs) $(DESTDIR)$(datadir)/themes/Default/gtk-2.0-key
@@ -920,7 +952,7 @@ install-data-local: install-ms-lib install-def-file
 	$(mkinstalldirs) $(DESTDIR)$(datadir)/themes/Emacs/gtk-2.0-key
 	$(INSTALL_DATA) $(srcdir)/gtkrc.key.emacs $(DESTDIR)$(datadir)/themes/Emacs/gtk-2.0-key/gtkrc
 
-uninstall-local: uninstall-ms-lib uninstall-def-file
+uninstall-local: uninstall-ms-lib uninstall-def-file uninstall-mac-key-theme
 	rm -f $(DESTDIR)$(datadir)/themes/Raleigh/gtk-2.0/gtkrc
 	rm -f $(DESTDIR)$(datadir)/themes/Default/gtk-2.0-key/gtkrc
 	rm -f $(DESTDIR)$(datadir)/themes/Emacs/gtk-2.0-key/gtkrc
@@ -939,7 +971,36 @@ TEST_DEPS = $(DEPS) gtk.immodules
 LDADDS =								\
 	$(gtktargetlib)							\
 	$(top_builddir)/gdk-pixbuf/libgdk_pixbuf-$(GTK_API_VERSION).la	\
-	$(top_builddir)/gdk/$(gdktargetlib)
+	$(top_builddir)/gdk/$(gdktargetlib)                             \
+	$(GTK_DEP_LIBS)
+
+if HAVE_INTROSPECTION
+introspection_files = \
+    $(gtkinclude_HEADERS) \
+    $(gtk_all_c_sources) \
+    gtktypebuiltins.h \
+    gtktypebuiltins.c
+
+Gtk-2.0.gir: $(INTROSPECTION_SCANNER) $(gtktargetlib) $(top_builddir)/gdk/Gdk-2.0.gir Makefile
+Gtk_2_0_gir_SCANNERFLAGS = --strip-prefix=Gtk
+Gtk_2_0_gir_INCLUDES = Atk-1.0 Gdk-2.0
+Gtk_2_0_gir_CFLAGS = \
+		$(INCLUDES) \
+		-UGDK_DISABLE_DEPRECATED \
+		-UGTK_DISABLE_DEPRECATED \
+		-DGTK_TEXT_USE_INTERNAL_UNSUPPORTED_API
+Gtk_2_0_gir_LIBS = $(gtktargetlib)
+Gtk_2_0_gir_FILES = $(addprefix $(srcdir)/, $(introspection_files))
+INTROSPECTION_GIRS += Gtk-2.0.gir
+
+girdir = $(datadir)/gir-1.0
+dist_gir_DATA = $(INTROSPECTION_GIRS)
+
+typelibsdir = $(libdir)/girepository-1.0
+typelibs_DATA = $(INTROSPECTION_GIRS:.gir=.typelib)
+
+CLEANFILES += $(dist_gir_DATA) $(typelibs_DATA)
+endif
 
 #
 # Installed tools
@@ -966,7 +1027,7 @@ gtk-update-icon-cache.exe.manifest:
 	(echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' ; \
 	 echo '<assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">' ; \
 	 echo '  <assemblyIdentity version="1.0.0.0"' ; \
-	 echo '     processorArchitecture="'$(LIB_EXE_MACHINE_FLAG)'"' ; \
+	 echo '     processorArchitecture="'$(EXE_MANIFEST_ARCHITECTURE)'"' ; \
 	 echo '     name="gtk-update-icon-cache.exe"' ; \
 	 echo '     type="win32"/>' ; \
 	 echo '  <!-- Identify the application security requirements. -->' ; \
@@ -988,7 +1049,10 @@ gtk_query_immodules_2_0_LDADD = $(LDADDS)
 
 gtk_query_immodules_2_0_SOURCES = queryimmodules.c
 
-gtk_update_icon_cache_LDADD = $(top_builddir)/gdk-pixbuf/libgdk_pixbuf-$(GTK_API_VERSION).la
+gtk_update_icon_cache_LDADD = \
+	$(top_builddir)/gdk-pixbuf/libgdk_pixbuf-$(GTK_API_VERSION).la \
+	$(GDK_PIXBUF_DEP_LIBS)
+
 
 gtk_update_icon_cache_SOURCES = \
 	updateiconcache.c 
@@ -1328,6 +1392,7 @@ EXTRA_DIST +=                   \
 	gtkrc.default		\
 	gtkrc.key.default	\
 	gtkrc.key.emacs		\
+	gtkrc.key.mac		\
 	makefile.msc		\
 	makefile.msc.in		\
 	makegtkalias.pl		\

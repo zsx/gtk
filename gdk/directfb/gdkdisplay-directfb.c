@@ -66,15 +66,12 @@ GdkDisplay * gdk_display_open (const gchar *display_name)
   IDirectFBInputDevice   *keyboard;
   DFBResult               ret;
 
-  int    argc = 0;
-  char **argv = NULL;
-
   if (_gdk_display)
     {
       return GDK_DISPLAY_OBJECT(_gdk_display); /* single display only */
     }
 
-  ret = DirectFBInit (&argc,&argv);
+  ret = DirectFBInit (NULL, NULL);
   if (ret != DFB_OK)
     {
       DirectFBError ("gdk_display_open: DirectFBInit", ret);
@@ -96,22 +93,24 @@ GdkDisplay * gdk_display_open (const gchar *display_name)
     {
       DirectFBError ("gdk_display_open: GetDisplayLayer", ret);
       directfb->Release (directfb);
-	  directfb = NULL;
+      _gdk_display->directfb = NULL;
       return NULL;
     }
 
 
-  ret=directfb->GetInputDevice (directfb, DIDID_KEYBOARD, &keyboard);
-
-  if (ret != DFB_OK){
+  ret = directfb->GetInputDevice (directfb, DIDID_KEYBOARD, &keyboard);
+  if (ret != DFB_OK)
+    {
       DirectFBError ("gdk_display_open: GetInputDevice", ret);
-   	return NULL;
-  }
+      directfb->Release (directfb);
+      _gdk_display->directfb = NULL;
+      return NULL;
+    }
 
   _gdk_display->layer=layer;
   _gdk_display->keyboard=keyboard;
 
-    _gdk_directfb_keyboard_init ();
+  _gdk_directfb_keyboard_init ();
 
   _gdk_screen = g_object_new (GDK_TYPE_SCREEN, NULL);
 
@@ -121,10 +120,10 @@ GdkDisplay * gdk_display_open (const gchar *display_name)
   gdk_screen_set_default_colormap (_gdk_screen,
                                    gdk_screen_get_system_colormap (_gdk_screen));  _gdk_windowing_image_init ();
 
+  _gdk_events_init ();
   _gdk_input_init ();
   _gdk_dnd_init ();
 
-  _gdk_events_init ();
   layer->EnableCursor (layer, 1);
 
   g_signal_emit_by_name (gdk_display_manager_get (),
@@ -140,7 +139,7 @@ gdk_display_dfb_get_type (void)
 
   if (!object_type)
     {
-      static const GTypeInfo object_info =
+      const GTypeInfo object_info =
         {
           sizeof (GdkDisplayDFBClass),
           (GBaseInitFunc) NULL,

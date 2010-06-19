@@ -373,7 +373,7 @@ get_toplevel (GtkWidget *widget)
   GtkWidget *toplevel = NULL;
 
   toplevel = gtk_widget_get_toplevel (widget);
-  if (!GTK_WIDGET_TOPLEVEL (toplevel))
+  if (!gtk_widget_is_toplevel (toplevel))
     return NULL;
   else
     return GTK_WINDOW (toplevel);
@@ -388,7 +388,7 @@ set_busy_cursor (GtkPrintUnixDialog *dialog,
   GdkCursor *cursor;
 
   toplevel = get_toplevel (GTK_WIDGET (dialog));
-  if (!toplevel || !GTK_WIDGET_REALIZED (toplevel))
+  if (!toplevel || !gtk_widget_get_realized (GTK_WIDGET (toplevel)))
     return;
 
   display = gtk_widget_get_display (GTK_WIDGET (toplevel));
@@ -414,7 +414,7 @@ add_custom_button_to_dialog (GtkDialog   *dialog,
   GtkWidget *button = NULL;
 
   button = gtk_button_new_with_mnemonic (mnemonic_label);
-  GTK_WIDGET_SET_FLAGS (button, GTK_CAN_DEFAULT);
+  gtk_widget_set_can_default (button, TRUE);
   gtk_button_set_image (GTK_BUTTON (button),
                         gtk_image_new_from_stock (stock_id,
                                                   GTK_ICON_SIZE_BUTTON));
@@ -2270,7 +2270,7 @@ create_main_page (GtkPrintUnixDialog *dialog)
                     0, 0);
 
   image = gtk_drawing_area_new ();
-  GTK_WIDGET_SET_FLAGS (image, GTK_NO_WINDOW);
+  gtk_widget_set_has_window (image, FALSE);
 
   priv->collate_image = image;
   gtk_widget_show (image);
@@ -2434,7 +2434,7 @@ dialog_set_print_pages (GtkPrintUnixDialog *dialog,
 static gdouble
 dialog_get_scale (GtkPrintUnixDialog *dialog)
 {
-  if (GTK_WIDGET_IS_SENSITIVE (dialog->priv->scale_spin))
+  if (gtk_widget_is_sensitive (dialog->priv->scale_spin))
     return gtk_spin_button_get_value (GTK_SPIN_BUTTON (dialog->priv->scale_spin));
   else
     return 100.0;
@@ -2450,7 +2450,7 @@ dialog_set_scale (GtkPrintUnixDialog *dialog,
 static GtkPageSet
 dialog_get_page_set (GtkPrintUnixDialog *dialog)
 {
-  if (GTK_WIDGET_IS_SENSITIVE (dialog->priv->page_set_combo))
+  if (gtk_widget_is_sensitive (dialog->priv->page_set_combo))
     return (GtkPageSet)gtk_combo_box_get_active (GTK_COMBO_BOX (dialog->priv->page_set_combo));
   else
     return GTK_PAGE_SET_ALL;
@@ -2467,7 +2467,7 @@ dialog_set_page_set (GtkPrintUnixDialog *dialog,
 static gint
 dialog_get_n_copies (GtkPrintUnixDialog *dialog)
 {
-  if (GTK_WIDGET_IS_SENSITIVE (dialog->priv->copies_spin))
+  if (gtk_widget_is_sensitive (dialog->priv->copies_spin))
     return gtk_spin_button_get_value_as_int (GTK_SPIN_BUTTON (dialog->priv->copies_spin));
   return 1;
 }
@@ -2483,7 +2483,7 @@ dialog_set_n_copies (GtkPrintUnixDialog *dialog,
 static gboolean
 dialog_get_collate (GtkPrintUnixDialog *dialog)
 {
-  if (GTK_WIDGET_IS_SENSITIVE (dialog->priv->collate_check))
+  if (gtk_widget_is_sensitive (dialog->priv->collate_check))
     return gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (dialog->priv->collate_check));
   return FALSE;
 }
@@ -2499,7 +2499,7 @@ dialog_set_collate (GtkPrintUnixDialog *dialog,
 static gboolean
 dialog_get_reverse (GtkPrintUnixDialog *dialog)
 {
-  if (GTK_WIDGET_IS_SENSITIVE (dialog->priv->reverse_check))
+  if (gtk_widget_is_sensitive (dialog->priv->reverse_check))
     return gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (dialog->priv->reverse_check));
   return FALSE;
 }
@@ -3077,21 +3077,32 @@ update_number_up_layout (GtkPrintUnixDialog *dialog)
             {
               option = priv->number_up_layout_2_option;
 
-              if (layout == GTK_NUMBER_UP_LAYOUT_LEFT_TO_RIGHT_TOP_TO_BOTTOM ||
-                  layout == GTK_NUMBER_UP_LAYOUT_TOP_TO_BOTTOM_LEFT_TO_RIGHT)
-                enum_value = g_enum_get_value (enum_class, GTK_NUMBER_UP_LAYOUT_LEFT_TO_RIGHT_TOP_TO_BOTTOM);
+              switch (layout)
+                {
+                case GTK_NUMBER_UP_LAYOUT_LEFT_TO_RIGHT_TOP_TO_BOTTOM:
+                case GTK_NUMBER_UP_LAYOUT_TOP_TO_BOTTOM_LEFT_TO_RIGHT:
+                  enum_value = g_enum_get_value (enum_class, GTK_NUMBER_UP_LAYOUT_LEFT_TO_RIGHT_TOP_TO_BOTTOM);
+                  break;
 
-              if (layout == GTK_NUMBER_UP_LAYOUT_LEFT_TO_RIGHT_BOTTOM_TO_TOP ||
-                  layout == GTK_NUMBER_UP_LAYOUT_BOTTOM_TO_TOP_LEFT_TO_RIGHT)
-                enum_value = g_enum_get_value (enum_class, GTK_NUMBER_UP_LAYOUT_LEFT_TO_RIGHT_BOTTOM_TO_TOP);
+                case GTK_NUMBER_UP_LAYOUT_LEFT_TO_RIGHT_BOTTOM_TO_TOP:
+                case GTK_NUMBER_UP_LAYOUT_BOTTOM_TO_TOP_LEFT_TO_RIGHT:
+                  enum_value = g_enum_get_value (enum_class, GTK_NUMBER_UP_LAYOUT_LEFT_TO_RIGHT_BOTTOM_TO_TOP);
+                  break;
 
-              if (layout == GTK_NUMBER_UP_LAYOUT_RIGHT_TO_LEFT_TOP_TO_BOTTOM ||
-                  layout == GTK_NUMBER_UP_LAYOUT_TOP_TO_BOTTOM_RIGHT_TO_LEFT)
-                enum_value = g_enum_get_value (enum_class, GTK_NUMBER_UP_LAYOUT_RIGHT_TO_LEFT_TOP_TO_BOTTOM);
+                case GTK_NUMBER_UP_LAYOUT_RIGHT_TO_LEFT_TOP_TO_BOTTOM:
+                case GTK_NUMBER_UP_LAYOUT_TOP_TO_BOTTOM_RIGHT_TO_LEFT:
+                  enum_value = g_enum_get_value (enum_class, GTK_NUMBER_UP_LAYOUT_RIGHT_TO_LEFT_TOP_TO_BOTTOM);
+                  break;
 
-              if (layout == GTK_NUMBER_UP_LAYOUT_RIGHT_TO_LEFT_BOTTOM_TO_TOP ||
-                  layout == GTK_NUMBER_UP_LAYOUT_BOTTOM_TO_TOP_RIGHT_TO_LEFT)
-                enum_value = g_enum_get_value (enum_class, GTK_NUMBER_UP_LAYOUT_RIGHT_TO_LEFT_BOTTOM_TO_TOP);
+                case GTK_NUMBER_UP_LAYOUT_RIGHT_TO_LEFT_BOTTOM_TO_TOP:
+                case GTK_NUMBER_UP_LAYOUT_BOTTOM_TO_TOP_RIGHT_TO_LEFT:
+                  enum_value = g_enum_get_value (enum_class, GTK_NUMBER_UP_LAYOUT_RIGHT_TO_LEFT_BOTTOM_TO_TOP);
+                  break;
+
+                default:
+                  g_assert_not_reached();
+                  enum_value = NULL;
+                }
             }
           else
             {
@@ -3489,7 +3500,7 @@ create_page_setup_page (GtkPrintUnixDialog *dialog)
   gtk_box_pack_start (GTK_BOX (main_vbox), hbox2, TRUE, TRUE, 0);
 
   draw = gtk_drawing_area_new ();
-  GTK_WIDGET_SET_FLAGS (draw, GTK_NO_WINDOW);
+  gtk_widget_set_has_window (draw, FALSE);
   priv->page_layout_preview = draw;
   gtk_widget_set_size_request (draw, 350, 200);
   g_signal_connect (draw, "expose-event", G_CALLBACK (draw_page_cb), dialog);
@@ -3779,12 +3790,16 @@ populate_dialog (GtkPrintUnixDialog *print_dialog)
   create_main_page (print_dialog);
   create_page_setup_page (print_dialog);
   create_job_page (print_dialog);
+  /* Translators: this will appear as tab label in print dialog. */
   create_optional_page (print_dialog, _("Image Quality"),
                         &priv->image_quality_table,
                         &priv->image_quality_page);
+  /* Translators: this will appear as tab label in print dialog. */
   create_optional_page (print_dialog, _("Color"),
                         &priv->color_table,
                         &priv->color_page);
+  /* Translators: this will appear as tab label in print dialog. */
+  /* It's a typographical term, as in "Binding and finishing" */
   create_optional_page (print_dialog, _("Finishing"),
                         &priv->finishing_table,
                         &priv->finishing_page);
@@ -3804,8 +3819,8 @@ populate_dialog (GtkPrintUnixDialog *print_dialog)
 
 /**
  * gtk_print_unix_dialog_new:
- * @title: Title of the dialog, or %NULL
- * @parent: Transient parent of the dialog, or %NULL
+ * @title: (allow-none): Title of the dialog, or %NULL
+ * @parent: (allow-none): Transient parent of the dialog, or %NULL
  *
  * Creates a new #GtkPrintUnixDialog.
  *
@@ -4014,7 +4029,7 @@ set_active_printer (GtkPrintUnixDialog *dialog,
 /**
  * gtk_print_unix_dialog_set_settings:
  * @dialog: a #GtkPrintUnixDialog
- * @settings: a #GtkPrintSettings, or %NULL
+ * @settings: (allow-none): a #GtkPrintSettings, or %NULL
  *
  * Sets the #GtkPrintSettings for the #GtkPrintUnixDialog. Typically,
  * this is used to restore saved print settings from a previous print

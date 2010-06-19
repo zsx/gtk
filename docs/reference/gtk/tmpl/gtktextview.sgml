@@ -23,6 +23,9 @@ types related to the text widget and how they work together.
 <!-- ##### SECTION Stability_Level ##### -->
 
 
+<!-- ##### SECTION Image ##### -->
+
+
 <!-- ##### STRUCT GtkTextView ##### -->
 <para>
 
@@ -103,6 +106,14 @@ types related to the text widget and how they work together.
 @textview: the object which received the signal.
 
 <!-- ##### SIGNAL GtkTextView::populate-popup ##### -->
+<para>
+
+</para>
+
+@textview: the object which received the signal.
+@arg1: 
+
+<!-- ##### SIGNAL GtkTextView::preedit-changed ##### -->
 <para>
 
 </para>
@@ -246,6 +257,7 @@ types related to the text widget and how they work together.
 
 </para>
 
+@void: 
 @Returns: 
 
 
@@ -546,6 +558,7 @@ multiple views.
 
 </para>
 
+@void: 
 @Returns: 
 
 

@@ -169,7 +169,7 @@ get_slider_button (GtkPathBar  *path_bar,
 static void
 gtk_path_bar_init (GtkPathBar *path_bar)
 {
-  GTK_WIDGET_SET_FLAGS (path_bar, GTK_NO_WINDOW);
+  gtk_widget_set_has_window (GTK_WIDGET (path_bar), FALSE);
   gtk_widget_set_redraw_on_allocate (GTK_WIDGET (path_bar), FALSE);
 
   path_bar->get_info_cancellable = NULL;
@@ -408,7 +408,7 @@ gtk_path_bar_realize (GtkWidget *widget)
   GdkWindowAttr attributes;
   gint attributes_mask;
 
-  GTK_WIDGET_SET_FLAGS (widget, GTK_REALIZED);
+  gtk_widget_set_realized (widget, TRUE);
 
   path_bar = GTK_PATH_BAR (widget);
   widget->window = gtk_widget_get_parent_window (widget);
@@ -464,7 +464,7 @@ gtk_path_bar_size_allocate (GtkWidget     *widget,
 
   widget->allocation = *allocation;
 
-  if (GTK_WIDGET_REALIZED (widget))
+  if (gtk_widget_get_realized (widget))
     gdk_window_move_resize (path_bar->event_window,
 			    allocation->x, allocation->y,
 			    allocation->width, allocation->height);
@@ -714,7 +714,7 @@ static void
 gtk_path_bar_remove_1 (GtkContainer *container,
 		       GtkWidget    *widget)
 {
-  gboolean was_visible = GTK_WIDGET_VISIBLE (widget);
+  gboolean was_visible = gtk_widget_get_visible (widget);
   gtk_widget_unparent (widget);
   if (was_visible)
     gtk_widget_queue_resize (GTK_WIDGET (container));
@@ -936,7 +936,7 @@ gtk_path_bar_slider_up_defocus (GtkWidget      *widget,
     }
 
   /* don't let the focus vanish */
-  if ((!GTK_WIDGET_IS_SENSITIVE (path_bar->up_slider_button)) || 
+  if ((!gtk_widget_is_sensitive (path_bar->up_slider_button)) ||
       (!gtk_widget_get_child_visible (path_bar->up_slider_button)))
     gtk_widget_grab_focus (BUTTON_DATA (up_button->data)->button);
 
@@ -964,7 +964,7 @@ gtk_path_bar_slider_down_defocus (GtkWidget      *widget,
     }
 
   /* don't let the focus vanish */
-  if ((!GTK_WIDGET_IS_SENSITIVE (path_bar->down_slider_button)) || 
+  if ((!gtk_widget_is_sensitive (path_bar->down_slider_button)) ||
       (!gtk_widget_get_child_visible (path_bar->down_slider_button)))
     gtk_widget_grab_focus (BUTTON_DATA (down_button->data)->button);
 
@@ -1036,7 +1036,7 @@ static void
 gtk_path_bar_state_changed (GtkWidget    *widget,
 			    GtkStateType  previous_state)
 {
-  if (!GTK_WIDGET_IS_SENSITIVE (widget)) 
+  if (!gtk_widget_is_sensitive (widget))
     gtk_path_bar_stop_scrolling (GTK_PATH_BAR (widget));
 }
 
@@ -1261,7 +1261,7 @@ set_button_image (GtkPathBar *path_bar,
 								 GTK_WIDGET (path_bar),
 								 path_bar->icon_size,
 								 NULL);
-      _gtk_file_system_volume_free (volume);
+      _gtk_file_system_volume_unref (volume);
 
       gtk_image_set_from_pixbuf (GTK_IMAGE (button_data->image), path_bar->root_icon);
       break;

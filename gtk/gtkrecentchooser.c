@@ -717,8 +717,8 @@ gtk_recent_chooser_get_sort_type (GtkRecentChooser *chooser)
  * gtk_recent_chooser_set_sort_func:
  * @chooser: a #GtkRecentChooser
  * @sort_func: the comparison function
- * @sort_data: user data to pass to @sort_func, or %NULL
- * @data_destroy: destroy notifier for @sort_data, or %NULL
+ * @sort_data: (allow-none): user data to pass to @sort_func, or %NULL
+ * @data_destroy: (allow-none): destroy notifier for @sort_data, or %NULL
  *
  * Sets the comparison function used when sorting to be @sort_func.  If
  * the @chooser has the sort type set to #GTK_RECENT_SORT_CUSTOM then
@@ -749,7 +749,7 @@ gtk_recent_chooser_set_sort_func  (GtkRecentChooser  *chooser,
  * gtk_recent_chooser_set_current_uri:
  * @chooser: a #GtkRecentChooser
  * @uri: a URI
- * @error: return location for a #GError, or %NULL
+ * @error: (allow-none): return location for a #GError, or %NULL
  *
  * Sets @uri as the current URI for @chooser.
  *
@@ -820,7 +820,7 @@ gtk_recent_chooser_get_current_item (GtkRecentChooser *chooser)
  * gtk_recent_chooser_select_uri:
  * @chooser: a #GtkRecentChooser
  * @uri: a URI
- * @error: return location for a #GError, or %NULL
+ * @error: (allow-none): return location for a #GError, or %NULL
  *
  * Selects @uri inside @chooser.
  *
@@ -898,7 +898,8 @@ gtk_recent_chooser_unselect_all (GtkRecentChooser *chooser)
  * The return value of this function is affected by the "sort-type" and
  * "limit" properties of @chooser.
  *
- * Return value: A newly allocated list of #GtkRecentInfo objects.  You should
+ * Return value:  (element-type GtkRecentInfo) (transfer full): A newly allocated
+ *   list of #GtkRecentInfo objects.  You should
  *   use gtk_recent_info_unref() on every item of the list, and then free
  *   the list itself using g_list_free().
  *
@@ -915,7 +916,7 @@ gtk_recent_chooser_get_items (GtkRecentChooser *chooser)
 /**
  * gtk_recent_chooser_get_uris:
  * @chooser: a #GtkRecentChooser
- * @length: return location for a the length of the URI list, or %NULL
+ * @length: (allow-none): return location for a the length of the URI list, or %NULL
  *
  * Gets the URI of the recently used resources.
  *
@@ -1014,7 +1015,8 @@ gtk_recent_chooser_remove_filter (GtkRecentChooser *chooser,
  *
  * Gets the #GtkRecentFilter objects held by @chooser.
  *
- * Return value: A singly linked list of #GtkRecentFilter objects.  You
+ * Return value: (element-type GtkRecentFilter) (transfer container): A singly linked list
+ *   of #GtkRecentFilter objects.  You
  *   should just free the returned list using g_slist_free().
  *
  * Since: 2.10

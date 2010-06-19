@@ -659,10 +659,14 @@ gtk_rc_color_hash_changed (GtkSettings  *settings,
 			   GParamSpec   *pspec,
 			   GtkRcContext *context)
 {
-  if (context->color_hash)
-    g_hash_table_unref (context->color_hash);
-  
+  GHashTable *old_hash;
+
+  old_hash = context->color_hash;
+
   g_object_get (settings, "color-hash", &context->color_hash, NULL);
+
+  if (old_hash)
+    g_hash_table_unref (old_hash);
 
   gtk_rc_reparse_all_for_settings (settings, TRUE);
 }
@@ -2024,13 +2028,13 @@ gtk_rc_get_style (GtkWidget *widget)
 /**
  * gtk_rc_get_style_by_paths:
  * @settings: a #GtkSettings object
- * @widget_path: the widget path to use when looking up the style, or %NULL
+ * @widget_path: (allow-none): the widget path to use when looking up the style, or %NULL
  *               if no matching against the widget path should be done
- * @class_path: the class path to use when looking up the style, or %NULL
+ * @class_path: (allow-none): the class path to use when looking up the style, or %NULL
  *               if no matching against the class path should be done.
  * @type: a type that will be used along with parent types of this type
  *        when matching against class styles, or #G_TYPE_NONE
- * 
+ *
  * Creates up a #GtkStyle from styles defined in a RC file by providing
  * the raw components used in matching. This function may be useful
  * when creating pseudo-widgets that should be themed like widgets but
@@ -3148,8 +3152,10 @@ gtk_rc_parse_style (GtkRcContext *context,
           break;
         case GTK_RC_TOKEN_COLOR:
           if (our_hash == NULL)
-            gtk_rc_style_prepend_empty_color_hash (rc_style);
-          our_hash = rc_priv->color_hashes->data;
+            {
+              gtk_rc_style_prepend_empty_color_hash (rc_style);
+              our_hash = rc_priv->color_hashes->data;
+            }
           token = gtk_rc_parse_logical_color (scanner, rc_style, our_hash);
           break;
 	case G_TOKEN_IDENTIFIER:
@@ -3862,7 +3868,7 @@ gtk_rc_parse_color (GScanner *scanner,
 /**
  * gtk_rc_parse_color_full:
  * @scanner: a #GScanner
- * @style: a #GtkRcStyle, or %NULL
+ * @style: (allow-none): a #GtkRcStyle, or %NULL
  * @color: a pointer to a #GdkColor structure in which to store the result
  *
  * Parses a color in the <link linkend="color=format">format</link> expected

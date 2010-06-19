@@ -162,7 +162,7 @@ get_children (GtkWidget *submenu)
        *
        * The following hack forces the menu items to be created.
        */
-      if (!GTK_WIDGET_VISIBLE (submenu))
+      if (!gtk_widget_get_visible (submenu))
         {
           GTK_WIDGET_SET_FLAGS (submenu, GTK_VISIBLE);
           g_signal_emit_by_name (submenu, "show");
@@ -291,7 +291,7 @@ gail_menu_item_do_action (AtkAction *action,
         /* State is defunct */
         return FALSE;
 
-      if (!GTK_WIDGET_SENSITIVE (item) || !GTK_WIDGET_VISIBLE (item))
+      if (!gtk_widget_get_sensitive (item) || !gtk_widget_get_visible (item))
         return FALSE;
 
       gail_menu_item = GAIL_MENU_ITEM (action);
@@ -325,7 +325,7 @@ ensure_menus_unposted (GailMenuItem *menu_item)
           widget = GTK_ACCESSIBLE (parent)->widget;
           if (GTK_IS_MENU (widget))
             {
-              if (GTK_WIDGET_MAPPED (widget))
+              if (gtk_widget_get_mapped (widget))
                 gtk_menu_shell_cancel (GTK_MENU_SHELL (widget));
 
               return;
@@ -347,12 +347,12 @@ idle_do_action (gpointer data)
   menu_item->action_idle_handler = 0;
   item = GTK_ACCESSIBLE (menu_item)->widget;
   if (item == NULL /* State is defunct */ ||
-      !GTK_WIDGET_SENSITIVE (item) || !GTK_WIDGET_VISIBLE (item))
+      !gtk_widget_get_sensitive (item) || !gtk_widget_get_visible (item))
     return FALSE;
 
   item_parent = gtk_widget_get_parent (item);
   gtk_menu_shell_select_item (GTK_MENU_SHELL (item_parent), item);
-  item_mapped = GTK_WIDGET_MAPPED (item);
+  item_mapped = gtk_widget_get_mapped (item);
   /*
    * This is what is called when <Return> is pressed for a menu item
    */

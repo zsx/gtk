@@ -25,6 +25,17 @@
 
 @implementation GdkQuartzView
 
+-(void)dealloc
+{
+  if (trackingRect)
+    {
+      [self removeTrackingRect:trackingRect];
+      trackingRect = 0;
+    }
+
+  [super dealloc];
+}
+
 -(void)setGdkWindow:(GdkWindow *)window
 {
   gdk_window = window;
@@ -60,7 +71,8 @@
   GdkWindowObject *private = GDK_WINDOW_OBJECT (gdk_window);
   GdkWindowImplQuartz *impl = GDK_WINDOW_IMPL_QUARTZ (private->impl);
   const NSRect *drawn_rects;
-  int count, i;
+  NSInteger count;
+  int i;
   GdkRegion *region;
 
   if (GDK_WINDOW_DESTROYED (gdk_window))
@@ -157,6 +169,15 @@
                                  owner:self
                               userData:nil
                           assumeInside:NO];
+
+  if (NSPointInRect ([[self window] convertScreenToBase:[NSEvent mouseLocation]], rect))
+    {
+      /* When a new window (and thus view) has been created, and the mouse
+       * is in the window area, we will not receive an NSMouseEntered
+       * event.  Therefore, we synthesize an enter notify event manually.
+       */
+      _gdk_quartz_events_send_enter_notify_event (gdk_window);
+    }
 }
 
 -(void)viewDidMoveToWindow

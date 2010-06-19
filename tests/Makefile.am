@@ -18,7 +18,8 @@ DEPS =									\
 LDADDS =								\
 	$(top_builddir)/gdk-pixbuf/libgdk_pixbuf-$(GTK_API_VERSION).la	\
 	$(top_builddir)/gdk/$(gdktargetlib)				\
-	$(top_builddir)/gtk/$(gtktargetlib)
+	$(top_builddir)/gtk/$(gtktargetlib)				\
+	$(GTK_DEP_LIBS)
 
 if USE_X11
 testsocket_programs = testsocket testsocket_child
@@ -58,6 +59,7 @@ noinst_PROGRAMS =  $(TEST_PROGS)	\
 	testnotebookdnd			\
 	testnouiprint			\
 	testoffscreen			\
+	testoffscreenwindow		\
 	testorientable			\
 	testprint			\
 	testrgb				\
@@ -140,6 +142,7 @@ testmultiscreen_DEPENDENCIES = $(TEST_DEPS)
 testnotebookdnd_DEPENDENCIES = $(TEST_DEPS)
 testnouiprint_DEPENDENCIES = $(TEST_DEPS)
 testoffscreen_DEPENDENCIES = $(TEST_DEPS)
+testoffscreenwindow_DEPENDENCIES = $(TEST_DEPS)
 testorientable_DEPENDENCIES = $(TEST_DEPS)
 testprint_DEPENDENCIES = $(TEST_DEPS)
 testrecentchooser_DEPENDENCIES = $(TEST_DEPS)
@@ -203,6 +206,7 @@ testmultiscreen_LDADD = $(LDADDS)
 testnotebookdnd_LDADD = $(LDADDS)
 testnouiprint_LDADD = $(LDADDS)
 testoffscreen_LDADD = $(LDADDS)
+testoffscreenwindow_LDADD = $(LDADDS)
 testorientable_LDADD = $(LDADDS)
 testprint_LDADD = $(LDADDS)
 testrecentchooser_LDADD = $(LDADDS)
@@ -339,7 +343,10 @@ testoffscreen_SOURCES = 	\
 	gtkoffscreenbox.h	\
 	testoffscreen.c
 
-testwindow_SOURCES = 	\
+testoffscreenwindow_SOURCES =	\
+	testoffscreenwindow.c
+
+testwindows_SOURCES = 	\
 	testwindows.c
 
 EXTRA_DIST += 			\

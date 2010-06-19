@@ -160,6 +160,7 @@ gtk_action_disconnect_accelerator
 #ifndef GTK_DISABLE_DEPRECATED
 gtk_action_disconnect_proxy
 #endif
+gtk_action_get_always_show_image
 gtk_action_get_accel_closure
 gtk_action_get_accel_path
 gtk_action_get_gicon
@@ -184,6 +185,7 @@ gtk_action_is_visible
 gtk_action_new
 gtk_action_set_accel_group
 gtk_action_set_accel_path
+gtk_action_set_always_show_image
 gtk_action_set_gicon
 gtk_action_set_icon_name
 gtk_action_set_is_important
@@ -407,6 +409,7 @@ gtk_text_direction_get_type G_GNUC_CONST
 gtk_text_buffer_target_info_get_type G_GNUC_CONST
 gtk_text_search_flags_get_type G_GNUC_CONST
 gtk_text_window_type_get_type G_GNUC_CONST
+gtk_tool_palette_drag_targets_get_type G_GNUC_CONST
 gtk_tree_model_flags_get_type G_GNUC_CONST
 gtk_tree_view_mode_get_type G_GNUC_CONST
 gtk_tree_view_grid_lines_get_type G_GNUC_CONST
@@ -541,7 +544,9 @@ gtk_button_box_set_layout
 #if IN_HEADER(__GTK_BUTTON_H__)
 #if IN_FILE(__GTK_BUTTON_C__)
 gtk_button_clicked
+#ifndef GTK_DISABLE_DEPRECATED
 gtk_button_enter
+#endif
 gtk_button_get_alignment
 gtk_button_get_focus_on_click
 gtk_button_get_image
@@ -551,13 +556,17 @@ gtk_button_get_relief
 gtk_button_get_type G_GNUC_CONST
 gtk_button_get_use_stock
 gtk_button_get_use_underline
+#ifndef GTK_DISABLE_DEPRECATED
 gtk_button_leave
+#endif
 gtk_button_new
 gtk_button_new_from_stock
 gtk_button_new_with_label
 gtk_button_new_with_mnemonic
+#ifndef GTK_DISABLE_DEPRECATED
 gtk_button_pressed
 gtk_button_released
+#endif
 gtk_button_set_alignment
 gtk_button_set_focus_on_click
 gtk_button_set_image
@@ -667,6 +676,13 @@ gtk_cell_renderer_pixbuf_new
 #if IN_FILE(__GTK_CELL_RENDERER_SPIN_C__)
 gtk_cell_renderer_spin_get_type G_GNUC_CONST
 gtk_cell_renderer_spin_new
+#endif
+#endif
+
+#if IN_HEADER(__GTK_CELL_RENDERER_SPINNER_H__)
+#if IN_FILE(__GTK_CELL_RENDERER_SPINNER_C__)
+gtk_cell_renderer_spinner_get_type G_GNUC_CONST
+gtk_cell_renderer_spinner_new
 #endif
 #endif
 
@@ -1098,6 +1114,7 @@ gtk_ctree_unselect_recursive
 
 #if IN_HEADER(__GTK_CURVE_H__)
 #if IN_FILE(__GTK_CURVE_C__)
+#ifndef GTK_DISABLE_DEPRECATED
 gtk_curve_get_type G_GNUC_CONST
 gtk_curve_get_vector
 gtk_curve_new
@@ -1106,6 +1123,7 @@ gtk_curve_set_curve_type
 gtk_curve_set_gamma
 gtk_curve_set_range
 gtk_curve_set_vector
+#endif
 #endif
 #endif
 
@@ -1126,6 +1144,7 @@ gtk_dialog_add_buttons G_GNUC_NULL_TERMINATED
 gtk_dialog_get_action_area
 gtk_dialog_get_content_area
 gtk_dialog_get_has_separator
+gtk_dialog_get_widget_for_response
 gtk_dialog_get_response_for_widget
 gtk_dialog_get_type G_GNUC_CONST
 gtk_dialog_new
@@ -1225,6 +1244,7 @@ gtk_status_icon_get_geometry
 gtk_status_icon_get_x11_window_id
 gtk_status_icon_get_title
 gtk_status_icon_set_title
+gtk_status_icon_set_name
 #endif
 #endif
 
@@ -1276,6 +1296,7 @@ gtk_paint_resize_grip
 gtk_paint_shadow
 gtk_paint_shadow_gap
 gtk_paint_slider
+gtk_paint_spinner
 gtk_paint_tab
 gtk_paint_vline
 gtk_border_new G_GNUC_MALLOC
@@ -1347,6 +1368,7 @@ gtk_entry_get_icon_stock
 gtk_entry_get_icon_storage_type
 gtk_entry_get_icon_tooltip_markup
 gtk_entry_get_icon_tooltip_text
+gtk_entry_get_icon_window
 gtk_entry_get_inner_border
 gtk_entry_get_invisible_char
 gtk_entry_get_layout
@@ -1360,6 +1382,7 @@ gtk_entry_get_text_length
 gtk_entry_get_type G_GNUC_CONST
 gtk_entry_get_visibility
 gtk_entry_get_width_chars
+gtk_entry_get_text_window
 gtk_entry_layout_index_to_text_index
 gtk_entry_new
 gtk_entry_new_with_buffer
@@ -1686,12 +1709,14 @@ gtk_file_selection_show_fileop_buttons
 
 #if IN_HEADER(__GTK_FIXED_H__)
 #if IN_FILE(__GTK_FIXED_C__)
-gtk_fixed_get_has_window
 gtk_fixed_get_type G_GNUC_CONST
 gtk_fixed_move
 gtk_fixed_new
 gtk_fixed_put
+#ifndef GTK_DISABLE_DEPRECATED
 gtk_fixed_set_has_window
+gtk_fixed_get_has_window
+#endif
 #endif
 #endif
 
@@ -1764,8 +1789,10 @@ gtk_frame_set_shadow_type
 
 #if IN_HEADER(__GTK_GAMMA_CURVE_H__)
 #if IN_FILE(__GTK_GAMMA_CURVE_C__)
+#ifndef GTK_DISABLE_DEPRECATED
 gtk_gamma_curve_get_type G_GNUC_CONST
 gtk_gamma_curve_new
+#endif
 #endif
 #endif
 
@@ -2419,8 +2446,10 @@ gtk_main_quit
 
 #if IN_HEADER(__GTK_INPUTDIALOG_H__)
 #if IN_FILE(__GTK_INPUTDIALOG_C__)
+#ifndef GTK_DISABLE_DEPRECATED
 gtk_input_dialog_get_type G_GNUC_CONST
 gtk_input_dialog_new
+#endif
 #endif
 #endif
 
@@ -2619,7 +2648,9 @@ gtk_notebook_popup_enable
 gtk_notebook_prepend_page
 gtk_notebook_prepend_page_menu
 gtk_notebook_prev_page
+#ifndef GTK_DISABLE_DEPRECATED
 gtk_notebook_query_tab_label_packing
+#endif
 gtk_notebook_remove_page
 gtk_notebook_reorder_child
 gtk_notebook_set_current_page
@@ -2635,7 +2666,9 @@ gtk_notebook_set_scrollable
 gtk_notebook_set_show_border
 gtk_notebook_set_show_tabs
 gtk_notebook_set_tab_label
+#ifndef GTK_DISABLE_DEPRECATED
 gtk_notebook_set_tab_label_packing
+#endif
 gtk_notebook_set_tab_label_text
 gtk_notebook_set_tab_pos
 gtk_notebook_set_window_creation_hook
@@ -2649,6 +2682,8 @@ gtk_notebook_get_tab_reorderable
 gtk_notebook_set_tab_reorderable
 gtk_notebook_get_tab_detachable
 gtk_notebook_set_tab_detachable
+gtk_notebook_get_action_widget
+gtk_notebook_set_action_widget
 #endif
 #endif
 
@@ -2679,6 +2714,15 @@ gtk_object_sink
 #endif
 gtk_object_destroy
 gtk_object_get_type G_GNUC_CONST
+#endif
+#endif
+
+#if IN_HEADER(__GTK_OFFSCREEN_WINDOW_H__)
+#if IN_FILE(__GTK_OFFSCREEN_WINDOW_C__)
+gtk_offscreen_window_get_type G_GNUC_CONST
+gtk_offscreen_window_new
+gtk_offscreen_window_get_pixmap
+gtk_offscreen_window_get_pixbuf
 #endif
 #endif
 
@@ -2716,6 +2760,7 @@ gtk_paned_add1
 gtk_paned_add2
 gtk_paned_get_child1
 gtk_paned_get_child2
+gtk_paned_get_handle_window
 gtk_paned_get_position
 gtk_paned_get_type G_GNUC_CONST
 gtk_paned_pack1
@@ -2888,6 +2933,7 @@ gtk_print_context_get_width
 gtk_print_context_get_height
 gtk_print_context_get_dpi_x
 gtk_print_context_get_dpi_y
+gtk_print_context_get_hard_margins
 gtk_print_context_get_pango_fontmap
 gtk_print_context_create_pango_context
 gtk_print_context_create_pango_layout
@@ -2915,6 +2961,7 @@ gtk_printer_compare
 gtk_printer_has_details
 gtk_printer_request_details
 gtk_printer_get_capabilities
+gtk_printer_get_hard_margins
 gtk_enumerate_printers
 gtk_print_capabilities_get_type G_GNUC_CONST
 #endif
@@ -3001,12 +3048,19 @@ gtk_print_job_get_settings
 gtk_print_job_get_printer
 gtk_print_job_get_title
 gtk_print_job_get_status
-gtk_print_job_set_status
 gtk_print_job_set_source_file
 gtk_print_job_get_surface
 gtk_print_job_send
 gtk_print_job_set_track_print_status
 gtk_print_job_get_track_print_status
+#endif
+#endif
+#endif
+
+#if IN_HEADER(__GTK_PRINTER_PRIVATE_H__)
+#if IN_FILE(__GTK_PRINT_JOB_C__)
+#ifdef G_OS_UNIX
+gtk_print_job_set_status
 #endif
 #endif
 #endif
@@ -3297,8 +3351,12 @@ gtk_range_get_fill_level
 gtk_range_get_flippable
 gtk_range_get_inverted
 gtk_range_get_lower_stepper_sensitivity
+gtk_range_get_min_slider_size
+gtk_range_get_range_rect
 gtk_range_get_restrict_to_fill_level
 gtk_range_get_show_fill_level
+gtk_range_get_slider_range
+gtk_range_get_slider_size_fixed
 gtk_range_get_type G_GNUC_CONST
 gtk_range_get_update_policy
 gtk_range_get_upper_stepper_sensitivity
@@ -3309,9 +3367,11 @@ gtk_range_set_flippable
 gtk_range_set_increments
 gtk_range_set_inverted
 gtk_range_set_lower_stepper_sensitivity
+gtk_range_set_min_slider_size
 gtk_range_set_range
 gtk_range_set_restrict_to_fill_level
 gtk_range_set_show_fill_level
+gtk_range_set_slider_size_fixed
 gtk_range_set_update_policy
 gtk_range_set_upper_stepper_sensitivity
 gtk_range_set_value
@@ -3801,10 +3861,20 @@ gtk_spin_button_update
 #endif
 #endif
 
+#if IN_HEADER(__GTK_SPINNER_H__)
+#if IN_FILE(__GTK_SPINNER_C__)
+gtk_spinner_get_type G_GNUC_CONST
+gtk_spinner_new
+gtk_spinner_start
+gtk_spinner_stop
+#endif
+#endif
+
 #if IN_HEADER(__GTK_STATUSBAR_H__)
 #if IN_FILE(__GTK_STATUSBAR_C__)
 gtk_statusbar_get_context_id
 gtk_statusbar_get_has_resize_grip
+gtk_statusbar_get_message_area
 gtk_statusbar_get_type G_GNUC_CONST
 gtk_statusbar_new
 gtk_statusbar_pop
@@ -4339,10 +4409,14 @@ gtk_toolbar_unset_style
 #if IN_HEADER(__GTK_TOOL_SHELL_H__)
 #if IN_FILE(__GTK_TOOL_SHELL_C__)
 gtk_tool_shell_get_type G_GNUC_CONST
+gtk_tool_shell_get_ellipsize_mode
 gtk_tool_shell_get_icon_size
 gtk_tool_shell_get_orientation
 gtk_tool_shell_get_style
 gtk_tool_shell_get_relief_style
+gtk_tool_shell_get_text_alignment
+gtk_tool_shell_get_text_orientation
+gtk_tool_shell_get_text_size_group
 gtk_tool_shell_rebuild_menu
 #endif
 #endif
@@ -4369,6 +4443,7 @@ gtk_tool_button_set_use_underline
 
 #if IN_HEADER(__GTK_TOOL_ITEM_H__)
 #if IN_FILE(__GTK_TOOL_ITEM_C__)
+gtk_tool_item_get_ellipsize_mode
 gtk_tool_item_get_expand
 gtk_tool_item_get_homogeneous
 gtk_tool_item_get_icon_size
@@ -4376,6 +4451,9 @@ gtk_tool_item_get_is_important
 gtk_tool_item_get_orientation
 gtk_tool_item_get_proxy_menu_item
 gtk_tool_item_get_relief_style
+gtk_tool_item_get_text_alignment
+gtk_tool_item_get_text_orientation
+gtk_tool_item_get_text_size_group
 gtk_tool_item_get_toolbar_style
 gtk_tool_item_get_type G_GNUC_CONST
 gtk_tool_item_get_use_drag_window
@@ -4400,6 +4478,57 @@ gtk_tool_item_toolbar_reconfigured
 #endif
 #endif
 
+#if IN_HEADER(__GTK_TOOL_ITEM_GROUP_H__)
+#if IN_FILE(__GTK_TOOL_ITEM_GROUP_C__)
+gtk_tool_item_group_get_type G_GNUC_CONST
+gtk_tool_item_group_new
+gtk_tool_item_group_set_label
+gtk_tool_item_group_set_label_widget
+gtk_tool_item_group_set_collapsed
+gtk_tool_item_group_set_ellipsize
+gtk_tool_item_group_set_header_relief
+gtk_tool_item_group_get_label
+gtk_tool_item_group_get_label_widget
+gtk_tool_item_group_get_ellipsize
+gtk_tool_item_group_get_header_relief
+gtk_tool_item_group_insert
+gtk_tool_item_group_set_item_position
+gtk_tool_item_group_get_item_position
+gtk_tool_item_group_get_n_items
+gtk_tool_item_group_get_nth_item
+gtk_tool_item_group_get_drop_item
+gtk_tool_item_group_get_collapsed
+#endif
+#endif
+
+#if IN_HEADER(__GTK_TOOL_PALETTE_H__)
+#if IN_FILE(__GTK_TOOL_PALETTE_C__)
+gtk_tool_palette_get_type G_GNUC_CONST
+gtk_tool_palette_new
+gtk_tool_palette_set_group_position
+gtk_tool_palette_set_exclusive
+gtk_tool_palette_set_expand
+gtk_tool_palette_get_group_position
+gtk_tool_palette_get_exclusive
+gtk_tool_palette_get_expand
+gtk_tool_palette_set_icon_size
+gtk_tool_palette_unset_icon_size
+gtk_tool_palette_set_style
+gtk_tool_palette_unset_style
+gtk_tool_palette_get_icon_size
+gtk_tool_palette_get_style
+gtk_tool_palette_get_drop_item
+gtk_tool_palette_get_drop_group
+gtk_tool_palette_get_drag_item
+gtk_tool_palette_set_drag_source
+gtk_tool_palette_add_drag_dest
+gtk_tool_palette_get_hadjustment
+gtk_tool_palette_get_vadjustment
+gtk_tool_palette_get_drag_target_item G_GNUC_CONST
+gtk_tool_palette_get_drag_target_group G_GNUC_CONST
+#endif
+#endif
+
 #if IN_HEADER(__GTK_TOOLTIP_H__)
 #if IN_FILE(__GTK_TOOLTIP_C__)
 gtk_tooltip_get_type G_GNUC_CONST
@@ -4407,6 +4536,7 @@ gtk_tooltip_set_custom
 gtk_tooltip_set_icon
 gtk_tooltip_set_icon_from_stock
 gtk_tooltip_set_icon_from_icon_name
+gtk_tooltip_set_icon_from_gicon
 gtk_tooltip_set_markup
 gtk_tooltip_set_text
 gtk_tooltip_set_tip_area
@@ -4888,6 +5018,7 @@ gtk_viewport_get_hadjustment
 gtk_viewport_get_shadow_type
 gtk_viewport_get_type G_GNUC_CONST
 gtk_viewport_get_vadjustment
+gtk_viewport_get_bin_window
 gtk_viewport_new
 gtk_viewport_set_hadjustment
 gtk_viewport_set_shadow_type
@@ -4992,6 +5123,7 @@ gtk_widget_get_parent_window
 gtk_widget_get_pointer
 gtk_widget_get_receives_default
 gtk_widget_get_root_window
+gtk_widget_get_requisition
 gtk_widget_get_screen
 gtk_widget_get_sensitive
 gtk_widget_get_settings
@@ -5011,6 +5143,7 @@ gtk_widget_grab_focus
 gtk_widget_has_default
 gtk_widget_has_focus
 gtk_widget_has_grab
+gtk_widget_has_rc_style
 gtk_widget_has_screen
 gtk_widget_hide
 gtk_widget_hide_all
@@ -5098,6 +5231,7 @@ gtk_widget_show_all
 gtk_widget_show_now
 gtk_widget_size_allocate
 gtk_widget_size_request
+gtk_widget_style_attach
 gtk_widget_style_get G_GNUC_NULL_TERMINATED
 gtk_widget_style_get_property
 gtk_widget_style_get_valist
@@ -5114,6 +5248,10 @@ gtk_widget_set_can_default
 gtk_widget_get_can_default
 gtk_widget_set_can_focus
 gtk_widget_get_can_focus
+gtk_widget_set_realized
+gtk_widget_get_realized
+gtk_widget_set_mapped
+gtk_widget_get_mapped
 #endif
 #endif
 
@@ -5147,6 +5285,7 @@ gtk_window_get_icon
 gtk_window_get_icon_list
 gtk_window_get_icon_name
 gtk_window_get_mnemonic_modifier
+gtk_window_get_mnemonics_visible
 gtk_window_get_modal
 gtk_window_get_position
 gtk_window_get_resizable
@@ -5160,6 +5299,7 @@ gtk_window_get_title
 gtk_window_get_transient_for
 gtk_window_get_type G_GNUC_CONST
 gtk_window_get_type_hint
+gtk_window_get_window_type
 gtk_window_group_add_window
 gtk_window_group_get_type G_GNUC_CONST
 gtk_window_group_new
@@ -5217,6 +5357,7 @@ gtk_window_set_icon_name
 gtk_window_set_keep_above
 gtk_window_set_keep_below
 gtk_window_set_mnemonic_modifier
+gtk_window_set_mnemonics_visible
 gtk_window_set_modal
 gtk_window_set_opacity
 gtk_window_get_opacity

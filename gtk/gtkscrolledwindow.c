@@ -362,7 +362,8 @@ gtk_scrolled_window_class_init (GtkScrolledWindowClass *class)
 static void
 gtk_scrolled_window_init (GtkScrolledWindow *scrolled_window)
 {
-  GTK_WIDGET_SET_FLAGS (scrolled_window, GTK_NO_WINDOW | GTK_CAN_FOCUS);
+  gtk_widget_set_has_window (GTK_WIDGET (scrolled_window), FALSE);
+  gtk_widget_set_can_focus (GTK_WIDGET (scrolled_window), TRUE);
 
   scrolled_window->hscrollbar = NULL;
   scrolled_window->vscrollbar = NULL;
@@ -377,12 +378,12 @@ gtk_scrolled_window_init (GtkScrolledWindow *scrolled_window)
 
 /**
  * gtk_scrolled_window_new:
- * @hadjustment: horizontal adjustment
- * @vadjustment: vertical adjustment
- * 
- * Creates a new scrolled window. 
+ * @hadjustment: (allow-none): horizontal adjustment
+ * @vadjustment: (allow-none): vertical adjustment
  *
- * The two arguments are the scrolled window's adjustments; these will be 
+ * Creates a new scrolled window.
+ *
+ * The two arguments are the scrolled window's adjustments; these will be
  * shared with the scrollbars and the child widget to keep the bars in sync 
  * with the child. Usually you want to pass %NULL for the adjustments, which 
  * will cause the scrolled window to create them for you.
@@ -819,7 +820,7 @@ gtk_scrolled_window_set_shadow_type (GtkScrolledWindow *scrolled_window,
     {
       scrolled_window->shadow_type = type;
 
-      if (GTK_WIDGET_DRAWABLE (scrolled_window))
+      if (gtk_widget_is_drawable (GTK_WIDGET (scrolled_window)))
 	gtk_widget_queue_draw (GTK_WIDGET (scrolled_window));
 
       gtk_widget_queue_resize (GTK_WIDGET (scrolled_window));
@@ -852,6 +853,9 @@ gtk_scrolled_window_destroy (GtkObject *object)
 
   if (scrolled_window->hscrollbar)
     {
+      g_signal_handlers_disconnect_by_func (gtk_range_get_adjustment (GTK_RANGE (scrolled_window->hscrollbar)),
+					    gtk_scrolled_window_adjustment_changed,
+					    scrolled_window);
       gtk_widget_unparent (scrolled_window->hscrollbar);
       gtk_widget_destroy (scrolled_window->hscrollbar);
       g_object_unref (scrolled_window->hscrollbar);
@@ -859,6 +863,9 @@ gtk_scrolled_window_destroy (GtkObject *object)
     }
   if (scrolled_window->vscrollbar)
     {
+      g_signal_handlers_disconnect_by_func (gtk_range_get_adjustment (GTK_RANGE (scrolled_window->vscrollbar)),
+					    gtk_scrolled_window_adjustment_changed,
+					    scrolled_window);
       gtk_widget_unparent (scrolled_window->vscrollbar);
       gtk_widget_destroy (scrolled_window->vscrollbar);
       g_object_unref (scrolled_window->vscrollbar);
@@ -1057,7 +1064,7 @@ static gboolean
 gtk_scrolled_window_expose (GtkWidget      *widget,
 			    GdkEventExpose *event)
 {
-  if (GTK_WIDGET_DRAWABLE (widget))
+  if (gtk_widget_is_drawable (widget))
     {
       gtk_scrolled_window_paint (widget, &event->area);
 
@@ -1210,7 +1217,7 @@ gtk_scrolled_window_move_focus_out (GtkScrolledWindow *scrolled_window,
    * a flag, then propagating the focus motion to the notebook.
    */
   toplevel = gtk_widget_get_toplevel (GTK_WIDGET (scrolled_window));
-  if (!GTK_WIDGET_TOPLEVEL (toplevel))
+  if (!gtk_widget_is_toplevel (toplevel))
     return;
 
   g_object_ref (scrolled_window);
@@ -1253,7 +1260,7 @@ gtk_scrolled_window_size_request (GtkWidget      *widget,
   gtk_widget_size_request (scrolled_window->vscrollbar,
 			   &vscrollbar_requisition);
   
-  if (bin->child && GTK_WIDGET_VISIBLE (bin->child))
+  if (bin->child && gtk_widget_get_visible (bin->child))
     {
       gtk_widget_size_request (bin->child, &child_requisition);
 
@@ -1409,7 +1416,7 @@ gtk_scrolled_window_size_allocate (GtkWidget     *widget,
   else if (scrolled_window->vscrollbar_policy == GTK_POLICY_NEVER)
     scrolled_window->vscrollbar_visible = FALSE;
 
-  if (bin->child && GTK_WIDGET_VISIBLE (bin->child))
+  if (bin->child && gtk_widget_get_visible (bin->child))
     {
       gboolean previous_hvis;
       gboolean previous_vvis;
@@ -1463,7 +1470,7 @@ gtk_scrolled_window_size_allocate (GtkWidget     *widget,
       gtk_widget_get_child_requisition (scrolled_window->hscrollbar,
 					&hscrollbar_requisition);
   
-      if (!GTK_WIDGET_VISIBLE (scrolled_window->hscrollbar))
+      if (!gtk_widget_get_visible (scrolled_window->hscrollbar))
 	gtk_widget_show (scrolled_window->hscrollbar);
 
       child_allocation.x = relative_allocation.x;
@@ -1502,13 +1509,13 @@ gtk_scrolled_window_size_allocate (GtkWidget     *widget,
 
       gtk_widget_size_allocate (scrolled_window->hscrollbar, &child_allocation);
     }
-  else if (GTK_WIDGET_VISIBLE (scrolled_window->hscrollbar))
+  else if (gtk_widget_get_visible (scrolled_window->hscrollbar))
     gtk_widget_hide (scrolled_window->hscrollbar);
 
   if (scrolled_window->vscrollbar_visible)
     {
       GtkRequisition vscrollbar_requisition;
-      if (!GTK_WIDGET_VISIBLE (scrolled_window->vscrollbar))
+      if (!gtk_widget_get_visible (scrolled_window->vscrollbar))
 	gtk_widget_show (scrolled_window->vscrollbar);
 
       gtk_widget_get_child_requisition (scrolled_window->vscrollbar,
@@ -1554,7 +1561,7 @@ gtk_scrolled_window_size_allocate (GtkWidget     *widget,
 
       gtk_widget_size_allocate (scrolled_window->vscrollbar, &child_allocation);
     }
-  else if (GTK_WIDGET_VISIBLE (scrolled_window->vscrollbar))
+  else if (gtk_widget_get_visible (scrolled_window->vscrollbar))
     gtk_widget_hide (scrolled_window->vscrollbar);
 }
 
@@ -1572,7 +1579,7 @@ gtk_scrolled_window_scroll_event (GtkWidget      *widget,
   else
     range = GTK_SCROLLED_WINDOW (widget)->hscrollbar;
 
-  if (range && GTK_WIDGET_VISIBLE (range))
+  if (range && gtk_widget_get_visible (range))
     {
       GtkAdjustment *adj = GTK_RANGE (range)->adjustment;
       gdouble delta, new_value;
@@ -1614,7 +1621,7 @@ gtk_scrolled_window_focus (GtkWidget        *widget,
 	return TRUE;
     }
 
-  if (!had_focus_child && GTK_WIDGET_CAN_FOCUS (widget))
+  if (!had_focus_child && gtk_widget_get_can_focus (widget))
     {
       gtk_widget_grab_focus (widget);
       return TRUE;

@@ -108,7 +108,7 @@ gtk_event_box_init (GtkEventBox *event_box)
 {
   GtkEventBoxPrivate *priv;
 
-  GTK_WIDGET_UNSET_FLAGS (event_box, GTK_NO_WINDOW);
+  gtk_widget_set_has_window (GTK_WIDGET (event_box), TRUE);
  
   priv = GTK_EVENT_BOX_GET_PRIVATE (event_box);
   priv->above_child = FALSE;
@@ -184,7 +184,7 @@ gtk_event_box_get_visible_window (GtkEventBox *event_box)
 {
   g_return_val_if_fail (GTK_IS_EVENT_BOX (event_box), FALSE);
 
-  return !GTK_WIDGET_NO_WINDOW (event_box);
+  return gtk_widget_get_has_window (GTK_WIDGET (event_box));
 }
 
 /**
@@ -242,22 +242,19 @@ gtk_event_box_set_visible_window (GtkEventBox *event_box,
 
   visible_window = visible_window != FALSE;
 
-  if (visible_window != !GTK_WIDGET_NO_WINDOW (widget))
+  if (visible_window != gtk_widget_get_has_window (widget))
     {
-      if (GTK_WIDGET_REALIZED (widget))
+      if (gtk_widget_get_realized (widget))
 	{
-	  gboolean visible = GTK_WIDGET_VISIBLE (widget);
+	  gboolean visible = gtk_widget_get_visible (widget);
 
 	  if (visible)
 	    gtk_widget_hide (widget);
 
 	  gtk_widget_unrealize (widget);
 
-	  if (visible_window)
-	    GTK_WIDGET_UNSET_FLAGS (widget, GTK_NO_WINDOW);
-	  else
-	    GTK_WIDGET_SET_FLAGS (widget, GTK_NO_WINDOW);
-	  
+          gtk_widget_set_has_window (widget, visible_window);
+
 	  gtk_widget_realize (widget);
 
 	  if (visible)
@@ -265,13 +262,10 @@ gtk_event_box_set_visible_window (GtkEventBox *event_box,
 	}
       else
 	{
-	  if (visible_window)
-	    GTK_WIDGET_UNSET_FLAGS (widget, GTK_NO_WINDOW);
-	  else
-	    GTK_WIDGET_SET_FLAGS (widget, GTK_NO_WINDOW);
+          gtk_widget_set_has_window (widget, visible_window);
 	}
 
-      if (GTK_WIDGET_VISIBLE (widget))
+      if (gtk_widget_get_visible (widget))
 	gtk_widget_queue_resize (widget);
       
       g_object_notify (G_OBJECT (event_box), "visible-window");
@@ -336,9 +330,9 @@ gtk_event_box_set_above_child (GtkEventBox *event_box,
     {
       priv->above_child = above_child;
 
-      if (GTK_WIDGET_REALIZED (widget))
+      if (gtk_widget_get_realized (widget))
 	{
-	  if (GTK_WIDGET_NO_WINDOW (widget))
+	  if (!gtk_widget_get_has_window (widget))
 	    {
 	      if (above_child)
 		gdk_window_raise (priv->event_window);
@@ -347,7 +341,7 @@ gtk_event_box_set_above_child (GtkEventBox *event_box,
 	    }
 	  else
 	    {
-	      gboolean visible = GTK_WIDGET_VISIBLE (widget);
+	      gboolean visible = gtk_widget_get_visible (widget);
 
 	      if (visible)
 		gtk_widget_hide (widget);
@@ -361,7 +355,7 @@ gtk_event_box_set_above_child (GtkEventBox *event_box,
 	    }
 	}
 
-      if (GTK_WIDGET_VISIBLE (widget))
+      if (gtk_widget_get_visible (widget))
 	gtk_widget_queue_resize (widget);
       
       g_object_notify (G_OBJECT (event_box), "above-child");
@@ -378,7 +372,7 @@ gtk_event_box_realize (GtkWidget *widget)
   GtkEventBoxPrivate *priv;
   gboolean visible_window;
 
-  GTK_WIDGET_SET_FLAGS (widget, GTK_REALIZED);
+  gtk_widget_set_realized (widget, TRUE);
 
   border_width = GTK_CONTAINER (widget)->border_width;
   
@@ -397,7 +391,7 @@ gtk_event_box_realize (GtkWidget *widget)
 
   priv = GTK_EVENT_BOX_GET_PRIVATE (widget);
 
-  visible_window = !GTK_WIDGET_NO_WINDOW (widget);
+  visible_window = gtk_widget_get_has_window (widget);
   if (visible_window)
     {
       attributes.visual = gtk_widget_get_visual (widget);
@@ -493,7 +487,7 @@ gtk_event_box_size_request (GtkWidget      *widget,
   requisition->width = GTK_CONTAINER (widget)->border_width * 2;
   requisition->height = GTK_CONTAINER (widget)->border_width * 2;
 
-  if (bin->child && GTK_WIDGET_VISIBLE (bin->child))
+  if (bin->child && gtk_widget_get_visible (bin->child))
     {
       GtkRequisition child_requisition;
       
@@ -515,7 +509,7 @@ gtk_event_box_size_allocate (GtkWidget     *widget,
   widget->allocation = *allocation;
   bin = GTK_BIN (widget);
   
-  if (GTK_WIDGET_NO_WINDOW (widget))
+  if (!gtk_widget_get_has_window (widget))
     {
       child_allocation.x = allocation->x + GTK_CONTAINER (widget)->border_width;
       child_allocation.y = allocation->y + GTK_CONTAINER (widget)->border_width;
@@ -528,7 +522,7 @@ gtk_event_box_size_allocate (GtkWidget     *widget,
   child_allocation.width = MAX (allocation->width - GTK_CONTAINER (widget)->border_width * 2, 0);
   child_allocation.height = MAX (allocation->height - GTK_CONTAINER (widget)->border_width * 2, 0);
 
-  if (GTK_WIDGET_REALIZED (widget))
+  if (gtk_widget_get_realized (widget))
     {
       priv = GTK_EVENT_BOX_GET_PRIVATE (widget);
 
@@ -539,7 +533,7 @@ gtk_event_box_size_allocate (GtkWidget     *widget,
 				child_allocation.width,
 				child_allocation.height);
       
-      if (!GTK_WIDGET_NO_WINDOW (widget))
+      if (gtk_widget_get_has_window (widget))
 	gdk_window_move_resize (widget->window,
 				allocation->x + GTK_CONTAINER (widget)->border_width,
 				allocation->y + GTK_CONTAINER (widget)->border_width,
@@ -555,7 +549,7 @@ static void
 gtk_event_box_paint (GtkWidget    *widget,
 		     GdkRectangle *area)
 {
-  if (!GTK_WIDGET_APP_PAINTABLE (widget))
+  if (!gtk_widget_get_app_paintable (widget))
     gtk_paint_flat_box (widget->style, widget->window,
 			widget->state, GTK_SHADOW_NONE,
 			area, widget, "eventbox",
@@ -566,9 +560,9 @@ static gboolean
 gtk_event_box_expose (GtkWidget      *widget,
 		     GdkEventExpose *event)
 {
-  if (GTK_WIDGET_DRAWABLE (widget))
+  if (gtk_widget_is_drawable (widget))
     {
-      if (!GTK_WIDGET_NO_WINDOW (widget))
+      if (gtk_widget_get_has_window (widget))
 	gtk_event_box_paint (widget, &event->area);
 
       GTK_WIDGET_CLASS (gtk_event_box_parent_class)->expose_event (widget, event);

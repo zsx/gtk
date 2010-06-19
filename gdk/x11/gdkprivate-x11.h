@@ -138,6 +138,10 @@ void     _gdk_x11_window_queue_translation (GdkWindow *window,
 void     _gdk_selection_window_destroyed   (GdkWindow            *window);
 gboolean _gdk_selection_filter_clear_event (XSelectionClearEvent *event);
 
+GdkRegion* _xwindow_get_shape              (Display *xdisplay,
+                                            Window window,
+                                            gint shape_type);
+
 void     _gdk_region_get_xrectangles       (const GdkRegion      *region,
                                             gint                  x_offset,
                                             gint                  y_offset,
@@ -153,8 +157,8 @@ void _gdk_keymap_state_changed    (GdkDisplay      *display,
 void _gdk_keymap_keys_changed     (GdkDisplay      *display);
 gint _gdk_x11_get_group_for_state (GdkDisplay      *display,
 				   GdkModifierType  state);
-void _gdk_keymap_add_virtual_modifiers (GdkKeymap       *keymap,
-					GdkModifierType *modifiers);
+void _gdk_keymap_add_virtual_modifiers_compat (GdkKeymap       *keymap,
+                                               GdkModifierType *modifiers);
 gboolean _gdk_keymap_key_is_modifier   (GdkKeymap       *keymap,
 					guint            keycode);
 

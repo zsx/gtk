@@ -39,10 +39,9 @@ G_BEGIN_DECLS
 typedef struct _GtkAccessible                GtkAccessible;
 typedef struct _GtkAccessibleClass           GtkAccessibleClass;
 
-  /**
+  /*
    * This object is a thin wrapper, in the GTK+ namespace, for AtkObject
    */
-
 struct _GtkAccessible
 {
   AtkObject parent;
@@ -51,7 +50,7 @@ struct _GtkAccessible
    * The GtkWidget whose properties and features are exported via this 
    * accessible instance.
    */
-  GtkWidget *widget;
+  GtkWidget *GSEAL (widget);
 };
 
 struct _GtkAccessibleClass

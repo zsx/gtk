@@ -34,7 +34,7 @@ When it makes sense, key values can be converted to and from
 Unicode characters with gdk_keyval_to_unicode() and gdk_unicode_to_keyval().
 </para>
 
-<para>
+<para id="key-group-explanation">
 One #GdkKeymap object exists for each user display. gdk_keymap_get_default() 
 returns the #GdkKeymap for the default display; to obtain keymaps for other 
 displays, use gdk_keymap_get_for_display(). A keymap
@@ -86,6 +86,9 @@ gdk_keymap_translate_keyboard_state() just to get the keyval.
 </para>
 
 <!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### SECTION Image ##### -->
 
 
 <!-- ##### STRUCT GdkKeymap ##### -->
@@ -143,6 +146,7 @@ be mapped to a keyval.
 
 </para>
 
+@void: 
 @Returns: 
 
 
@@ -231,6 +235,25 @@ Returns: %PANGO_DIRECTION_LTR or %PANGO_DIRECTION_RTL.
 </para>
 
 @keymap: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gdk_keymap_add_virtual_modifiers ##### -->
+<para>
+
+</para>
+
+@keymap: 
+@state: 
+
+
+<!-- ##### FUNCTION gdk_keymap_map_virtual_modifiers ##### -->
+<para>
+
+</para>
+
+@keymap: 
+@state: 
 @Returns: 
 
 

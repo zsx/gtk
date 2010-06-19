@@ -29,6 +29,9 @@ exactly this, so you can ignore the presence of the viewport.
 <!-- ##### SECTION Stability_Level ##### -->
 
 
+<!-- ##### SECTION Image ##### -->
+
+
 <!-- ##### STRUCT GtkViewport ##### -->
 <para>
 
@@ -115,6 +118,15 @@ exactly this, so you can ignore the presence of the viewport.
 
 
 <!-- ##### FUNCTION gtk_viewport_get_shadow_type ##### -->
+<para>
+
+</para>
+
+@viewport: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gtk_viewport_get_bin_window ##### -->
 <para>
 
 </para>

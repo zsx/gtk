@@ -119,7 +119,7 @@ gdk_keymap_x11_get_type (void)
 
   if (!object_type)
     {
-      static const GTypeInfo object_info =
+      const GTypeInfo object_info =
 	{
 	  sizeof (GdkKeymapClass),
 	  (GBaseInitFunc) NULL,
@@ -834,11 +834,11 @@ gdk_keymap_get_caps_lock_state (GdkKeymap *keymap)
 
 /**
  * gdk_keymap_get_entries_for_keyval:
- * @keymap: a #GdkKeymap, or %NULL to use the default keymap
+ * @keymap: (allow-none): a #GdkKeymap, or %NULL to use the default keymap
  * @keyval: a keyval, such as %GDK_a, %GDK_Up, %GDK_Return, etc.
- * @keys: return location for an array of #GdkKeymapKey
- * @n_keys: return location for number of elements in returned array
- * 
+ * @keys: (out): return location for an array of #GdkKeymapKey
+ * @n_keys: (out): return location for number of elements in returned array
+ *
  * Obtains a list of keycode/group/level combinations that will
  * generate @keyval. Groups and levels are two kinds of keyboard mode;
  * in general, the level determines whether the top or bottom symbol
@@ -984,10 +984,10 @@ gdk_keymap_get_entries_for_keyval (GdkKeymap     *keymap,
 
 /**
  * gdk_keymap_get_entries_for_keycode:
- * @keymap: a #GdkKeymap or %NULL to use the default keymap
+ * @keymap: (allow-none): a #GdkKeymap or %NULL to use the default keymap
  * @hardware_keycode: a keycode
- * @keys: return location for array of #GdkKeymapKey, or %NULL
- * @keyvals: return location for array of keyvals, or %NULL
+ * @keys: (out): return location for array of #GdkKeymapKey, or %NULL
+ * @keyvals: (out): return location for array of keyvals, or %NULL
  * @n_entries: length of @keys and @keyvals
  *
  * Returns the keyvals bound to @hardware_keycode.
@@ -1198,8 +1198,8 @@ MyEnhancedXkbTranslateKeyCode(register XkbDescPtr     xkb,
                               register unsigned int   mods,
                               unsigned int *          mods_rtrn,
                               KeySym *                keysym_rtrn,
-                              unsigned int *          group_rtrn,
-                              unsigned int *          level_rtrn)
+                              int *                   group_rtrn,
+                              int *                   level_rtrn)
 {
     XkbKeyTypeRec *type;
     int col,nKeyGroups;
@@ -1324,8 +1324,8 @@ translate_keysym (GdkKeymapX11   *keymap_x11,
 		  guint           hardware_keycode,
 		  gint            group,
 		  GdkModifierType state,
-		  guint          *effective_group,
-		  guint          *effective_level)
+		  gint           *effective_group,
+		  gint           *effective_level)
 {
   const KeySym *map = get_keymap (keymap_x11);
   const KeySym *syms = map + (hardware_keycode - keymap_x11->min_keycode) * keymap_x11->keysyms_per_keycode;
@@ -1409,20 +1409,20 @@ translate_keysym (GdkKeymapX11   *keymap_x11,
 
 /**
  * gdk_keymap_translate_keyboard_state:
- * @keymap: a #GdkKeymap, or %NULL to use the default
+ * @keymap: (allow-none): a #GdkKeymap, or %NULL to use the default
  * @hardware_keycode: a keycode
- * @state: a modifier state 
+ * @state: a modifier state
  * @group: active keyboard group
- * @keyval: return location for keyval, or %NULL
- * @effective_group: return location for effective group, or %NULL
- * @level: return location for level, or %NULL
- * @consumed_modifiers: return location for modifiers that were used to
+ * @keyval: (out) (allow-none): return location for keyval, or %NULL
+ * @effective_group: (out) (allow-none): return location for effective group, or %NULL
+ * @level: (out) (allow-none):  return location for level, or %NULL
+ * @consumed_modifiers: (out) (allow-none):  return location for modifiers that were used to
  *     determine the group or level, or %NULL
  *
  * Translates the contents of a #GdkEventKey into a keyval, effective
  * group, and level. Modifiers that affected the translation and
  * are thus unavailable for application use are returned in
- * @consumed_modifiers.  See gdk_keyval_get_keys() for an explanation of
+ * @consumed_modifiers.  See <xref linkend="key-group-explanation"/> for an explanation of
  * groups and levels.  The @effective_group is the group that was
  * actually used for the translation; some keys such as Enter are not
  * affected by the active keyboard group. The @level is derived from
@@ -1657,8 +1657,8 @@ _gdk_x11_get_group_for_state (GdkDisplay      *display,
 }
 
 void
-_gdk_keymap_add_virtual_modifiers (GdkKeymap       *keymap,
-				   GdkModifierType *modifiers)
+_gdk_keymap_add_virtual_modifiers_compat (GdkKeymap       *keymap,
+				          GdkModifierType *modifiers)
 {
   GdkKeymapX11 *keymap_x11;
   int i;
@@ -1678,6 +1678,51 @@ _gdk_keymap_add_virtual_modifiers (GdkKeymap       *keymap,
 	    *modifiers |= GDK_HYPER_MASK;
 	  else if (keymap_x11->modmap[i] & GDK_META_MASK)
 	    *modifiers |= GDK_META_MASK;
+        }
+    }
+}
+
+/**
+ * gdk_keymap_add_virtual_modifiers:
+ * @keymap: a #GdkKeymap
+ * @state: pointer to the modifier mask to change
+ *
+ * Adds virtual modifiers (i.e. Super, Hyper and Meta) which correspond
+ * to the real modifiers (i.e Mod2, Mod3, ...) in @modifiers.
+ * are set in @state to their non-virtual counterparts (i.e. Mod2,
+ * Mod3,...) and set the corresponding bits in @state.
+ *
+ * GDK already does this before delivering key events, but for
+ * compatibility reasons, it only sets the first virtual modifier
+ * it finds, whereas this function sets all matching virtual modifiers.
+ *
+ * This function is useful when matching key events against
+ * accelerators.
+ *
+ * Since: 2.20
+ */
+void
+gdk_keymap_add_virtual_modifiers (GdkKeymap       *keymap,
+			          GdkModifierType *state)
+{
+  GdkKeymapX11 *keymap_x11;
+  int i;
+
+  keymap = GET_EFFECTIVE_KEYMAP (keymap);
+  keymap_x11 = GDK_KEYMAP_X11 (keymap);
+
+  for (i = 3; i < 8; i++)
+    {
+      if ((1 << i) & *state)
+        {
+	  if (keymap_x11->modmap[i] & GDK_MOD1_MASK)
+	    *state |= GDK_MOD1_MASK;
+	  if (keymap_x11->modmap[i] & GDK_SUPER_MASK)
+	    *state |= GDK_SUPER_MASK;
+	  if (keymap_x11->modmap[i] & GDK_HYPER_MASK)
+	    *state |= GDK_HYPER_MASK;
+	  if (keymap_x11->modmap[i] & GDK_META_MASK)
+	    *state |= GDK_META_MASK;
         }
     }
 }
@@ -1715,6 +1760,61 @@ _gdk_keymap_key_is_modifier (GdkKeymap *keymap,
     }
 
   return FALSE;
+}
+
+/**
+ * gdk_keymap_map_virtual_modifiers:
+ * @keymap: a #GdkKeymap
+ * @state: pointer to the modifier state to map
+ *
+ * Maps the virtual modifiers (i.e. Super, Hyper and Meta) which
+ * are set in @state to their non-virtual counterparts (i.e. Mod2,
+ * Mod3,...) and set the corresponding bits in @state.
+ *
+ * This function is useful when matching key events against
+ * accelerators.
+ *
+ * Returns: %TRUE if no virtual modifiers were mapped to the
+ *     same non-virtual modifier. Note that %FALSE is also returned
+ *     if a virtual modifier is mapped to a non-virtual modifier that
+ *     was already set in @state.
+ *
+ * Since: 2.20
+ */
+gboolean
+gdk_keymap_map_virtual_modifiers (GdkKeymap       *keymap,
+                                  GdkModifierType *state)
+{
+  GdkKeymapX11 *keymap_x11;
+  const guint vmods[] = {
+    GDK_SUPER_MASK, GDK_HYPER_MASK, GDK_META_MASK
+  };
+  int i, j;
+  gboolean retval;
+
+  keymap = GET_EFFECTIVE_KEYMAP (keymap);
+  keymap_x11 = GDK_KEYMAP_X11 (keymap);
+
+  retval = TRUE;
+
+  for (j = 0; j < 3; j++)
+    {
+      if (*state & vmods[j])
+        {
+          for (i = 3; i < 8; i++)
+            {
+              if (keymap_x11->modmap[i] & vmods[j])
+                {
+                  if (*state & (1 << i))
+                    retval = FALSE;
+                  else
+                    *state |= 1 << i;
+                }
+            }
+        }
+    }
+
+  return retval;
 }
 
 

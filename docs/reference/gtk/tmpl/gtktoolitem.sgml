@@ -17,6 +17,9 @@ GtkToolItem
 <!-- ##### SECTION Stability_Level ##### -->
 
 
+<!-- ##### SECTION Image ##### -->
+
+
 <!-- ##### STRUCT GtkToolItem ##### -->
 <para>
 
@@ -69,6 +72,7 @@ GtkToolItem
 
 </para>
 
+@void: 
 @Returns: 
 
 
@@ -209,6 +213,15 @@ GtkToolItem
 @Returns: 
 
 
+<!-- ##### FUNCTION gtk_tool_item_get_ellipsize_mode ##### -->
+<para>
+
+</para>
+
+@tool_item: 
+@Returns: 
+
+
 <!-- ##### FUNCTION gtk_tool_item_get_icon_size ##### -->
 <para>
 
@@ -237,6 +250,24 @@ GtkToolItem
 
 
 <!-- ##### FUNCTION gtk_tool_item_get_relief_style ##### -->
+<para>
+
+</para>
+
+@tool_item: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gtk_tool_item_get_text_alignment ##### -->
+<para>
+
+</para>
+
+@tool_item: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gtk_tool_item_get_text_orientation ##### -->
 <para>
 
 </para>
@@ -288,5 +319,14 @@ GtkToolItem
 </para>
 
 @tool_item: 
+
+
+<!-- ##### FUNCTION gtk_tool_item_get_text_size_group ##### -->
+<para>
+
+</para>
+
+@tool_item: 
+@Returns: 
 
 

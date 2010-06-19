@@ -229,6 +229,8 @@ gdk_gc_finalize (GObject *object)
  * Deprecated function; use g_object_ref() instead.
  *
  * Return value: the gc.
+ *
+ * Deprecated: 2.0: Use g_object_ref() instead.
  **/
 GdkGC *
 gdk_gc_ref (GdkGC *gc)
@@ -242,7 +244,7 @@ gdk_gc_ref (GdkGC *gc)
  *
  * Decrement the reference count of @gc.
  *
- * Deprecated: Use g_object_unref() instead.
+ * Deprecated: 2.0: Use g_object_unref() instead.
  **/
 void
 gdk_gc_unref (GdkGC *gc)
@@ -680,6 +682,7 @@ _gdk_gc_add_drawable_clip (GdkGC     *gc,
 			      -1, -1);
 	  gdk_gc_set_clip_region (tmp_gc, NULL);
 	  gdk_gc_set_clip_mask (gc, new_mask);
+	  g_object_unref (new_mask);
 	}
       else if (overlap == GDK_OVERLAP_RECTANGLE_OUT)
 	{

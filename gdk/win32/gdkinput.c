@@ -73,7 +73,7 @@ gdk_device_get_type (void)
 
   if (!object_type)
     {
-      static const GTypeInfo object_info =
+      const GTypeInfo object_info =
 	{
 	  sizeof (GdkDeviceClass),
 	  (GBaseInitFunc) NULL,
@@ -314,14 +314,12 @@ void
 _gdk_input_crossing_event (GdkWindow *window,
 			   gboolean enter)
 {
-  GdkWindowObject *priv = (GdkWindowObject *)window;
-  GdkInputWindow *input_window;
-  gint root_x, root_y;
-
   if (enter)
     {
-#if 0
-      /* No idea what to do... */
+#if 0 /* No idea what to do... */
+      GdkWindowObject *priv = (GdkWindowObject *)window;
+      GdkInputWindow *input_window;
+      gint root_x, root_y;
 #if 0
       gdk_input_check_proximity(display);
 #endif

@@ -363,7 +363,7 @@ popup_position_func (GtkMenu  *menu,
   gint monitor_num;
   GdkRectangle monitor;
   
-  g_return_if_fail (GTK_WIDGET_REALIZED (link_button));
+  g_return_if_fail (gtk_widget_get_realized (widget));
 
   gdk_window_get_origin (widget->window, x, y);
 
@@ -412,7 +412,7 @@ gtk_link_button_do_popup (GtkLinkButton  *link_button,
       time = gtk_get_current_event_time ();
     }
 
-  if (GTK_WIDGET_REALIZED (link_button))
+  if (gtk_widget_get_realized (GTK_WIDGET (link_button)))
     {
       GtkWidget *menu_item;
       
@@ -452,7 +452,7 @@ static gboolean
 gtk_link_button_button_press (GtkWidget      *widget,
 			      GdkEventButton *event)
 {
-  if (!GTK_WIDGET_HAS_FOCUS (widget))
+  if (!gtk_widget_has_focus (widget))
     gtk_widget_grab_focus (widget);
 
   if ((event->button == 3) && (event->type == GDK_BUTTON_PRESS))
@@ -600,11 +600,11 @@ gtk_link_button_new (const gchar *uri)
 /**
  * gtk_link_button_new_with_label:
  * @uri: a valid URI
- * @label: the text of the button
+ * @label: (allow-none): the text of the button
  *
  * Creates a new #GtkLinkButton containing a label.
  *
- * Return value: a new link button widget.
+ * Return value: (transfer none): a new link button widget.
  *
  * Since: 2.10
  */
@@ -703,9 +703,9 @@ gtk_link_button_get_uri (GtkLinkButton *link_button)
 
 /**
  * gtk_link_button_set_uri_hook:
- * @func: a function called each time a #GtkLinkButton is clicked, or %NULL
- * @data: user data to be passed to @func, or %NULL
- * @destroy: a #GDestroyNotify that gets called when @data is no longer needed, or %NULL
+ * @func: (allow-none): a function called each time a #GtkLinkButton is clicked, or %NULL
+ * @data: (allow-none): user data to be passed to @func, or %NULL
+ * @destroy: (allow-none): a #GDestroyNotify that gets called when @data is no longer needed, or %NULL
  *
  * Sets @func as the function that should be invoked every time a user clicks
  * a #GtkLinkButton. This function is called before every callback registered

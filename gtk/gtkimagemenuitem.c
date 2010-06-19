@@ -326,7 +326,7 @@ gtk_image_menu_item_toggle_size_request (GtkMenuItem *menu_item,
 
   *requisition = 0;
 
-  if (image_menu_item->image && GTK_WIDGET_VISIBLE (image_menu_item->image))
+  if (image_menu_item->image && gtk_widget_get_visible (image_menu_item->image))
     {
       GtkRequisition image_requisition;
       guint toggle_spacing;
@@ -420,7 +420,7 @@ gtk_image_menu_item_size_request (GtkWidget      *widget,
 
   image_menu_item = GTK_IMAGE_MENU_ITEM (widget);
 
-  if (image_menu_item->image && GTK_WIDGET_VISIBLE (image_menu_item->image))
+  if (image_menu_item->image && gtk_widget_get_visible (image_menu_item->image))
     {
       GtkRequisition child_requisition;
       
@@ -464,7 +464,7 @@ gtk_image_menu_item_size_allocate (GtkWidget     *widget,
 
   GTK_WIDGET_CLASS (gtk_image_menu_item_parent_class)->size_allocate (widget, allocation);
 
-  if (image_menu_item->image && GTK_WIDGET_VISIBLE (image_menu_item->image))
+  if (image_menu_item->image && gtk_widget_get_visible (image_menu_item->image))
     {
       gint x, y, offset;
       GtkRequisition child_requisition;
@@ -671,6 +671,8 @@ gtk_image_menu_item_sync_action_properties (GtkActivatable *activatable,
       !activatable_update_gicon (image_menu_item, action))
     activatable_update_icon_name (image_menu_item, action);
 
+  gtk_image_menu_item_set_always_show_image (image_menu_item,
+                                             gtk_action_get_always_show_image (action));
 }
 
 
@@ -845,9 +847,8 @@ gtk_image_menu_item_set_always_show_image (GtkImageMenuItem *image_menu_item,
 /**
  * gtk_image_menu_item_get_always_show_image:
  * @image_menu_item: a #GtkImageMenuItem
- * @always_show: %TRUE if the menuitem should always show the image
  *
- * Returns whether the menu item will ignore the #GtkSettings:gtk-menu-images 
+ * Returns whether the menu item will ignore the #GtkSettings:gtk-menu-images
  * setting and always show the image, if available.
  * 
  * Returns: %TRUE if the menu item will always show the image
@@ -915,8 +916,8 @@ gtk_image_menu_item_set_accel_group (GtkImageMenuItem *image_menu_item,
 /** 
  * gtk_image_menu_item_set_image:
  * @image_menu_item: a #GtkImageMenuItem.
- * @image: a widget to set as the image for the menu item.
- * 
+ * @image: (allow-none): a widget to set as the image for the menu item.
+ *
  * Sets the image of @image_menu_item to the given widget.
  * Note that it depends on the show-menu-images setting whether
  * the image will be displayed or not.
@@ -976,12 +977,13 @@ gtk_image_menu_item_remove (GtkContainer *container,
     {
       gboolean widget_was_visible;
       
-      widget_was_visible = GTK_WIDGET_VISIBLE (child);
+      widget_was_visible = gtk_widget_get_visible (child);
       
       gtk_widget_unparent (child);
       image_menu_item->image = NULL;
       
-      if (GTK_WIDGET_VISIBLE (container) && widget_was_visible)
+      if (widget_was_visible &&
+          gtk_widget_get_visible (GTK_WIDGET (container)))
         gtk_widget_queue_resize (GTK_WIDGET (container));
 
       g_object_notify (G_OBJECT (image_menu_item), "image");

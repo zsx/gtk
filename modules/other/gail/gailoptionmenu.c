@@ -212,7 +212,7 @@ gail_option_menu_do_action (AtkAction *action,
      */
     return FALSE;
 
-  if (!GTK_WIDGET_SENSITIVE (widget) || !GTK_WIDGET_VISIBLE (widget))
+  if (!gtk_widget_get_sensitive (widget) || !gtk_widget_get_visible (widget))
     return FALSE;
 
   switch (i)
@@ -243,13 +243,13 @@ idle_do_action (gpointer data)
 
   widget = GTK_ACCESSIBLE (gail_button)->widget;
   if (widget == NULL /* State is defunct */ ||
-      !GTK_WIDGET_SENSITIVE (widget) || !GTK_WIDGET_VISIBLE (widget))
+      !gtk_widget_get_sensitive (widget) || !gtk_widget_get_visible (widget))
     return FALSE;
 
   button = GTK_BUTTON (widget); 
 
   button->in_button = TRUE;
-  gtk_button_enter (button);
+  g_signal_emit_by_name (button, "enter");
   /*
    * Simulate a button press event. calling gtk_button_pressed() does
    * not get the job done for a GtkOptionMenu.  

@@ -814,7 +814,7 @@ color_sample_draw_sample (GtkColorSelection *colorsel, int which)
   priv = colorsel->private_data;
   
   g_return_if_fail (priv->sample_area != NULL);
-  if (!GTK_WIDGET_DRAWABLE (priv->sample_area))
+  if (!gtk_widget_is_drawable (priv->sample_area))
     return;
 
   if (which == 0)
@@ -945,6 +945,30 @@ color_sample_setup_dnd (GtkColorSelection *colorsel, GtkWidget *sample)
   
 }
 
+static void
+update_tooltips (GtkColorSelection *colorsel)
+{
+  ColorSelectionPrivate *priv;
+
+  priv = colorsel->private_data;
+
+  if (priv->has_palette == TRUE)
+    {
+      gtk_widget_set_tooltip_text (priv->old_sample,
+                            _("The previously-selected color, for comparison to the color you're selecting now. You can drag this color to a palette entry, or select this color as current by dragging it to the other color swatch alongside."));
+
+      gtk_widget_set_tooltip_text (priv->cur_sample,
+                            _("The color you've chosen. You can drag this color to a palette entry to save it for use in the future."));
+    }
+  else
+    {
+      gtk_widget_set_tooltip_text (priv->old_sample,
+                            _("The previously-selected color, for comparison to the color you're selecting now."));
+
+      gtk_widget_set_tooltip_text (priv->cur_sample,
+                            _("The color you've chosen."));
+    }
+}
 
 static void
 color_sample_new (GtkColorSelection *colorsel)
@@ -972,13 +996,8 @@ color_sample_new (GtkColorSelection *colorsel)
   color_sample_setup_dnd (colorsel, priv->old_sample);
   color_sample_setup_dnd (colorsel, priv->cur_sample);
 
-  gtk_widget_set_tooltip_text (priv->old_sample,
-                        _("The previously-selected color, for comparison to the color you're selecting now. You can drag this color to a palette entry, or select this color as current by dragging it to the other color swatch alongside."));
+  update_tooltips (colorsel);
 
-
-  gtk_widget_set_tooltip_text (priv->cur_sample,
-                        _("The color you've chosen. You can drag this color to a palette entry to save it for use in the future."));
-  
   gtk_widget_show_all (priv->sample_area);
 }
 
@@ -1030,7 +1049,7 @@ palette_paint (GtkWidget    *drawing_area,
   gdk_cairo_rectangle (cr, area);
   cairo_fill (cr);
   
-  if (GTK_WIDGET_HAS_FOCUS (drawing_area))
+  if (gtk_widget_has_focus (drawing_area))
     {
       set_focus_line_attributes (drawing_area, cr, &focus_width);
 
@@ -1068,7 +1087,7 @@ set_focus_line_attributes (GtkWidget *drawing_area,
 
   if (dash_list[0])
     {
-      gint n_dashes = strlen (dash_list);
+      gint n_dashes = strlen ((gchar *)dash_list);
       gdouble *dashes = g_new (gdouble, n_dashes);
       gdouble total_length = 0;
       gdouble dash_offset;
@@ -1312,7 +1331,7 @@ popup_position_func (GtkMenu   *menu,
   
   widget = GTK_WIDGET (user_data);
   
-  g_return_if_fail (GTK_WIDGET_REALIZED (widget));
+  g_return_if_fail (gtk_widget_get_realized (widget));
 
   gdk_window_get_origin (widget->window, &root_x, &root_y);
   
@@ -1528,7 +1547,7 @@ palette_new (GtkColorSelection *colorsel)
   
   retval = gtk_drawing_area_new ();
 
-  GTK_WIDGET_SET_FLAGS (retval, GTK_CAN_FOCUS);
+  gtk_widget_set_can_focus (retval, TRUE);
   
   g_object_set_data (G_OBJECT (retval), I_("color_set"), GINT_TO_POINTER (0)); 
   gtk_widget_set_events (retval, GDK_BUTTON_PRESS_MASK
@@ -2364,7 +2383,9 @@ gtk_color_selection_set_has_palette (GtkColorSelection *colorsel,
 	gtk_widget_show (priv->palette_frame);
       else
 	gtk_widget_hide (priv->palette_frame);
-      
+
+      update_tooltips (colorsel);
+
       g_object_notify (G_OBJECT (colorsel), "has-palette");
     }
 }
@@ -2459,7 +2480,7 @@ gtk_color_selection_set_color (GtkColorSelection    *colorsel,
 /**
  * gtk_color_selection_get_current_color:
  * @colorsel: a #GtkColorSelection.
- * @color: a #GdkColor to fill in with the current color.
+ * @color: (out): a #GdkColor to fill in with the current color.
  *
  * Sets @color to be the current color in the GtkColorSelection widget.
  **/
@@ -2504,7 +2525,7 @@ gtk_color_selection_get_current_alpha (GtkColorSelection *colorsel)
  *
  * Sets @color to be the current color in the GtkColorSelection widget.
  *
- * Deprecated: Use gtk_color_selection_get_current_color() instead.
+ * Deprecated: 2.0: Use gtk_color_selection_get_current_color() instead.
  **/
 void
 gtk_color_selection_get_color (GtkColorSelection *colorsel,

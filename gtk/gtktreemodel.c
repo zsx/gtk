@@ -257,6 +257,9 @@ gtk_tree_model_base_init (gpointer g_class)
        * @path: a #GtkTreePath identifying the tree node whose children
        *        have been reordered
        * @iter: a valid #GtkTreeIter pointing to the node whose 
+       * @new_order: an array of integers mapping the current position of
+       *             each child to its old position before the re-ordering,
+       *             i.e. @new_order<literal>[newpos] = oldpos</literal>.
        *
        * This signal is emitted when the children of a node in the #GtkTreeModel
        * have been reordered. 
@@ -1120,7 +1123,7 @@ gtk_tree_model_get_path (GtkTreeModel *tree_model,
  * @tree_model: A #GtkTreeModel.
  * @iter: The #GtkTreeIter.
  * @column: The column to lookup the value at.
- * @value: An empty #GValue to set.
+ * @value: (inout) (transfer none) An empty #GValue to set.
  *
  * Initializes and sets @value to that at @column.
  * When done with @value, g_value_unset() needs to be called 
@@ -1173,10 +1176,10 @@ gtk_tree_model_iter_next (GtkTreeModel  *tree_model,
  * gtk_tree_model_iter_children:
  * @tree_model: A #GtkTreeModel.
  * @iter: The new #GtkTreeIter to be set to the child.
- * @parent: The #GtkTreeIter, or %NULL
+ * @parent: (allow-none): The #GtkTreeIter, or %NULL
  *
- * Sets @iter to point to the first child of @parent.  If @parent has no 
- * children, %FALSE is returned and @iter is set to be invalid.  @parent 
+ * Sets @iter to point to the first child of @parent.  If @parent has no
+ * children, %FALSE is returned and @iter is set to be invalid.  @parent
  * will remain a valid node after this function has been called.
  *
  * If @parent is %NULL returns the first node, equivalent to
@@ -1229,7 +1232,7 @@ gtk_tree_model_iter_has_child (GtkTreeModel *tree_model,
 /**
  * gtk_tree_model_iter_n_children:
  * @tree_model: A #GtkTreeModel.
- * @iter: The #GtkTreeIter, or %NULL.
+ * @iter: (allow-none): The #GtkTreeIter, or %NULL.
  *
  * Returns the number of children that @iter has.  As a special case, if @iter
  * is %NULL, then the number of toplevel nodes is returned.
@@ -1254,7 +1257,7 @@ gtk_tree_model_iter_n_children (GtkTreeModel *tree_model,
  * gtk_tree_model_iter_nth_child:
  * @tree_model: A #GtkTreeModel.
  * @iter: The #GtkTreeIter to set to the nth child.
- * @parent: The #GtkTreeIter to get the child from, or %NULL.
+ * @parent: (allow-none): The #GtkTreeIter to get the child from, or %NULL.
  * @n: Then index of the desired child.
  *
  * Sets @iter to be the child of @parent, using the given index.  The first
@@ -2031,7 +2034,7 @@ gtk_tree_row_reference_get_model (GtkTreeRowReference *reference)
 
 /**
  * gtk_tree_row_reference_valid:
- * @reference: A #GtkTreeRowReference, or %NULL
+ * @reference: (allow-none): A #GtkTreeRowReference, or %NULL
  * 
  * Returns %TRUE if the @reference is non-%NULL and refers to a current valid
  * path.
@@ -2068,7 +2071,7 @@ gtk_tree_row_reference_copy (GtkTreeRowReference *reference)
 
 /**
  * gtk_tree_row_reference_free:
- * @reference: A #GtkTreeRowReference, or %NULL
+ * @reference: (allow-none): A #GtkTreeRowReference, or %NULL
  * 
  * Free's @reference. @reference may be %NULL.
  **/

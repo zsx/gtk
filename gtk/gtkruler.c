@@ -306,7 +306,7 @@ gtk_ruler_set_metric (GtkRuler      *ruler,
 
   ruler->metric = (GtkRulerMetric *) &ruler_metrics[metric];
 
-  if (GTK_WIDGET_DRAWABLE (ruler))
+  if (gtk_widget_is_drawable (GTK_WIDGET (ruler)))
     gtk_widget_queue_draw (GTK_WIDGET (ruler));
 
   g_object_notify (G_OBJECT (ruler), "metric");
@@ -379,16 +379,16 @@ gtk_ruler_set_range (GtkRuler *ruler,
     }
   g_object_thaw_notify (G_OBJECT (ruler));
 
-  if (GTK_WIDGET_DRAWABLE (ruler))
+  if (gtk_widget_is_drawable (GTK_WIDGET (ruler)))
     gtk_widget_queue_draw (GTK_WIDGET (ruler));
 }
 
 /**
  * gtk_ruler_get_range:
  * @ruler: a #GtkRuler
- * @lower: location to store lower limit of the ruler, or %NULL
- * @upper: location to store upper limit of the ruler, or %NULL
- * @position: location to store the current position of the mark on the ruler, or %NULL
+ * @lower: (allow-none): location to store lower limit of the ruler, or %NULL
+ * @upper: (allow-none): location to store upper limit of the ruler, or %NULL
+ * @position: (allow-none): location to store the current position of the mark on the ruler, or %NULL
  * @max_size: location to store the maximum size of the ruler used when calculating
  *            the space to leave for the text, or %NULL.
  *
@@ -441,7 +441,8 @@ gtk_ruler_realize (GtkWidget *widget)
   gint attributes_mask;
 
   ruler = GTK_RULER (widget);
-  GTK_WIDGET_SET_FLAGS (ruler, GTK_REALIZED);
+
+  gtk_widget_set_realized (widget, TRUE);
 
   attributes.window_type = GDK_WINDOW_CHILD;
   attributes.x = widget->allocation.x;
@@ -513,7 +514,7 @@ gtk_ruler_size_allocate (GtkWidget     *widget,
 
   widget->allocation = *allocation;
 
-  if (GTK_WIDGET_REALIZED (widget))
+  if (gtk_widget_get_realized (widget))
     {
       gdk_window_move_resize (widget->window,
 			      allocation->x, allocation->y,
@@ -554,7 +555,7 @@ static gboolean
 gtk_ruler_expose (GtkWidget      *widget,
 		  GdkEventExpose *event)
 {
-  if (GTK_WIDGET_DRAWABLE (widget))
+  if (gtk_widget_is_drawable (widget))
     {
       GtkRuler *ruler = GTK_RULER (widget);
 
@@ -632,7 +633,7 @@ gtk_ruler_real_draw_ticks (GtkRuler *ruler)
   PangoLayout *layout;
   PangoRectangle logical_rect, ink_rect;
 
-  if (!GTK_WIDGET_DRAWABLE (ruler))
+  if (!gtk_widget_is_drawable (widget))
     return;
 
   xthickness = widget->style->xthickness;
@@ -783,7 +784,7 @@ gtk_ruler_real_draw_ticks (GtkRuler *ruler)
 
                   gtk_paint_layout (widget->style,
                                     ruler->backing_store,
-                                    GTK_WIDGET_STATE (widget),
+                                    gtk_widget_get_state (widget),
                                     FALSE,
                                     NULL,
                                     widget,
@@ -800,7 +801,7 @@ gtk_ruler_real_draw_ticks (GtkRuler *ruler)
 
                       gtk_paint_layout (widget->style,
                                         ruler->backing_store,
-                                        GTK_WIDGET_STATE (widget),
+                                        gtk_widget_get_state (widget),
                                         FALSE,
                                         NULL,
                                         widget,
@@ -833,7 +834,7 @@ gtk_ruler_real_draw_pos (GtkRuler *ruler)
   gint ythickness;
   gdouble increment;
 
-  if (GTK_WIDGET_DRAWABLE (ruler))
+  if (gtk_widget_is_drawable (widget))
     {
       xthickness = widget->style->xthickness;
       ythickness = widget->style->ythickness;

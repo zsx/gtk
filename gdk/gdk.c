@@ -338,9 +338,10 @@ gdk_display_open_default_libgtk_only (void)
   return display;
 }
 
-/*
- *--------------------------------------------------------------
- * gdk_init_check
+/**
+ * gdk_init_check:
+ * @argc: (inout):
+ * @argv: (array length=argc) (inout):
  *
  *   Initialize the library for use.
  *
@@ -359,7 +360,6 @@ gdk_display_open_default_libgtk_only (void)
  *
  *--------------------------------------------------------------
  */
-
 gboolean
 gdk_init_check (int    *argc,
 		char ***argv)
@@ -369,6 +369,12 @@ gdk_init_check (int    *argc,
   return gdk_display_open_default_libgtk_only () != NULL;
 }
 
+
+/**
+ * gdk_init:
+ * @argc: (inout):
+ * @argv: (array length=argc) (inout):
+ */
 void
 gdk_init (int *argc, char ***argv)
 {
@@ -528,7 +534,7 @@ gdk_threads_dispatch_free (gpointer data)
  *            range btweeen #G_PRIORITY_DEFAULT_IDLE and #G_PRIORITY_HIGH_IDLE
  * @function: function to call
  * @data:     data to pass to @function
- * @notify:   function to call when the idle is removed, or %NULL
+ * @notify: (allow-none):   function to call when the idle is removed, or %NULL
  *
  * Adds a function to be called whenever there are no higher priority
  * events pending.  If the function returns %FALSE it is automatically
@@ -628,7 +634,7 @@ gdk_threads_add_idle (GSourceFunc    function,
  *             (1/1000ths of a second)
  * @function: function to call
  * @data:     data to pass to @function
- * @notify:   function to call when the timeout is removed, or %NULL
+ * @notify: (allow-none):   function to call when the timeout is removed, or %NULL
  *
  * Sets a function to be called at regular intervals holding the GDK lock,
  * with the given priority.  The function is called repeatedly until it 
@@ -734,7 +740,7 @@ gdk_threads_add_timeout (guint       interval,
  * @interval: the time between calls to the function, in seconds
  * @function: function to call
  * @data:     data to pass to @function
- * @notify:   function to call when the timeout is removed, or %NULL
+ * @notify: (allow-none):   function to call when the timeout is removed, or %NULL
  *
  * A variant of gdk_threads_add_timout_full() with second-granularity.
  * See g_timeout_add_seconds_full() for a discussion of why it is

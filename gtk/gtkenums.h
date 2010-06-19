@@ -94,6 +94,7 @@ typedef enum
   GTK_BUTTONBOX_CENTER
 } GtkButtonBoxStyle;
 
+#ifndef GTK_DISABLE_DEPRECATED
 /* Curve types */
 typedef enum
 {
@@ -101,6 +102,7 @@ typedef enum
   GTK_CURVE_TYPE_SPLINE,       /* spline interpolation */
   GTK_CURVE_TYPE_FREE          /* free form curve */
 } GtkCurveType;
+#endif
 
 typedef enum
 {
@@ -228,7 +230,7 @@ typedef enum
   GTK_MOVEMENT_VISUAL_POSITIONS,  /* move by left/right graphemes */
   GTK_MOVEMENT_WORDS,             /* move by forward/back words */
   GTK_MOVEMENT_DISPLAY_LINES,     /* move up/down lines (wrapped lines) */
-  GTK_MOVEMENT_DISPLAY_LINE_ENDS, /* move up/down lines (wrapped lines) */
+  GTK_MOVEMENT_DISPLAY_LINE_ENDS, /* move to either end of a line */
   GTK_MOVEMENT_PARAGRAPHS,        /* move up/down paragraphs (newline-ended lines) */
   GTK_MOVEMENT_PARAGRAPH_ENDS,    /* move to either end of a paragraph */
   GTK_MOVEMENT_PAGES,	          /* move by pages */

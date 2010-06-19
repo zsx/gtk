@@ -403,6 +403,17 @@ struct _GtkStyleClass
 				 gint			 y,
 				 gint			 width,
 				 gint			 height);
+  void (*draw_spinner)          (GtkStyle		*style,
+				 GdkWindow		*window,
+				 GtkStateType		 state_type,
+				 GdkRectangle		*area,
+				 GtkWidget		*widget,
+				 const gchar		*detail,
+				 guint                   step,
+				 gint			 x,
+				 gint			 y,
+				 gint			 width,
+				 gint			 height);
 
   /* Padding for future expansion */
   void (*_gtk_reserved1)  (void);
@@ -416,7 +427,6 @@ struct _GtkStyleClass
   void (*_gtk_reserved9)  (void);
   void (*_gtk_reserved10) (void);
   void (*_gtk_reserved11) (void);
-  void (*_gtk_reserved12) (void);
 };
 
 struct _GtkBorder
@@ -856,7 +866,17 @@ void gtk_paint_resize_grip (GtkStyle           *style,
                             gint                y,
                             gint                width,
                             gint                height);
-
+void gtk_paint_spinner     (GtkStyle           *style,
+			    GdkWindow          *window,
+			    GtkStateType        state_type,
+                            const GdkRectangle *area,
+                            GtkWidget          *widget,
+                            const gchar        *detail,
+			    guint               step,
+			    gint                x,
+			    gint                y,
+			    gint                width,
+			    gint                height);
 
 GType      gtk_border_get_type (void) G_GNUC_CONST;
 GtkBorder *gtk_border_new      (void) G_GNUC_MALLOC;

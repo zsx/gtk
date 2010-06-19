@@ -191,11 +191,11 @@ gtk_paper_size_new_from_info (const PaperInfo *info)
 
 /**
  * gtk_paper_size_new:
- * @name: a paper size name, or %NULL
- * 
- * Creates a new #GtkPaperSize object by parsing a 
+ * @name: (allow-none): a paper size name, or %NULL
+ *
+ * Creates a new #GtkPaperSize object by parsing a
  * <ulink url="ftp://ftp.pwg.org/pub/pwg/candidates/cs-pwgmsn10-20020226-5101.1.pdf">PWG 5101.1-2002</ulink>
- * paper name. 
+ * paper name.
  *
  * If @name is %NULL, the default paper size is returned,
  * see gtk_paper_size_get_default().
@@ -443,8 +443,8 @@ GList * _gtk_load_custom_papers (void);
  *     as defined in the page setup dialog
  *
  * Creates a list of known paper sizes.
- * 
- * Return value: a newly allocated list of newly 
+ *
+ * Return value:  (element-type GtkPaperSize) (transfer full): a newly allocated list of newly
  *    allocated #GtkPaperSize objects
  *
  * Since: 2.12
@@ -669,10 +669,11 @@ gtk_paper_size_get_default (void)
   if (!locale)
     return GTK_PAPER_NAME_A4;
 
-  if (g_str_has_prefix (locale, "en_CA") ||
-      g_str_has_prefix (locale, "en_US") ||
-      g_str_has_prefix (locale, "es_PR") ||
-      g_str_has_prefix (locale, "es_US"))
+  /* CLDR 1.8.1
+   * http://unicode.org/repos/cldr-tmp/trunk/diff/supplemental/territory_language_information.html
+   */
+  if (g_regex_match_simple("[^_.@]{2,3}_(BZ|CA|CL|CO|CR|GT|MX|NI|PA|PH|PR|SV|US|VE)",
+                           locale, G_REGEX_ANCHORED, G_REGEX_MATCH_ANCHORED))
     paper_size = GTK_PAPER_NAME_LETTER;
   else
     paper_size = GTK_PAPER_NAME_A4;
@@ -792,7 +793,7 @@ gtk_paper_size_get_default_right_margin (GtkPaperSize *size,
  * @key_file: the #GKeyFile to retrieve the papersize from
  * @group_name: the name ofthe group in the key file to read,
  *     or %NULL to read the first group
- * @error: return location for an error, or %NULL
+ * @error: (allow-none): return location for an error, or %NULL
  *
  * Reads a paper size from the group @group_name in the key file
  * @key_file. 

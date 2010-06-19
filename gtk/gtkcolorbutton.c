@@ -319,7 +319,7 @@ render (GtkColorButton *color_button)
       
     for (i = 0; i < width; i++) 
       {
-        if (!GTK_WIDGET_IS_SENSITIVE (GTK_WIDGET (color_button)) && (i+j)%2) 
+        if (!gtk_widget_is_sensitive (GTK_WIDGET (color_button)) && (i+j)%2)
           {
             *(pixels + j * rowstride + i * 3) = insensitive_r;
             *(pixels + j * rowstride + i * 3 + 1) = insensitive_g;
@@ -403,7 +403,7 @@ gtk_color_button_style_set (GtkWidget *widget,
 
   GTK_WIDGET_CLASS (gtk_color_button_parent_class)->style_set (widget, previous_style);
 
-  if (GTK_WIDGET_REALIZED (widget)) 
+  if (gtk_widget_get_realized (widget))
     {
       if (color_button->priv->pixbuf != NULL)
 	g_object_unref (color_button->priv->pixbuf);
@@ -713,7 +713,7 @@ gtk_color_button_clicked (GtkButton *button)
       
       color_dialog = GTK_COLOR_SELECTION_DIALOG (color_button->priv->cs_dialog);
 
-      if (GTK_WIDGET_TOPLEVEL (parent) && GTK_IS_WINDOW (parent))
+      if (gtk_widget_is_toplevel (parent) && GTK_IS_WINDOW (parent))
         {
           if (GTK_WINDOW (parent) != gtk_window_get_transient_for (GTK_WINDOW (color_dialog)))
  	    gtk_window_set_transient_for (GTK_WINDOW (color_dialog), GTK_WINDOW (parent));

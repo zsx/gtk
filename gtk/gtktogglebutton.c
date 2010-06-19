@@ -310,7 +310,7 @@ gtk_toggle_button_set_mode (GtkToggleButton *toggle_button,
       toggle_button->draw_indicator = draw_indicator;
       GTK_BUTTON (toggle_button)->depress_on_activate = !draw_indicator;
       
-      if (GTK_WIDGET_VISIBLE (toggle_button))
+      if (gtk_widget_get_visible (GTK_WIDGET (toggle_button)))
 	gtk_widget_queue_resize (GTK_WIDGET (toggle_button));
 
       g_object_notify (G_OBJECT (toggle_button), "draw-indicator");
@@ -419,14 +419,14 @@ static gint
 gtk_toggle_button_expose (GtkWidget      *widget,
 			  GdkEventExpose *event)
 {
-  if (GTK_WIDGET_DRAWABLE (widget))
+  if (gtk_widget_is_drawable (widget))
     {
       GtkWidget *child = GTK_BIN (widget)->child;
       GtkButton *button = GTK_BUTTON (widget);
       GtkStateType state_type;
       GtkShadowType shadow_type;
 
-      state_type = GTK_WIDGET_STATE (widget);
+      state_type = gtk_widget_get_state (widget);
       
       if (GTK_TOGGLE_BUTTON (widget)->inconsistent)
         {
@@ -456,7 +456,7 @@ gtk_toggle_button_mnemonic_activate (GtkWidget *widget,
    * gtk_widget_real_mnemonic_activate() in order to focus the widget even
    * if there is no mnemonic conflict.
    */
-  if (GTK_WIDGET_CAN_FOCUS (widget))
+  if (gtk_widget_get_can_focus (widget))
     gtk_widget_grab_focus (widget);
 
   if (!group_cycling)

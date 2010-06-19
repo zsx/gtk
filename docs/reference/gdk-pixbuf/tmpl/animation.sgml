@@ -23,6 +23,9 @@ Animated images.
 <!-- ##### SECTION Stability_Level ##### -->
 
 
+<!-- ##### SECTION Image ##### -->
+
+
 <!-- ##### STRUCT GdkPixbufAnimation ##### -->
 <para>
 An opaque struct representing an animation.
@@ -151,6 +154,11 @@ certain position in an animation.
 An opaque struct representing a simple animation.
 </para>
 
+
+<!-- ##### ARG GdkPixbufSimpleAnim:loop ##### -->
+<para>
+
+</para>
 
 <!-- ##### FUNCTION gdk_pixbuf_simple_anim_new ##### -->
 <para>

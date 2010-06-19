@@ -390,15 +390,21 @@ _gtk_key_hash_lookup (GtkKeyHash      *key_hash,
   guint keyval;
   gint effective_group;
   gint level;
+  GdkModifierType modifiers;
   GdkModifierType consumed_modifiers;
+  const GdkModifierType xmods = GDK_MOD2_MASK|GDK_MOD3_MASK|GDK_MOD4_MASK|GDK_MOD5_MASK;
+  const GdkModifierType vmods = GDK_SUPER_MASK|GDK_HYPER_MASK|GDK_META_MASK;
 
   /* We don't want Caps_Lock to affect keybinding lookups.
    */
   state &= ~GDK_LOCK_MASK;
-  
+
+  gdk_keymap_map_virtual_modifiers (key_hash->keymap, &mask);
+
   gdk_keymap_translate_keyboard_state (key_hash->keymap,
 				       hardware_keycode, state, group,
 				       &keyval, &effective_group, &level, &consumed_modifiers);
+  gdk_keymap_add_virtual_modifiers (key_hash->keymap, &state);
 
   GTK_NOTE (KEYBINDINGS,
 	    g_message ("Looking up keycode = %u, modifiers = 0x%04x,\n"
@@ -411,17 +417,19 @@ _gtk_key_hash_lookup (GtkKeyHash      *key_hash,
       while (tmp_list)
 	{
 	  GtkKeyHashEntry *entry = tmp_list->data;
-	  GdkModifierType xmods, vmods;
-	  
-	  /* If the virtual super, hyper or meta modifiers are present, 
-	   * they will also be mapped to some of the mod2 - mod5 modifiers, 
-	   * so we compare them twice, ignoring either set.
-	   */
-	  xmods = GDK_MOD2_MASK|GDK_MOD3_MASK|GDK_MOD4_MASK|GDK_MOD5_MASK;
-	  vmods = GDK_SUPER_MASK|GDK_HYPER_MASK|GDK_META_MASK;
 
-	  if ((entry->modifiers & ~consumed_modifiers & mask) == (state & ~consumed_modifiers & mask & ~vmods) ||
-	      (entry->modifiers & ~consumed_modifiers & mask) == (state & ~consumed_modifiers & mask & ~xmods))
+	  /* If the virtual Super, Hyper or Meta modifiers are present,
+	   * they will also be mapped to some of the Mod2 - Mod5 modifiers,
+	   * so we compare them twice, ignoring either set.
+	   * We accept combinations involving virtual modifiers only if they
+	   * are mapped to separate modifiers; i.e. if Super and Hyper are
+	   * both mapped to Mod4, then pressing a key that is mapped to Mod4
+	   * will not match a Super+Hyper entry.
+	   */
+          modifiers = entry->modifiers;
+          if (gdk_keymap_map_virtual_modifiers (key_hash->keymap, &modifiers) &&
+	      ((modifiers & ~consumed_modifiers & mask & ~vmods) == (state & ~consumed_modifiers & mask & ~vmods) ||
+	       (modifiers & ~consumed_modifiers & mask & ~xmods) == (state & ~consumed_modifiers & mask & ~xmods)))
 	    {
 	      gint i;
 
@@ -468,7 +476,7 @@ _gtk_key_hash_lookup (GtkKeyHash      *key_hash,
        * define these keyvals; if yes, discard results because a widget up in 
        * the stack may have an exact match and we don't want to 'steal' it.
        */
-      gint oldkeyval;
+      guint oldkeyval = 0;
       GtkKeyHashEntry *keyhashentry;
 
       results = sort_lookup_results_by_keyval (results);

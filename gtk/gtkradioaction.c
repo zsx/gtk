@@ -183,8 +183,8 @@ gtk_radio_action_init (GtkRadioAction *action)
 /**
  * gtk_radio_action_new:
  * @name: A unique name for the action
- * @label: The label displayed in menu items and on buttons, or %NULL
- * @tooltip: A tooltip for this action, or %NULL
+ * @label: (allow-none): The label displayed in menu items and on buttons, or %NULL
+ * @tooltip: (allow-none): A tooltip for this action, or %NULL
  * @stock_id: The stock icon to display in widgets representing this
  *   action, or %NULL
  * @value: The value which gtk_radio_action_get_current_value() should
@@ -395,7 +395,7 @@ create_menu_item (GtkAction *action)
  *     }
  * ]|
  *
- * Returns: the list representing the radio group for this object
+ * Returns:  (element-type GtkAction) (transfer none): the list representing the radio group for this object
  *
  * Since: 2.4
  */

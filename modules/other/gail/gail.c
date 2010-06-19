@@ -263,7 +263,7 @@ gail_focus_watcher (GSignalInvocationHint *ihint,
 		    {
 		      GtkWidget *child = gtk_bin_get_child (GTK_BIN (widget));
 
-		      if (GTK_IS_WIDGET (child) && GTK_WIDGET_HAS_GRAB (child))
+		      if (GTK_IS_WIDGET (child) && gtk_widget_has_grab (child))
 			{
 			  if (GTK_IS_MENU_SHELL (child))
 			    {
@@ -307,7 +307,7 @@ gail_focus_watcher (GSignalInvocationHint *ihint,
     }
   else
     {
-      if (event->type == GDK_MOTION_NOTIFY && GTK_WIDGET_HAS_FOCUS (widget))
+      if (event->type == GDK_MOTION_NOTIFY && gtk_widget_has_focus (widget))
         {
           if (widget == focus_widget)
             {
@@ -348,7 +348,7 @@ gail_select_watcher (GSignalInvocationHint *ihint,
 
   widget = GTK_WIDGET (object);
 
-  if (!GTK_WIDGET_MAPPED (widget))
+  if (!gtk_widget_get_mapped (widget))
     {
       g_signal_connect (widget, "map",
                         G_CALLBACK (gail_map_cb),
@@ -369,7 +369,7 @@ gail_finish_select (GtkWidget *widget)
 
       menu_item = GTK_MENU_ITEM (widget);
       if (menu_item->submenu &&
-          !GTK_WIDGET_MAPPED (menu_item->submenu))
+          !gtk_widget_get_mapped (menu_item->submenu))
         {
           /*
            * If the submenu is not visble, wait until it is before

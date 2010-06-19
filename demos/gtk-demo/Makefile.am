@@ -37,9 +37,11 @@ demos =						\
 	rotated_text.c				\
 	search_entry.c				\
 	sizegroup.c				\
+	spinner.c				\
 	stock_browser.c				\
 	textview.c				\
 	textscroll.c				\
+	toolpalette.c				\
 	tree_store.c				\
 	ui_manager.c
 
@@ -60,7 +62,8 @@ DEPS = \
 LDADDS = \
 	$(top_builddir)/gdk-pixbuf/libgdk_pixbuf-$(GTK_API_VERSION).la	\
 	$(top_builddir)/gdk/$(gdktargetlib)        			\
-	$(top_builddir)/gtk/$(gtktargetlib)
+	$(top_builddir)/gtk/$(gtktargetlib)				\
+	$(GTK_DEP_LIBS)
 
 bin_PROGRAMS = gtk-demo
 

@@ -275,8 +275,8 @@ gtk_icon_theme_new (void)
  * 
  * Gets the icon theme for the default screen. See
  * gtk_icon_theme_get_for_screen().
- * 
- * Return value: A unique #GtkIconTheme associated with
+ *
+ * Return value: (transfer none): A unique #GtkIconTheme associated with
  *  the default screen. This icon theme is associated with
  *  the screen and can be used as long as the screen
  *  is open. Do not ref or unref it.
@@ -301,8 +301,8 @@ gtk_icon_theme_get_default (void)
  * is usually a better choice than calling than gtk_icon_theme_new()
  * and setting the screen yourself; by using this function
  * a single icon theme object will be shared between users.
- * 
- * Return value: A unique #GtkIconTheme associated with
+ *
+ * Return value: (transfer none): A unique #GtkIconTheme associated with
  *  the given screen. This icon theme is associated with
  *  the screen and can be used as long as the screen
  *  is open. Do not ref or unref it.
@@ -744,7 +744,7 @@ gtk_icon_theme_set_search_path (GtkIconTheme *icon_theme,
 /**
  * gtk_icon_theme_get_search_path:
  * @icon_theme: a #GtkIconTheme
- * @path: location to store a list of icon theme path directories or %NULL
+ * @path: (allow-none): (array length=n_elements) (out): location to store a list of icon theme path directories or %NULL
  *        The stored value should be freed with g_strfreev().
  * @n_elements: location to store number of elements
  *              in @path, or %NULL
@@ -1497,7 +1497,7 @@ gtk_icon_theme_error_quark (void)
  * @size: the desired icon size. The resulting icon may not be
  *        exactly this size; see gtk_icon_info_load_icon().
  * @flags: flags modifying the behavior of the icon lookup
- * @error: Location to store error information on failure, or %NULL.
+ * @error: (allow-none): Location to store error information on failure, or %NULL.
  * 
  * Looks up an icon in an icon theme, scales it to the given size
  * and renders it into a pixbuf. This is a convenience function;
@@ -1738,8 +1738,8 @@ add_key_to_list (gpointer  key,
  * The set of values for the context string is system dependent,
  * but will typically include such values as "Applications" and
  * "MimeTypes".
- * 
- * Return value: a #GList list holding the names of all the
+ *
+ * Return value: (element-type utf8) (transfer none): a #GList list holding the names of all the
  *  icons in the theme. You must first free each element
  *  in the list with g_free(), then free the list itself
  *  with g_list_free().
@@ -1801,7 +1801,7 @@ gtk_icon_theme_list_icons (GtkIconTheme *icon_theme,
  * Gets the list of contexts available within the current
  * hierarchy of icon themes
  *
- * Return value: a #GList list holding the names of all the
+ * Return value: (element-type utf8) (transfer full): a #GList list holding the names of all the
  *  contexts in the theme. You must first free each element
  *  in the list with g_free(), then free the list itself
  *  with g_list_free().
@@ -2749,8 +2749,8 @@ gtk_icon_info_get_filename (GtkIconInfo *icon_info)
  * GTK+ to use built in icon images, you must pass the
  * %GTK_ICON_LOOKUP_USE_BUILTIN to
  * gtk_icon_theme_lookup_icon().
- * 
- * Return value: the built-in image pixbuf, or %NULL. No
+ *
+ * Return value: (transfer none): the built-in image pixbuf, or %NULL. No
  *  extra reference is added to the returned pixbuf, so if
  *  you want to keep it around, you must use g_object_ref().
  *  The returned image must not be modified.
@@ -3035,7 +3035,7 @@ icon_info_ensure_scale_and_pixbuf (GtkIconInfo  *icon_info,
 /**
  * gtk_icon_info_load_icon:
  * @icon_info: a #GtkIconInfo structure from gtk_icon_theme_lookup_icon()
- * @error: location to store error information on failure, or %NULL.
+ * @error: (allow-none): location to store error information on failure, or %NULL.
  * 
  * Renders an icon previously looked up in an icon theme using
  * gtk_icon_theme_lookup_icon(); the size will be based on the size
@@ -3192,9 +3192,9 @@ gtk_icon_info_get_embedded_rect (GtkIconInfo  *icon_info,
 /**
  * gtk_icon_info_get_attach_points:
  * @icon_info: a #GtkIconInfo
- * @points: location to store pointer to an array of points, or %NULL
+ * @points: (allow-none): (array length=n_points) (out): location to store pointer to an array of points, or %NULL
  *          free the array of points with g_free().
- * @n_points: location to store the number of points in @points, or %NULL
+ * @n_points: (allow-none): location to store the number of points in @points, or %NULL
  * 
  * Fetches the set of attach points for an icon. An attach point
  * is a location in the icon that can be used as anchor points for attaching

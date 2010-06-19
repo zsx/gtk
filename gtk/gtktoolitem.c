@@ -308,7 +308,7 @@ gtk_tool_item_class_init (GtkToolItemClass *klass)
 static void
 gtk_tool_item_init (GtkToolItem *toolitem)
 {
-  GTK_WIDGET_UNSET_FLAGS (toolitem, GTK_CAN_FOCUS);  
+  gtk_widget_set_can_focus (GTK_WIDGET (toolitem), FALSE);
 
   toolitem->priv = GTK_TOOL_ITEM_GET_PRIVATE (toolitem);
 
@@ -425,7 +425,7 @@ gtk_tool_item_property_notify (GObject    *object,
 
   if (tool_item->priv->menu_item && strcmp (pspec->name, "sensitive") == 0)
     gtk_widget_set_sensitive (tool_item->priv->menu_item,
-			      GTK_WIDGET_SENSITIVE (tool_item));
+			      gtk_widget_get_sensitive (GTK_WIDGET (tool_item)));
 }
 
 static void
@@ -462,7 +462,7 @@ gtk_tool_item_realize (GtkWidget *widget)
   GtkToolItem *toolitem;
 
   toolitem = GTK_TOOL_ITEM (widget);
-  GTK_WIDGET_SET_FLAGS (widget, GTK_REALIZED);
+  gtk_widget_set_realized (widget, TRUE);
 
   widget->window = gtk_widget_get_parent_window (widget);
   g_object_ref (widget->window);
@@ -524,7 +524,7 @@ gtk_tool_item_size_request (GtkWidget      *widget,
 {
   GtkWidget *child = GTK_BIN (widget)->child;
 
-  if (child && GTK_WIDGET_VISIBLE (child))
+  if (child && gtk_widget_get_visible (child))
     {
       gtk_widget_size_request (child, requisition);
     }
@@ -557,7 +557,7 @@ gtk_tool_item_size_allocate (GtkWidget     *widget,
                             widget->allocation.width - border_width * 2,
                             widget->allocation.height - border_width * 2);
   
-  if (child && GTK_WIDGET_VISIBLE (child))
+  if (child && gtk_widget_get_visible (child))
     {
       child_allocation.x = allocation->x + border_width;
       child_allocation.y = allocation->y + border_width;
@@ -704,6 +704,33 @@ gtk_tool_item_new (void)
 }
 
 /**
+ * gtk_tool_item_get_ellipsize_mode:
+ * @tool_item: a #GtkToolItem
+ *
+ * Returns the ellipsize mode used for @tool_item. Custom subclasses of
+ * #GtkToolItem should call this function to find out how text should
+ * be ellipsized.
+ *
+ * Return value: a #PangoEllipsizeMode indicating how text in @tool_item
+ * should be ellipsized.
+ *
+ * Since: 2.20
+ **/
+PangoEllipsizeMode
+gtk_tool_item_get_ellipsize_mode (GtkToolItem *tool_item)
+{
+  GtkWidget *parent;
+  
+  g_return_val_if_fail (GTK_IS_TOOL_ITEM (tool_item), GTK_ORIENTATION_HORIZONTAL);
+
+  parent = GTK_WIDGET (tool_item)->parent;
+  if (!parent || !GTK_IS_TOOL_SHELL (parent))
+    return PANGO_ELLIPSIZE_NONE;
+
+  return gtk_tool_shell_get_ellipsize_mode (GTK_TOOL_SHELL (parent));
+}
+
+/**
  * gtk_tool_item_get_icon_size:
  * @tool_item: a #GtkToolItem
  * 
@@ -711,7 +738,8 @@ gtk_tool_item_new (void)
  * #GtkToolItem should call this function to find out what size icons
  * they should use.
  * 
- * Return value: a #GtkIconSize indicating the icon size used for @tool_item
+ * Return value: (type int): a #GtkIconSize indicating the icon size
+ * used for @tool_item
  * 
  * Since: 2.4
  **/
@@ -828,17 +856,96 @@ gtk_tool_item_get_relief_style (GtkToolItem *tool_item)
 }
 
 /**
- * gtk_tool_item_set_expand:
- * @tool_item: a #GtkToolItem 
- * @expand: Whether @tool_item is allocated extra space
+ * gtk_tool_item_get_text_alignment:
+ * @tool_item: a #GtkToolItem: 
  * 
+ * Returns the text alignment used for @tool_item. Custom subclasses of
+ * #GtkToolItem should call this function to find out how text should
+ * be aligned.
+ * 
+ * Return value: a #gfloat indicating the horizontal text alignment
+ * used for @tool_item
+ * 
+ * Since: 2.20
+ **/
+gfloat
+gtk_tool_item_get_text_alignment (GtkToolItem *tool_item)
+{
+  GtkWidget *parent;
+  
+  g_return_val_if_fail (GTK_IS_TOOL_ITEM (tool_item), GTK_ORIENTATION_HORIZONTAL);
+
+  parent = GTK_WIDGET (tool_item)->parent;
+  if (!parent || !GTK_IS_TOOL_SHELL (parent))
+    return 0.5;
+
+  return gtk_tool_shell_get_text_alignment (GTK_TOOL_SHELL (parent));
+}
+
+/**
+ * gtk_tool_item_get_text_orientation:
+ * @tool_item: a #GtkToolItem
+ *
+ * Returns the text orientation used for @tool_item. Custom subclasses of
+ * #GtkToolItem should call this function to find out how text should
+ * be orientated.
+ *
+ * Return value: a #GtkOrientation indicating the text orientation
+ * used for @tool_item
+ *
+ * Since: 2.20
+ */
+GtkOrientation
+gtk_tool_item_get_text_orientation (GtkToolItem *tool_item)
+{
+  GtkWidget *parent;
+  
+  g_return_val_if_fail (GTK_IS_TOOL_ITEM (tool_item), GTK_ORIENTATION_HORIZONTAL);
+
+  parent = GTK_WIDGET (tool_item)->parent;
+  if (!parent || !GTK_IS_TOOL_SHELL (parent))
+    return GTK_ORIENTATION_HORIZONTAL;
+
+  return gtk_tool_shell_get_text_orientation (GTK_TOOL_SHELL (parent));
+}
+
+/**
+ * gtk_tool_item_get_text_size_group:
+ * @tool_item: a #GtkToolItem
+ *
+ * Returns the size group used for labels in @tool_item. Custom subclasses of
+ * #GtkToolItem should call this function and use the size group for labels.
+ *
+ * Return value: a #GtkSizeGroup
+ *
+ * Since: 2.20
+ */
+GtkSizeGroup *
+gtk_tool_item_get_text_size_group (GtkToolItem *tool_item)
+{
+  GtkWidget *parent;
+  
+  g_return_val_if_fail (GTK_IS_TOOL_ITEM (tool_item), NULL);
+
+  parent = GTK_WIDGET (tool_item)->parent;
+  if (!parent || !GTK_IS_TOOL_SHELL (parent))
+    return NULL;
+
+  return gtk_tool_shell_get_text_size_group (GTK_TOOL_SHELL (parent));
+}
+
+/**
+ * gtk_tool_item_set_expand:
+ * @tool_item: a #GtkToolItem
+ * @expand: Whether @tool_item is allocated extra space
+ *
  * Sets whether @tool_item is allocated extra space when there
  * is more room on the toolbar then needed for the items. The
  * effect is that the item gets bigger when the toolbar gets bigger
  * and smaller when the toolbar gets smaller.
- * 
+ *
  * Since: 2.4
- **/
+ */
 void
 gtk_tool_item_set_expand (GtkToolItem *tool_item,
 			  gboolean     expand)
@@ -988,10 +1095,10 @@ gtk_tool_item_real_set_tooltip (GtkToolItem *tool_item,
 
 /**
  * gtk_tool_item_set_tooltip:
- * @tool_item: a #GtkToolItem 
+ * @tool_item: a #GtkToolItem
  * @tooltips: The #GtkTooltips object to be used
- * @tip_text: text to be used as tooltip text for @tool_item
- * @tip_private: text to be used as private tooltip text
+ * @tip_text: (allow-none): text to be used as tooltip text for @tool_item
+ * @tip_private: (allow-none): text to be used as private tooltip text
  *
  * Sets the #GtkTooltips object to be used for @tool_item, the
  * text to be displayed as tooltip on the item and the private text
@@ -1089,10 +1196,11 @@ gtk_tool_item_set_use_drag_window (GtkToolItem *toolitem,
       
       if (use_drag_window)
 	{
-	  if (!toolitem->priv->drag_window && GTK_WIDGET_REALIZED (toolitem))
+	  if (!toolitem->priv->drag_window &&
+              gtk_widget_get_realized (GTK_WIDGET (toolitem)))
 	    {
 	      create_drag_window(toolitem);
-	      if (GTK_WIDGET_MAPPED (toolitem))
+	      if (gtk_widget_get_mapped (GTK_WIDGET (toolitem)))
 		gdk_window_show (toolitem->priv->drag_window);
 	    }
 	}
@@ -1226,10 +1334,10 @@ gtk_tool_item_get_visible_vertical (GtkToolItem *toolitem)
  * Returns the #GtkMenuItem that was last set by
  * gtk_tool_item_set_proxy_menu_item(), ie. the #GtkMenuItem
  * that is going to appear in the overflow menu.
- * 
- * Return value: The #GtkMenuItem that is going to appear in the
+ *
+ * Return value: (transfer none): The #GtkMenuItem that is going to appear in the
  * overflow menu for @tool_item.
- * 
+ *
  * Since: 2.4
  **/
 GtkWidget *
@@ -1277,20 +1385,19 @@ gtk_tool_item_get_proxy_menu_item (GtkToolItem *tool_item,
 }
 
 /**
- * gtk_tool_item_rebuild_menu()
+ * gtk_tool_item_rebuild_menu:
  * @tool_item: a #GtkToolItem
- * 
+ *
  * Calling this function signals to the toolbar that the
  * overflow menu item for @tool_item has changed. If the
  * overflow menu is visible when this function it called,
  * the menu will be rebuilt.
  *
- * The function must be called when the tool item
- * changes what it will do in response to the "create_menu_proxy"
- * signal.
- * 
+ * The function must be called when the tool item changes what it
+ * will do in response to the #GtkToolItem::create-menu-proxy signal.
+ *
  * Since: 2.6
- **/
+ */
 void
 gtk_tool_item_rebuild_menu (GtkToolItem *tool_item)
 {
@@ -1339,7 +1446,7 @@ gtk_tool_item_set_proxy_menu_item (GtkToolItem *tool_item,
 	  g_object_ref_sink (menu_item);
 
 	  gtk_widget_set_sensitive (menu_item,
-				    GTK_WIDGET_SENSITIVE (tool_item));
+				    gtk_widget_get_sensitive (GTK_WIDGET (tool_item)));
 	}
       
       tool_item->priv->menu_item = menu_item;

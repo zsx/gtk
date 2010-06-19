@@ -163,6 +163,7 @@ NC_("paper size", "prc5 Envelope")
 NC_("paper size", "prc6 Envelope")
 NC_("paper size", "prc7 Envelope")
 NC_("paper size", "prc8 Envelope")
+NC_("paper size", "prc9 Envelope")
 NC_("paper size", "ROC 16k")
 NC_("paper size", "ROC 8k")
 #endif
@@ -517,6 +518,9 @@ static const char paper_names[] =
   "prc_8\0"
   "prc8 Envelope\0"
   "EnvPRC8\0"
+  "prc_9\0"
+  "prc9 Envelope\0"
+  "EnvPRC9\0"
   "roc_16k\0"
   "ROC 16k\0"
   "roc_8k\0"
@@ -691,11 +695,12 @@ static const PaperInfo standard_names_offsets[] = {
   { 2959, 97, 151, 2967, 2975 },
   { 2982, 110, 208, 2988, 3002 },
   { 3010, 110, 220, 3016, 3030 },
-  { 3038, 120, 320, 3044, 3058 },
+  { 3038, 120, 230, 3044, 3058 },
   { 3066, 160, 230, 3072, 3086 },
   { 3094, 120, 309, 3100, 3114 },
-  { 3122, 196.85, 273.05, 3130,   -1 },
-  { 3138, 273.05, 393.7, 3145,   -1 },
+  { 3122, 229, 324, 3128, 3142 },
+  { 3150, 196.85, 273.05, 3158,   -1 },
+  { 3166, 273.05, 393.7, 3173,   -1 },
 };
 
 static const struct {
@@ -705,7 +710,7 @@ static const struct {
   {  634,  743 },
   {  766,  756 },
   {  779,  769 },
-  { 3152, 2309 },
+  { 3180, 2309 },
   {  880,  858 },
   { 2301, 2270 },
 };
