@@ -23,6 +23,7 @@ env_demos.Command('test-inline-pixbufs.h', ['$PREFIX/bin/gdk-pixbuf-csource.exe'
 
 tests = (('testpixbuf', ['testpixbuf.c', 'pixbuf-init.obj']),
          ('testpixbuf_drawable', ['testpixbuf-drawable.c', 'pixbuf-init.obj']),
+         ('testpixbuf_color', ['testpixbuf-color.c']),
          ('testpixbuf_save', ['testpixbuf-save.c']),
          ('testpixbuf_scale', ['testpixbuf-scale.c', 'pixbuf-init.obj']),
          ('testanimation', ['testanimation.c', 'pixbuf-init.obj']),

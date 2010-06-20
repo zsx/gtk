@@ -12,7 +12,7 @@ env_gdk_pixbuf['CPPDEFINES']=['HAVE_CONFIG_H',
                               'INCLUDE_bmp',
                               'INCLUDE_gif',
                               'INCLUDE_ico',
-                              'INCLUDE_gdip_png',
+                              #'INCLUDE_gdip_png',
                               'INCLUDE_png',
                               'INCLUDE_xpm',
                               'INCLUDE_wbmp',
@@ -22,6 +22,7 @@ env_gdk_pixbuf['CPPDEFINES']=['HAVE_CONFIG_H',
                               'INCLUDE_icns',
                               'INCLUDE_pcx',
                               'INCLUDE_ras',
+                              'INCLUDE_qtif',
                               #'INCLUDE_jasper', #no jasper.h
                               ] + env_gdk_pixbuf['DEBUG_CPPDEFINES']
 env_gdk_pixbuf.Append(CPPPATH=['#', '#gdk-pixbuf'])
@@ -43,7 +44,8 @@ loaders = [('png', ['io-png.c']),
            ('tga', ['io-tga.c']),
            ('icns', ['io-icns.c']),
            ('pcx', ['io-pcx.c']),
-           #('jasper', ['io-jasper.c'])
+           #('jasper', ['io-jasper.c']),
+           ('qtif', ['io-qtif.c'])
            ]
 
 gdip_loaders = [('ico', ['io-gdip-utils.c', 'io-gdip-animation.c', 'io-gdip-ico.c']),
@@ -52,7 +54,6 @@ gdip_loaders = [('ico', ['io-gdip-utils.c', 'io-gdip-animation.c', 'io-gdip-ico.
                 ('bmp', ['io-gdip-bmp.c']),
                 ('gif', ['io-gdip-gif.c']),
                 ('jpeg', ['io-gdip-jpeg.c']),
-                ('png', ['io-gdip-png.c']),
                 ('tiff', ['io-gdip-tiff.c'])]
 '''
 env_loaders = env_gdk_pixbuf.Clone()
